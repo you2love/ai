@@ -1,0 +1,807 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #6366f1;
+    --secondary-color: #8b5cf6;
+    --accent-color: #06b6d4;
+    --text-color: #1e293b;
+    --bg-color: #0f172a;
+    --card-bg: #1e293b;
+    --border-color: #334155;
+    --gradient-primary: linear-gradient(135deg, #6366f1, #8b5cf6);
+    --gradient-secondary: linear-gradient(135deg, #06b6d4, #10b981);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background: var(--bg-color);
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 导航栏 */
+.navbar {
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 20px;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+.nav-links a {
+    color: #e2e8f0;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--gradient-primary);
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: var(--primary-color);
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+/* 英雄区域 */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: radial-gradient(circle at center, rgba(99, 102, 241, 0.15), transparent 70%);
+    padding-top: 80px;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInUp 1s ease;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    color: #94a3b8;
+    margin-bottom: 2rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    animation: fadeInUp 1.2s ease;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    animation: fadeInUp 1.4s ease;
+}
+
+.btn {
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: #e2e8f0;
+    border: 2px solid var(--primary-color);
+}
+
+.btn-secondary:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* 通用部分样式 */
+.section {
+    padding: 5rem 0;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 3rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* 核心技术卡片 */
+.technologies {
+    background: linear-gradient(180deg, transparent, rgba(15, 23, 42, 0.8), transparent);
+}
+
+.tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.tech-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.tech-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.tech-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2);
+    border-color: var(--primary-color);
+}
+
+.tech-card:hover::before {
+    opacity: 1;
+}
+
+.tech-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.tech-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #f1f5f9;
+}
+
+.tech-card p {
+    color: #94a3b8;
+    margin-bottom: 1rem;
+}
+
+.tech-features {
+    list-style: none;
+    padding-left: 0;
+}
+
+.tech-features li {
+    color: #cbd5e1;
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.tech-features li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* 学习路径 */
+.learning-path {
+    background: linear-gradient(180deg, transparent, rgba(6, 182, 212, 0.05), transparent);
+}
+
+.path-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.path-level {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+
+.path-level:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(6, 182, 212, 0.15);
+}
+
+.level-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.level-header h3 {
+    font-size: 1.5rem;
+    color: #f1f5f9;
+}
+
+.level-badge {
+    background: var(--gradient-secondary);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.path-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.topic-item h4 {
+    color: #e2e8f0;
+    margin-bottom: 0.25rem;
+}
+
+.topic-item p {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+/* 实战项目 */
+.projects {
+    background: linear-gradient(180deg, transparent, rgba(139, 92, 246, 0.05), transparent);
+}
+
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+.project-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    gap: 1.5rem;
+    transition: all 0.3s ease;
+    align-items: flex-start;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(139, 92, 246, 0.2);
+}
+
+.project-image {
+    font-size: 3rem;
+    flex-shrink: 0;
+}
+
+.project-info {
+    flex-grow: 1;
+}
+
+.project-info h3 {
+    font-size: 1.25rem;
+    color: #f1f5f9;
+    margin-bottom: 0.5rem;
+}
+
+.project-info p {
+    color: #94a3b8;
+    margin-bottom: 1rem;
+}
+
+.project-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.tag {
+    background: rgba(99, 102, 241, 0.2);
+    color: var(--primary-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* 技术趋势 */
+.trends {
+    background: linear-gradient(180deg, transparent, rgba(16, 185, 129, 0.05), transparent);
+}
+
+.trend-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.trend-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.trend-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.15);
+}
+
+.trend-number {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 3rem;
+    font-weight: 800;
+    color: rgba(16, 185, 129, 0.15);
+}
+
+.trend-item h3 {
+    font-size: 1.25rem;
+    color: #f1f5f9;
+    margin-bottom: 0.75rem;
+    padding-right: 3rem;
+}
+
+.trend-item p {
+    color: #94a3b8;
+}
+
+/* 页脚 */
+.footer {
+    background: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    padding: 3rem 0;
+    text-align: center;
+    margin-top: 5rem;
+}
+
+.footer p {
+    color: #94a3b8;
+    margin-bottom: 0.5rem;
+}
+
+.footer-note {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+/* 动画 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero p {
+        font-size: 1rem;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .tech-grid,
+    .project-grid,
+    .trend-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .project-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .container {
+        padding: 0 15px;
+    }
+
+    .tech-card,
+    .project-card,
+    .trend-item,
+    .path-level {
+        padding: 1.5rem;
+    }
+}
+
+/* 平滑滚动 */
+html {
+    scroll-behavior: smooth;
+}
+
+/* 卡片进入动画 */
+.tech-card,
+.project-card,
+.trend-item,
+.path-level {
+    animation: fadeInUp 0.6s ease;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-color);
+}
+
+/* Python代码示例样式 */
+.python-code {
+    background: linear-gradient(180deg, transparent, rgba(99, 102, 241, 0.05), transparent);
+}
+
+.section-subtitle {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    margin-bottom: 3rem;
+}
+
+.code-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.code-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.code-section:hover {
+    box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2);
+}
+
+.code-header {
+    background: rgba(99, 102, 241, 0.1);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.code-header h3 {
+    margin: 0;
+    color: #f1f5f9;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.code-header h3::before {
+    content: '📝';
+    font-size: 1.5rem;
+}
+
+.copy-btn {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.copy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+.copy-btn:active {
+    transform: translateY(0);
+}
+
+.code-block {
+    margin: 0;
+    padding: 2rem;
+    background: #0f172a;
+    overflow-x: auto;
+    font-family: 'Fira Code', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: #e2e8f0;
+    position: relative;
+    white-space: pre;
+    word-wrap: normal;
+}
+
+.code-block code {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    display: block;
+    white-space: pre;
+    overflow-x: auto;
+}
+
+.code-block::-webkit-scrollbar {
+    height: 8px;
+}
+
+.code-block::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
+.code-block::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+.code-block code {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    display: block;
+    white-space: pre;
+    overflow-x: auto;
+}
+
+/* 改进代码块的显示 */
+.code-block {
+    background: #1a1a2e;
+    border-left: 4px solid var(--primary-color);
+}
+
+/* 确保代码不会溢出 */
+.code-block code {
+    display: block;
+    white-space: pre;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 代码高亮颜色 */
+.language-python {
+    display: block;
+}
+
+/* 注释 */
+code .comment {
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* 关键字 */
+code .keyword {
+    color: #f472b6;
+    font-weight: bold;
+}
+
+/* 字符串 */
+code .string {
+    color: #34d399;
+}
+
+/* 数字 */
+code .number {
+    color: #fbbf24;
+}
+
+/* 函数名 */
+code .function {
+    color: #60a5fa;
+}
+
+/* 变量 */
+code .variable {
+    color: #f97316;
+}
+
+/* 运算符 */
+code .operator {
+    color: #f472b6;
+}
+
+/* 装饰器 */
+code .decorator {
+    color: #a78bfa;
+}
+
+/* 内置函数 */
+code .builtin {
+    color: #2dd4bf;
+}
+
+/* 属性 */
+code .attribute {
+    color: #fb923c;
+}
+
+/* 类名 */
+code .class {
+    color: #f472b6;
+    font-weight: bold;
+}
+
+/* 简单的语法高亮（CSS选择器模拟） */
+code:contains("#") {
+    color: #6b7280;
+}
+
+/* 代码行号 */
+.code-block::before {
+    counter-reset: line;
+}
+
+/* 代码复制成功提示 */
+.copy-btn.copied {
+    background: #10b981;
+}
+
+.copy-btn.copied::after {
+    content: ' ✓已复制';
+}
+
+/* 响应式代码块 */
+@media (max-width: 768px) {
+    .code-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .code-block {
+        padding: 1rem;
+        font-size: 0.8rem;
+        line-height: 1.6;
+    }
+
+    .code-section {
+        border-radius: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .code-block {
+        padding: 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .copy-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .code-header h3 {
+        font-size: 1rem;
+    }
+}
+
+/* 代码块动画 */
+.code-section {
+    animation: fadeInUp 0.6s ease;
+}
+
+/* 代码块悬停效果 */
+.code-section:hover .code-block {
+    background: #1e293b;
+    transition: background 0.3s ease;
+}

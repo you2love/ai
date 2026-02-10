@@ -141,7 +141,7 @@
             </div>
 
             <!-- 常见算法 -->
-            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🔧 常见算法</h3>
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🔧 常见算法（监督学习）</h3>
 
             <div class="cards-grid card-grid-3">
                 <div class="card">
@@ -149,19 +149,24 @@
                         <div class="card-icon">📉</div>
                         <div>
                             <div class="card-title">线性回归</div>
-                            <div class="card-subtitle">Regression</div>
+                            <div class="card-subtitle">Linear Regression</div>
                         </div>
                     </div>
                     <div class="card-body">
-                        <p style="font-size: 0.9rem; margin-bottom: 1rem;">找一条直线拟合数据</p>
-                        <div class="diagram-box" style="margin: 0; padding: 0.75rem;">
-                            <div style="font-size: 0.8rem;">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">找一条直线拟合数据</p>
+                        <div class="tags">
+                            <span class="tag green">回归</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
 输入：面积 → 输出：价格
-  50㎡ → 100万
-  80㎡ → 160万
-  100㎡ → 200万
+50㎡ → 100万, 80㎡ → 160万
                             </div>
                         </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>简单、可解释</li>
+                            <li>房价预测、销量预测</li>
+                        </ul>
                     </div>
                 </div>
 
@@ -170,18 +175,24 @@
                         <div class="card-icon">🚦</div>
                         <div>
                             <div class="card-title">逻辑回归</div>
-                            <div class="card-subtitle">Classification</div>
+                            <div class="card-subtitle">Logistic Regression</div>
                         </div>
                     </div>
                     <div class="card-body">
-                        <p style="font-size: 0.9rem; margin-bottom: 1rem;">二分类问题的经典算法</p>
-                        <div class="diagram-box" style="margin: 0; padding: 0.75rem;">
-                            <div style="font-size: 0.8rem;">
-输入：邮件内容 → 输出：是否垃圾
-  "中奖通知" → 垃圾邮件 ✓
-  "会议安排" → 正常邮件 ✓
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">二分类问题的经典算法</p>
+                        <div class="tags">
+                            <span class="tag yellow">分类</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+输入：邮件 → 输出：是否垃圾
+用Sigmoid函数输出概率
                             </div>
                         </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>输出概率值</li>
+                            <li>垃圾邮件、信用评分</li>
+                        </ul>
                     </div>
                 </div>
 
@@ -190,19 +201,26 @@
                         <div class="card-icon">🌳</div>
                         <div>
                             <div class="card-title">决策树</div>
-                            <div class="card-subtitle">Tree</div>
+                            <div class="card-subtitle">Decision Tree</div>
                         </div>
                     </div>
                     <div class="card-body">
-                        <p style="font-size: 0.9rem; margin-bottom: 1rem;">像树一样不断分支判断</p>
-                        <div class="diagram-box" style="margin: 0; padding: 0.75rem;">
-                            <div style="font-size: 0.8rem;">
-              天气如何？
-            /     |     \
-         晴天  阴天   下雨
-          ✓     ?     取消
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">像树一样不断分支判断</p>
+                        <div class="tags">
+                            <span class="tag">通用</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+天气如何？
+/   |   \
+晴天 阴天 下雨
+✓    ?    取消
                             </div>
                         </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>可解释性强</li>
+                            <li>规则提取、分类</li>
+                        </ul>
                     </div>
                 </div>
 
@@ -211,19 +229,105 @@
                         <div class="card-icon">🌲</div>
                         <div>
                             <div class="card-title">随机森林</div>
-                            <div class="card-subtitle">Ensemble</div>
+                            <div class="card-subtitle">Random Forest</div>
                         </div>
                     </div>
                     <div class="card-body">
-                        <p style="font-size: 0.9rem; margin-bottom: 1rem;">多棵树一起投票，精度更高</p>
-                        <div class="diagram-box" style="margin: 0; padding: 0.75rem;">
-                            <div style="font-size: 0.8rem;">
-树1预测：猫
-树2预测：狗
-树3预测：猫
-→ 最终结果：猫（2:1）
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">多棵树一起投票</p>
+                        <div class="tags">
+                            <span class="tag green">集成</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+树1:猫 树2:狗 树3:猫
+→ 投票结果: 猫 (2:1)
                             </div>
                         </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>抗过拟合</li>
+                            <li>Kaggle竞赛常用</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📊</div>
+                        <div>
+                            <div class="card-title">梯度提升</div>
+                            <div class="card-subtitle">Gradient Boosting</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">串行建造多棵树</p>
+                        <div class="tags">
+                            <span class="tag green">集成</span>
+                            <span class="tag red">XGBoost</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+树1错误 → 树2纠正 → 树3再纠正
+累积多棵树的预测结果
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>精度极高</li>
+                            <li>结构化数据首选</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎯</div>
+                        <div>
+                            <div class="card-title">支持向量机</div>
+                            <div class="card-subtitle">SVM</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">找到最佳分割超平面</p>
+                        <div class="tags">
+                            <span class="tag yellow">分类</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+● ● ● ● ●
+───最佳分割线───
+○ ○ ○ ○ ○
+最大化两类之间的间隔
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>高维数据有效</li>
+                            <li>文本分类、人脸识别</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📬</div>
+                        <div>
+                            <div class="card-title">朴素贝叶斯</div>
+                            <div class="card-subtitle">Naive Bayes</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">基于概率的分类</p>
+                        <div class="tags">
+                            <span class="tag yellow">分类</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+P(垃圾|词) = P(词|垃圾) × P(垃圾) / P(词)
+基于贝叶斯定理计算概率
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>快速、高效</li>
+                            <li>垃圾邮件、文本分类</li>
+                        </ul>
                     </div>
                 </div>
 
@@ -236,14 +340,588 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <p style="font-size: 0.9rem; margin-bottom: 1rem;">看邻居是什么，你就是什么</p>
-                        <div class="diagram-box" style="margin: 0; padding: 0.75rem;">
-                            <div style="font-size: 0.8rem;">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">看邻居判断自己是哪类</p>
+                        <div class="tags">
+                            <span class="tag yellow">分类</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
 新样本周围3个邻居：
-2个是A类，1个是B类
+2个A类 + 1个B类
 → 分类为A类
                             </div>
                         </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>简单直观</li>
+                            <li>推荐系统、简单分类</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🚀</div>
+                        <div>
+                            <div class="card-title">AdaBoost</div>
+                            <div class="card-subtitle">Adaptive Boosting</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">关注被错分的样本</p>
+                        <div class="tags">
+                            <span class="tag green">集成</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+前一个树分错的样本
+→ 下一个树重点关注
+→ 多个弱分类器组合
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>自动调整权重</li>
+                            <li>人脸检测（早期）</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 无监督学习算法 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🔧 无监督学习算法</h3>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📊</div>
+                        <div>
+                            <div class="card-title">K均值聚类</div>
+                            <div class="card-subtitle">K-Means</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">自动把相似数据分K组</p>
+                        <div class="tags">
+                            <span class="tag green">聚类</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+选K个中心点 → 分配样本 →
+更新中心点 → 重复直到收敛
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>用户分群</li>
+                            <li>图像压缩</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🔬</div>
+                        <div>
+                            <div class="card-title">层次聚类</div>
+                            <div class="card-subtitle">Hierarchical</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">自底向上合并样本</p>
+                        <div class="tags">
+                            <span class="tag green">聚类</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+    ●     ●●●
+   ●●   ●●●●●
+  ●●●●●●●●●●●●●
+   合并成树状结构（Dendrogram）
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>不需要预设K值</li>
+                            <li>生物分类、文档组织</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📉</div>
+                        <div>
+                            <div class="card-title">PCA降维</div>
+                            <div class="card-subtitle">主成分分析</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">找到数据主要方向</p>
+                        <div class="tags">
+                            <span class="tag gray">降维</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+2D数据 ──▶ 投影到1D
+保留最多方差信息
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>可视化</li>
+                            <li>加速训练</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎨</div>
+                        <div>
+                            <div class="card-title">t-SNE</div>
+                            <div class="card-subtitle">非线性降维</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">高维数据可视化</p>
+                        <div class="tags">
+                            <span class="tag gray">降维</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+784维图像 ──▶ 2D点图
+保持相似样本靠近
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>MNIST可视化</li>
+                            <li>聚类结果展示</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🔍</div>
+                        <div>
+                            <div class="card-title">DBSCAN</div>
+                            <div class="card-subtitle">密度聚类</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">基于密度的聚类</p>
+                        <div class="tags">
+                            <span class="tag green">聚类</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+密集区域 → 形成簇
+稀疏区域 → 噪声点
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>自动发现簇数量</li>
+                            <li>异常检测</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">⚠️</div>
+                        <div>
+                            <div class="card-title">孤立森林</div>
+                            <div class="card-subtitle">Isolation Forest</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">异常点更容易被孤立</p>
+                        <div class="tags">
+                            <span class="tag red">异常检测</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+正常点：需要多次分割
+异常点：一次分割隔离
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>金融欺诈检测</li>
+                            <li>网络入侵检测</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🔮</div>
+                        <div>
+                            <div class="card-title">高斯混合模型</div>
+                            <div class="card-subtitle">GMM</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">用多个高斯分布混合</p>
+                        <div class="tags">
+                            <span class="tag green">聚类</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+P(x) = Σwᵢ·N(x|μᵢ,Σᵢ)
+软分配：每个点属于各簇的概率
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>软聚类（概率输出）</li>
+                            <li>数据分布建模</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🗺️</div>
+                        <div>
+                            <div class="card-title">UMAP</div>
+                            <div class="card-subtitle">非线性降维</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">比t-SNE更快更好</p>
+                        <div class="tags">
+                            <span class="tag gray">降维</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+高维数据 → 保持局部结构
+速度快、可保留全局结构
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>大规模数据可视化</li>
+                            <li>单细胞数据分析</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📦</div>
+                        <div>
+                            <div class="card-title">关联规则</div>
+                            <div class="card-subtitle">Apriori</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">发现物品间关联关系</p>
+                        <div class="tags">
+                            <span class="tag yellow">关联</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+啤酒 → 尿布（经典案例）
+支持度、置信度、提升度
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>超市购物分析</li>
+                            <li>推荐系统冷启动</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 更多监督学习算法 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🚀 更多监督学习算法</h3>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">⚡</div>
+                        <div>
+                            <div class="card-title">LightGBM</div>
+                            <div class="card-subtitle">轻量级梯度提升</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">更快的梯度提升框架</p>
+                        <div class="tags">
+                            <span class="tag green">集成</span>
+                            <span class="tag red">高效</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+GOSS: 梯度单边采样
+EFB: 互斥特征捆绑
+Histogram-based: 直方图优化
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>训练速度极快</li>
+                            <li>支持类别特征</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🐱</div>
+                        <div>
+                            <div class="card-title">CatBoost</div>
+                            <div class="card-subtitle">类别特征优化</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">自动处理类别特征</p>
+                        <div class="tags">
+                            <span class="tag green">集成</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+Ordered Target Statistics
+对称提升树结构
+自动处理缺失值
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>类别特征无需编码</li>
+                            <li>减少过拟合</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🧠</div>
+                        <div>
+                            <div class="card-title">多层感知机</div>
+                            <div class="card-subtitle">MLP</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">最简单的神经网络</p>
+                        <div class="tags">
+                            <span class="tag yellow">深度学习</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+输入层 → 隐藏层 × N → 输出层
+全连接 + 激活函数
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>表格数据分类/回归</li>
+                            <li>特征自动学习</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📐</div>
+                        <div>
+                            <div class="card-title">岭回归</div>
+                            <div class="card-subtitle">Ridge</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">L2正则化的线性回归</p>
+                        <div class="tags">
+                            <span class="tag green">回归</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+损失 = MSE + α·Σw²
+惩罚大权重，防止过拟合
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>多重共线性问题</li>
+                            <li>特征数量 > 样本数量</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎯</div>
+                        <div>
+                            <div class="card-title">Lasso回归</div>
+                            <div class="card-subtitle">L1正则化</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">L1正则化 + 特征选择</p>
+                        <div class="tags">
+                            <span class="tag green">回归</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+损失 = MSE + α·Σ|w|
+可将不重要特征系数变为0
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>自动特征筛选</li>
+                            <li>稀疏解</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">⚖️</div>
+                        <div>
+                            <div class="card-title">弹性网络</div>
+                            <div class="card-subtitle">Elastic Net</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">L1 + L2 正则化组合</p>
+                        <div class="tags">
+                            <span class="tag green">回归</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+结合Ridge和Lasso优点
+适合高相关特征
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>特征组选择</li>
+                            <li>推荐系统常用</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🌲</div>
+                        <div>
+                            <div class="card-title">极端随机树</div>
+                            <div class="card-subtitle">Extra Trees</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">比随机森林更随机</p>
+                        <div class="tags">
+                            <span class="tag green">集成</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+分裂阈值完全随机
+不进行Bootstrap
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>降低方差</li>
+                            <li>训练更快</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📚</div>
+                        <div>
+                            <div class="card-title">装袋法</div>
+                            <div class="card-subtitle">Bagging</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">并行训练多个模型</p>
+                        <div class="tags">
+                            <span class="tag green">集成</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+Bootstrap样本 → 独立训练
+多数投票/平均 → 最终结果
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>降低方差</li>
+                            <li>Random Forest基于此</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🏗️</div>
+                        <div>
+                            <div class="card-title">堆叠法</div>
+                            <div class="card-subtitle">Stacking</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">用元学习器组合模型</p>
+                        <div class="tags">
+                            <span class="tag green">集成</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+基础模型预测 → 元特征
+元学习器 → 最终预测
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>Kaggle竞赛常用</li>
+                            <li>提升模型上限</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 高级算法扩展 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🚀 更多高级算法</h3>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎪</div>
+                        <div>
+                            <div class="card-title">AdaBoost</div>
+                            <div class="card-subtitle">自适应提升</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">多个弱分类器串联</p>
+                        <div class="tags">
+                            <span class="tag green">集成</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+弱分类器 → 加权组合
+关注错误样本 → 增强学习
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>人脸检测（Viola-Jones）</li>
+                            <li>特征选择</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🔢</div>
+                        <div>
+                            <div class="card-title">朴素贝叶斯</div>
+                            <div class="card-subtitle">Naive Bayes</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">基于贝叶斯定理的分类</p>
+                        <div class="tags">
+                            <span class="tag yellow">分类</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+P(A|B) = P(B|A)·P(A)/P(B)
+假设特征条件独立
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>垃圾邮件分类</li>
+                            <li>文本情感分析</li>
+                        </ul>
                     </div>
                 </div>
 
@@ -251,20 +929,396 @@
                     <div class="card-header">
                         <div class="card-icon">📊</div>
                         <div>
-                            <div class="card-title">K均值</div>
-                            <div class="card-subtitle">K-Means</div>
+                            <div class="card-title">判别分析</div>
+                            <div class="card-subtitle">LDA/QDA</div>
                         </div>
                     </div>
                     <div class="card-body">
-                        <p style="font-size: 0.9rem; margin-bottom: 1rem;">自动把相似数据分在一起</p>
-                        <div class="diagram-box" style="margin: 0; padding: 0.75rem;">
-                            <div style="font-size: 0.8rem;">
-用户数据 → 自动分组
-年轻+高消费 → 高价值用户
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">线性/二次判别分析</p>
+                        <div class="tags">
+                            <span class="tag yellow">分类</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+LDA: 线性决策边界
+QDA: 二次决策边界
                             </div>
                         </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>数据可视化（降维）</li>
+                            <li>特征分类</li>
+                        </ul>
                     </div>
                 </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📈</div>
+                        <div>
+                            <div class="card-title">支持向量机</div>
+                            <div class="card-subtitle">SVM</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">找最大间隔分类超平面</p>
+                        <div class="tags">
+                            <span class="tag yellow">分类</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+找到支持向量
+最大化类别间隔
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>文本分类</li>
+                            <li>图像识别</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🌐</div>
+                        <div>
+                            <div class="card-title">核方法</div>
+                            <div class="card-subtitle">Kernel Methods</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">非线性问题转线性</p>
+                        <div class="tags">
+                            <span class="tag">通用</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+RBF核: 高斯径向基
+多项式核: 低次转高次
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>SVM非线性扩展</li>
+                            <li>高维映射</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🔄</div>
+                        <div>
+                            <div class="card-title">马尔可夫链</div>
+                            <div class="card-subtitle">Markov Chain</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">状态转移的概率模型</p>
+                        <div class="tags">
+                            <span class="tag">序列</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+P(sₜ₊₁|sₜ)
+未来只依赖当前状态
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>时序预测</li>
+                            <li>自然语言处理</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🏃</div>
+                        <div>
+                            <div class="card-title">隐马尔可夫模型</div>
+                            <div class="card-subtitle">HMM</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">观测序列推断隐状态</p>
+                        <div class="tags">
+                            <span class="tag">序列</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+观测序列 ← 隐状态序列
+通过概率推断隐状态
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>语音识别</li>
+                            <li>基因序列分析</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🗣️</div>
+                        <div>
+                            <div class="card-title">条件随机场</div>
+                            <div class="card-subtitle">CRF</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">序列标注的判别模型</p>
+                        <div class="tags">
+                            <span class="tag">序列</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+考虑上下文关系
+序列标注任务
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>命名实体识别</li>
+                            <li>词性标注</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🔮</div>
+                        <div>
+                            <div class="card-title">高斯过程</div>
+                            <div class="card-subtitle">Gaussian Process</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">函数上的概率分布</p>
+                        <div class="tags">
+                            <span class="tag green">回归</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+预测值 + 不确定性
+贝叶斯非参数方法
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>超参数优化</li>
+                            <li>不确定性量化</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎯</div>
+                        <div>
+                            <div class="card-title">因子分析</div>
+                            <div class="card-subtitle">Factor Analysis</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">发现潜在因子</p>
+                        <div class="tags">
+                            <span class="tag gray">降维</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+观测变量 → 潜在因子
++ 特殊因子
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>心理测量学</li>
+                            <li>特征解释</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🧩</div>
+                        <div>
+                            <div class="card-title">独立成分分析</div>
+                            <div class="card-subtitle">ICA</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">分离独立信号</p>
+                        <div class="tags">
+                            <span class="tag gray">降维</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+盲源分离
+最大化独立性
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>脑信号分析</li>
+                            <li>音频分离</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📉</div>
+                        <div>
+                            <div class="card-title">偏最小二乘</div>
+                            <div class="card-subtitle">PLS</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">有监督的降维回归</p>
+                        <div class="tags">
+                            <span class="tag green">回归</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+同时考虑X和Y
+最大化协方差
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>多输出回归</li>
+                            <li>光谱分析</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🧠</div>
+                        <div>
+                            <div class="card-title">受限玻尔兹曼机</div>
+                            <div class="card-subtitle">RBM</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">生成式概率模型</p>
+                        <div class="tags">
+                            <span class="tag yellow">深度学习</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+可见层 ↔ 隐藏层
+对比散度训练
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>深度信念网络</li>
+                            <li>特征学习</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🔀</div>
+                        <div>
+                            <div class="card-title">混合专家</div>
+                            <div class="card-subtitle">Mixture of Experts</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">多个专家网络组合</p>
+                        <div class="tags">
+                            <span class="tag green">集成</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+专家网络 → 门控网络
+加权组合输出
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>大模型常用</li>
+                            <li>多任务学习</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎪</div>
+                        <div>
+                            <div class="card-title">梯度提升决策树</div>
+                            <div class="card-subtitle">GBDT</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">迭代拟合残差</p>
+                        <div class="tags">
+                            <span class="tag green">集成</span>
+                        </div>
+                        <div class="diagram-box" style="margin: 0.75rem 0; padding: 0.5rem;">
+                            <div style="font-size: 0.75rem;">
+弱学习器 → 残差拟合
+累加提升效果
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.8rem; padding-left: 1rem; margin: 0;">
+                            <li>XGBoost基础</li>
+                            <li>结构化数据首选</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 算法选择指南 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">📋 算法选择指南</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>场景</th>
+                            <th>推荐算法</th>
+                            <th>原因</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>快速baseline</strong></td>
+                            <td>逻辑回归 / 决策树</td>
+                            <td>简单、可解释</td>
+                        </tr>
+                        <tr>
+                            <td><strong>结构化数据</strong></td>
+                            <td>梯度提升（XGBoost/LightGBM）</td>
+                            <td>精度高、稳定</td>
+                        </tr>
+                        <tr>
+                            <td><strong>图像/文本</strong></td>
+                            <td>深度学习（CNN/RNN/Transformer）</td>
+                            <td>自动特征提取</td>
+                        </tr>
+                        <tr>
+                            <td><strong>需要可解释</strong></td>
+                            <td>决策树 / 逻辑回归</td>
+                            <td>规则清晰</td>
+                        </tr>
+                        <tr>
+                            <td><strong>聚类分析</strong></td>
+                            <td>K-Means / DBSCAN</td>
+                            <td>效果稳定</td>
+                        </tr>
+                        <tr>
+                            <td><strong>异常检测</strong></td>
+                            <td>孤立森林 / One-Class SVM</td>
+                            <td>专门设计</td>
+                        </tr>
+                        <tr>
+                            <td><strong>数据量小</strong></td>
+                            <td>SVM / 朴素贝叶斯</td>
+                            <td>小样本效果好</td>
+                        </tr>
+                        <tr>
+                            <td><strong>高维稀疏</strong></td>
+                            <td>逻辑回归 / 线性SVM</td>
+                            <td>擅长高维</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
             <!-- 机器学习流程 -->
@@ -329,17 +1383,6 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>
-
-            <!-- 学习建议 -->
-            <div class="info-box tip">
-                <div class="info-box-title">💡 学习建议</div>
-                <ol style="margin-left: 1.5rem;">
-                    <li>先理解每种算法的"直觉"，不要死记公式</li>
-                    <li>使用Scikit-learn库快速实践各种算法</li>
-                    <li>完成Kaggle入门竞赛，如Titanic生存预测</li>
-                    <li>学会使用交叉验证评估模型</li>
-                </ol>
             </div>
 
         </div>

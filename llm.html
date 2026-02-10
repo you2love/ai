@@ -3,2224 +3,881 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>大模型入门到精通 - AI技术学习平台</title>
+    <title>大语言模型 - AI技术学习平台</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <section class="section">
         <div class="container">
-            <h2 class="section-title">大模型入门到精通</h2>
-            <p class="section-subtitle">从基础概念到高级应用，掌握大语言模型核心技术</p>
+            <h2 class="section-title">大语言模型</h2>
+            <p class="section-subtitle">从基础概念到核心技术，掌握LLM核心原理</p>
 
-            <div class="code-sections">
-                <!-- 什么是大语言模型 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>1. 什么是大语言模型？</h3>
+            <div class="card">
+                <div class="card-header">什么是大语言模型？</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     大语言模型（LLM）发展历程                              │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  统计语言模型    神经网络语言模型    Transformer    预训练+微调   超大规模 │
+│  （1990s）   →  （2000s）      →   （2017）   →   （2018-）   →  （2020-） │
+│      │              │              │              │              │        │
+│      ▼              ▼              ▼              ▼              ▼        │
+│   词频统计      Word2Vec, RNN   Attention机制   BERT, GPT    GPT-3/4    │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
                     </div>
-                    <pre class="code-block"><code class="language-python"># 大语言模型（LLM）入门指南
-#
-# 大语言模型（Large Language Model，简称LLM）
-# 是基于深度学习的自然语言处理模型，能够理解和生成人类语言
-#
-# 发展历程：
-# 1. 统计语言模型（1990s）- 基于词频统计
-# 2. 神经网络语言模型（2000s）- Word2Vec, RNN
-# 3. Transformer架构（2017）- Attention机制
-# 4. 预训练+微调范式（2018-）- BERT, GPT系列
-# 5. 超大规模模型（2020-）- GPT-3, PaLM, LLaMA
-
-# LLM的核心能力
-LLM_CAPABILITIES = """
-1. 文本生成 - 续写文章、创作内容
-2. 理解分析 - 阅读理解、情感分析
-3. 问答对话 - 智能客服、知识问答
-4. 代码编写 - 代码生成、调试
-5. 翻译摘要 - 多语言翻译、文本摘要
-6. 推理规划 - 逻辑推理、任务规划
-"""
-
-# 模型规模对比
-MODEL_SCALE = """
-参数量级对比：
-- 小模型（&lt;1B）：快速响应，简单任务
-- 中等模型（1-10B）：一般对话，简单推理
-- 大模型（10-100B）：复杂推理，多任务处理
-- 超大模型（&gt;100B）：接近人类水平，多领域专家
-
-训练数据规模：
-- GPT-1: 5GB - 简单语言理解
-- GPT-2: 40GB - 文本生成
-- GPT-3: 45TB - 少样本学习
-- GPT-4: 万亿级tokens - 复杂推理
-"""
-
-print("大语言模型的核心特点：")
-print("1. 基于Transformer架构")
-print("2. 海量数据预训练")
-print("3. 涌现能力（Emergent Abilities）")
-print("4. 零样本/少样本学习")
-print("5. 可塑性和适应性")</code></pre>
-                </div>
-
-                <!-- Transformer架构 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>2. Transformer架构详解</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># Transformer架构实现详解
-import numpy as np
-from typing import List, Tuple, Dict
-import math
-
-class MultiHeadAttention:
-    """多头注意力机制"""
-
-    def __init__(self, d_model: int, num_heads: int):
-        self.d_model = d_model
-        self.num_heads = num_heads
-        self.d_k = d_model // num_heads
-
-        # 初始化权重
-        self.W_q = np.random.randn(d_model, d_model) * 0.1
-        self.W_k = np.random.randn(d_model, d_model) * 0.1
-        self.W_v = np.random.randn(d_model, d_model) * 0.1
-        self.W_o = np.random.randn(d_model, d_model) * 0.1
-
-    def scaled_dot_product_attention(
-        self,
-        Q: np.ndarray,
-        K: np.ndarray,
-        V: np.ndarray,
-        mask: np.ndarray = None
-    ) -> np.ndarray:
-        """缩放点积注意力"""
-        # 计算注意力分数
-        scores = np.dot(Q, K.T) / math.sqrt(self.d_k)
-
-        # 应用掩码（可选）
-        if mask is not None:
-            scores = np.where(mask == 0, -1e9, scores)
-
-        # Softmax归一化
-        attention_weights = self.softmax(scores)
-        output = np.dot(attention_weights, V)
-        return output
-
-    def softmax(self, x: np.ndarray) -> np.ndarray:
-        """Softmax函数"""
-        exp_x = np.exp(x - np.max(x, axis=-1, keepdims=True))
-        return exp_x / np.sum(exp_x, axis=-1, keepdims=True)
-
-    def forward(self, x: np.ndarray, mask: np.ndarray = None) -> np.ndarray:
-        """前向传播"""
-        batch_size, seq_len, _ = x.shape
-
-        # 线性变换
-        Q = np.dot(x, self.W_q)
-        K = np.dot(x, self.W_k)
-        V = np.dot(x, self.W_v)
-
-        # 分割多头
-        Q = Q.reshape(batch_size, seq_len, self.num_heads, self.d_k).transpose(0, 2, 1, 3)
-        K = K.reshape(batch_size, seq_len, self.num_heads, self.d_k).transpose(0, 2, 1, 3)
-        V = V.reshape(batch_size, seq_len, self.num_heads, self.d_k).transpose(0, 2, 1, 3)
-
-        # 计算注意力
-        attention = self.scaled_dot_product_attention(Q, K, V, mask)
-
-        # 合并多头
-        attention = attention.transpose(0, 2, 1, 3).reshape(batch_size, seq_len, self.d_model)
-
-        # 输出线性变换
-        output = np.dot(attention, self.W_o)
-        return output
-
-
-class PositionEncoding:
-    """位置编码"""
-
-    def __init__(self, d_model: int, max_seq_len: int = 5000):
-        self.d_model = d_model
-        self.encoding = np.zeros((max_seq_len, d_model))
-        position = np.arange(max_seq_len).reshape(-1, 1)
-        div_term = np.exp(np.arange(0, d_model, 2) * (-math.log(10000.0) / d_model))
-
-        self.encoding[:, 0::2] = np.sin(position * div_term)
-        self.encoding[:, 1::2] = np.cos(position * div_term)
-
-    def forward(self, x: np.ndarray) -> np.ndarray:
-        """添加位置编码"""
-        seq_len = x.shape[1]
-        return x + self.encoding[:seq_len, :]
-
-
-class FeedForwardNetwork:
-    """前馈神经网络"""
-
-    def __init__(self, d_model: int, d_ff: int):
-        self.d_model = d_model
-        self.d_ff = d_ff
-
-        self.W1 = np.random.randn(d_model, d_ff) * 0.1
-        self.W2 = np.random.randn(d_ff, d_model) * 0.1
-        self.b1 = np.zeros(d_ff)
-        self.b2 = np.zeros(d_model)
-
-    def forward(self, x: np.ndarray) -> np.ndarray:
-        """前向传播"""
-        hidden = np.maximum(0, np.dot(x, self.W1) + self.b1)  # ReLU激活
-        output = np.dot(hidden, self.W2) + self.b2
-        return output
-
-
-class TransformerEncoderBlock:
-    """Transformer编码器块"""
-
-    def __init__(self, d_model: int, num_heads: int, d_ff: int, dropout: float = 0.1):
-        self.attention = MultiHeadAttention(d_model, num_heads)
-        self.feed_forward = FeedForwardNetwork(d_model, d_ff)
-        self.norm1 = LayerNormalization(d_model)
-        self.norm2 = LayerNormalization(d_model)
-        self.dropout = dropout
-
-    def forward(self, x: np.ndarray, mask: np.ndarray = None) -> np.ndarray:
-        """前向传播"""
-        # 多头注意力 + 残差连接 + LayerNorm
-        attn_output = self.attention.forward(x, mask)
-        x = self.norm1(x + self.dropout_layer(attn_output))
-
-        # 前馈网络 + 残差连接 + LayerNorm
-        ff_output = self.feed_forward.forward(x)
-        x = self.norm2(x + self.dropout_layer(ff_output))
-
-        return x
-
-    def dropout_layer(self, x: np.ndarray) -> np.ndarray:
-        """Dropout层"""
-        mask = (np.random.rand(*x.shape) > self.dropout)
-        return x * mask / (1 - self.dropout)
-
-
-class LayerNormalization:
-    """层归一化"""
-
-    def __init__(self, d_model: int, eps: float = 1e-6):
-        self.d_model = d_model
-        self.eps = eps
-        self.gamma = np.ones(d_model)
-        self.beta = np.zeros(d_model)
-
-    def forward(self, x: np.ndarray) -> np.ndarray:
-        """前向传播"""
-        mean = np.mean(x, axis=-1, keepdims=True)
-        variance = np.var(x, axis=-1, keepdims=True)
-        normalized = (x - mean) / np.sqrt(variance + self.eps)
-        return self.gamma * normalized + self.beta
-
-
-class Transformer:
-    """完整的Transformer模型"""
-
-    def __init__(
-        self,
-        d_model: int = 512,
-        num_heads: int = 8,
-        num_layers: int = 6,
-        d_ff: int = 2048,
-        vocab_size: int = 30000,
-        max_seq_len: int = 512
-    ):
-        self.d_model = d_model
-        self.vocab_size = vocab_size
-
-        # 词嵌入
-        self.embedding = np.random.randn(vocab_size, d_model) * 0.1
-
-        # 位置编码
-        self.pos_encoding = PositionEncoding(d_model, max_seq_len)
-
-        # 编码器层
-        self.encoder_layers = [
-            TransformerEncoderBlock(d_model, num_heads, d_ff)
-            for _ in range(num_layers)
-        ]
-
-        # 输出层
-        self.output_layer = np.random.randn(d_model, vocab_size) * 0.1
-
-    def forward(self, x: np.ndarray) -> np.ndarray:
-        """前向传播"""
-        # 词嵌入 + 位置编码
-        x = self.embedding[x] if x.ndim == 2 else x
-        x = self.pos_encoding.forward(x)
-
-        # 编码器层
-        for layer in self.encoder_layers:
-            x = layer.forward(x)
-
-        # 输出层
-        logits = np.dot(x, self.output_layer)
-        return logits
-
-    def generate(
-        self,
-        start_token: int,
-        max_length: int = 100,
-        temperature: float = 1.0,
-        top_k: int = 0,
-        top_p: float = 0.0
-    ) -> List[int]:
-        """文本生成"""
-        output = [start_token]
-
-        for _ in range(max_length):
-            x = np.array([output])
-            logits = self.forward(x)
-
-            # 最后一个token的logits
-            last_logits = logits[0, -1] / temperature
-
-            # Top-k过滤
-            if top_k > 0:
-                indices = np.argsort(last_logits)[-top_k:]
-                last_logits = np.where(
-                    np.arange(len(last_logits)) >= top_k,
-                    -1e9,
-                    last_logits
-                )
-
-            # 采样
-            probs = self.softmax(last_logits)
-            next_token = np.random.choice(len(probs), p=probs)
-
-            if next_token == 0:  # 假设0是结束符
-                break
-
-            output.append(next_token)
-
-        return output
-
-    def softmax(self, x: np.ndarray) -> np.ndarray:
-        """Softmax函数"""
-        exp_x = np.exp(x - np.max(x))
-        return exp_x / np.sum(exp_x)
-
-
-# 使用示例
-async def transformer_demo():
-    """Transformer示例"""
-    print("=== Transformer架构示例 ===")
-
-    # 创建模型
-    model = Transformer(
-        d_model=512,
-        num_heads=8,
-        num_layers=6,
-        vocab_size=30000
-    )
-
-    print(f"模型参数量估算:")
-    print(f"  - 嵌入层: {model.vocab_size * 512:,}")
-    print(f"  - 编码器层数: 6")
-    print(f"  - 总参数量: 约 1.5亿")
-
-    # 模拟输入
-    input_ids = [1, 45, 123, 456, 789, 101, 202]  # 7个token
-    x = np.array([input_ids])
-
-    print(f"\n输入序列长度: {len(input_ids)}")
-    print(f"模型维度: {model.d_model}")
-
-    # 前向传播
-    logits = model.forward(x)
-    print(f"输出logits形状: {logits.shape}")</code></pre>
-                </div>
-
-                <!-- Tokenization -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>3. Tokenization分词技术</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># Tokenization分词技术详解
-import re
-from collections import Counter
-from typing import List, Dict, Tuple
-import json
-
-
-class BytePairEncoding:
-    """BPE（字节对编码）分词器"""
-
-    def __init__(self, vocab_size: int = 10000):
-        self.vocab_size = vocab_size
-        self.word_vocab = {}
-        self.merge_rules = {}
-        self.special_tokens = {
-            "&lt;PAD&gt;": 0,
-            "&lt;UNK&gt;": 1,
-            "&lt;BOS&gt;": 2,
-            "&lt;EOS&gt;": 3,
-            "&lt;MASK&gt;": 4
-        }
-        self.token_to_id = {}
-        self.id_to_token = {}
-
-    def preprocess(self, text: str) -> str:
-        """文本预处理"""
-        # 统一空白字符
-        text = re.sub(r'\s+', ' ', text)
-        # 添加空格
-        text = ' '.join(list(text))
-        return text
-
-    def get_vocab(self, texts: List[str]) -> Dict[str, int]:
-        """获取词频统计"""
-        word_freq = Counter()
-        for text in texts:
-            words = self.preprocess(text).split()
-            for word in words:
-                word_freq[word] += 1
-        return word_freq
-
-    def train(self, texts: List[str], min_freq: int = 2):
-        """训练BPE模型"""
-        # 获取词频
-        word_freq = self.get_vocab(texts)
-
-        # 创建词词汇表
-        vocab = {}
-        for word, freq in word_freq.items():
-            if freq >= min_freq:
-                # 每个字符后面添加结束标记
-                chars = list(word)
-                for i, char in enumerate(chars[:-1]):
-                    chars[i] = char + chars[i + 1]
-                chars.append(word + '</w>')
-                vocab[word] = freq
-
-        # 迭代合并
-        self.token_to_id = dict(self.special_tokens)
-        self.id_to_token = {v: k for k, v in self.token_to_id.items()}
-
-        while len(self.token_to_id) < self.vocab_size:
-            # 统计相邻字符对
-            pair_freq = Counter()
-            for word, freq in vocab.items():
-                chars = word.split()
-                for i in range(len(chars) - 1):
-                    pair = (chars[i], chars[i + 1])
-                    pair_freq[pair] += freq
-
-            if not pair_freq:
-                break
-
-            # 找到最常见的字符对
-            best_pair = pair_freq.most_common(1)[0][0]
-
-            # 合并
-            self.merge_rules[best_pair] = len(self.merge_rules) + len(self.special_tokens)
-            new_word = best_pair[0] + best_pair[1]
-
-            # 更新词汇表
-            new_vocab = {}
-            for word, freq in vocab.items():
-                new_word_str = word.replace(' '.join(best_pair), new_word)
-                new_vocab[new_word_str] = freq
-
-            vocab = new_vocab
-
-            # 添加到词汇表
-            if new_word not in self.token_to_id:
-                self.token_to_id[new_word] = len(self.token_to_id)
-                self.id_to_token[self.token_to_id[new_word]] = new_word
-
-            if len(self.token_to_id) >= self.vocab_size:
-                break
-
-    def encode(self, text: str) -> List[int]:
-        """编码文本"""
-        words = self.preprocess(text).split()
-
-        # 迭代应用合并规则
-        for merge_rule in sorted(self.merge_rules.keys(), key=lambda x: self.merge_rules[x]):
-            pattern = ' '.join(merge_rule)
-            merged = merge_rule[0] + merge_rule[1]
-            words = [w.replace(pattern, merged) for w in words]
-
-        # 转换为ID
-        tokens = []
-        for word in words:
-            if word in self.token_to_id:
-                tokens.append(self.token_to_id[word])
-            else:
-                # 未知词用UNK
-                tokens.append(self.special_tokens["&lt;UNK&gt;"])
-
-        return tokens
-
-    def decode(self, tokens: List[int]) -> str:
-        """解码文本"""
-        words = []
-        for token in tokens:
-            if token in self.id_to_token:
-                word = self.id_to_token[token].replace('</w>', '')
-            else:
-                word = "&lt;UNK&gt;"
-            words.append(word)
-        return ''.join(words)
-
-
-class CharacterTokenizer:
-    """字符级分词器"""
-
-    def __init__(self):
-        self.char_vocab = {}
-        self.inverse_vocab = {}
-
-    def train(self, texts: List[str]):
-        """训练词汇表"""
-        chars = set()
-        for text in texts:
-            chars.update(set(text))
-        self.char_vocab = {c: i for i, c in enumerate(sorted(chars))}
-        self.inverse_vocab = {v: k for k, v in self.char_vocab.items()}
-
-    def encode(self, text: str) -> List[int]:
-        """编码"""
-        return [self.char_vocab.get(c, 1) for c in text]  # 1 for unknown
-
-    def decode(self, tokens: List[int]) -> str:
-        """解码"""
-        return ''.join(self.inverse_vocab.get(t, '?') for t in tokens)
-
-
-class WordTokenizer:
-    """词级分词器"""
-
-    def __init__(self, vocab_size: int = 10000):
-        self.vocab_size = vocab_size
-        self.word_to_id = {}
-        self.id_to_word = {}
-        self.min_freq = 2
-
-    def train(self, texts: List[str]):
-        """训练词汇表"""
-        word_freq = Counter()
-        for text in texts:
-            words = text.lower().split()
-            word_freq.update(words)
-
-        # 选择高频词
-        self.word_to_id = {"&lt;PAD&gt;": 0, "&lt;UNK&gt;": 1}
-        for word, freq in word_freq.most_common(self.vocab_size - 2):
-            if freq >= self.min_freq:
-                self.word_to_id[word] = len(self.word_to_id)
-
-        self.id_to_word = {v: k for k, v in self.word_to_id.items()}
-
-    def encode(self, text: str) -> List[int]:
-        """编码"""
-        words = text.lower().split()
-        return [self.word_to_id.get(w, 1) for w in words]  # 1 for UNK
-
-    def decode(self, tokens: List[int]) -> str:
-        """解码"""
-        return ' '.join(self.id_to_word.get(t, "&lt;UNK&gt;") for t in tokens)
-
-
-# 完整分词示例
-class TokenizerDemo:
-    """分词演示"""
-
-    def __init__(self):
-        self.bpe = BytePairEncoding(vocab_size=500)
-        self.char = CharacterTokenizer()
-        self.word = WordTokenizer(vocab_size=1000)
-
-    def compare_tokenizers(self, texts: List[str]):
-        """比较不同分词器"""
-        # 训练
-        self.char.train(texts)
-        self.word.train(texts)
-        self.bpe.train(texts, min_freq=2)
-
-        text = "Hello, world! How are you today?"
-
-        print("=== Tokenization比较 ===")
-        print(f"原文: {text}")
-
-        # 字符级
-        char_tokens = self.char.encode(text)
-        print(f"\n字符级分词 ({len(char_tokens)} tokens):")
-        print(f"  {char_tokens[:20]}...")
-
-        # 词级
-        word_tokens = self.word.encode(text)
-        print(f"\n词级分词 ({len(word_tokens)} tokens):")
-        print(f"  {word_tokens}")
-
-        # BPE
-        bpe_tokens = self.bpe.encode(text)
-        print(f"\nBPE分词 ({len(bpe_tokens)} tokens):")
-        print(f"  {bpe_tokens}")
-
-        # 压缩率
-        original_len = len(text)
-        print(f"\n压缩率:")
-        print(f"  字符级: {original_len / len(char_tokens):.2f}x")
-        print(f"  词级: {original_len / len(word_tokens):.2f}x")
-        print(f"  BPE: {original_len / len(bpe_tokens):.2f}x")
-
-
-# 使用示例
-async def tokenization_demo():
-    demo = TokenizerDemo()
-    texts = [
-        "Hello world, how are you doing today?",
-        "The weather is very nice today.",
-        "Machine learning is amazing!",
-        "Natural language processing is fun.",
-        "Artificial intelligence is changing the world."
-    ]
-    demo.compare_tokenizers(texts)</code></pre>
-                </div>
-
-                <!-- Embeddings -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>4. Word Embeddings词嵌入</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># Word Embeddings词嵌入详解
-import numpy as np
-from typing import List, Dict
-from collections import Counter
-import math
-
-
-class Word2Vec:
-    """Word2Vec实现 - Skip-gram和CBOW"""
-
-    def __init__(self, vocab_size: int, embedding_dim: int = 100, window_size: int = 2):
-        self.vocab_size = vocab_size
-        self.embedding_dim = embedding_dim
-        self.window_size = window_size
-        self.vocab = {}
-        self.id_to_word = {}
-
-        # 初始化嵌入
-        np.random.seed(42)
-        self.W = np.random.randn(vocab_size, embedding_dim) * 0.01
-        self.W_context = np.random.randn(vocab_size, embedding_dim) * 0.01
-
-    def build_vocab(self, texts: List[str]):
-        """构建词汇表"""
-        word_freq = Counter()
-        for text in texts:
-            words = text.lower().split()
-            word_freq.update(words)
-
-        # 选择高频词
-        self.vocab = {"&lt;UNK&gt;": 0}
-        for word, freq in word_freq.most_common(self.vocab_size - 1):
-            self.vocab[word] = len(self.vocab)
-        self.id_to_word = {v: k for k, v in self.vocab.items()}
-
-        # 重新初始化权重
-        self.W = np.random.randn(len(self.vocab), self.embedding_dim) * 0.01
-        self.W_context = np.random.randn(len(self.vocab), self.embedding_dim) * 0.01
-
-    def sigmoid(self, x: np.ndarray) -> np.ndarray:
-        """Sigmoid函数"""
-        return 1 / (1 + np.exp(-np.clip(x, -500, 500)))
-
-    def train(self, texts: List[str], epochs: int = 5, lr: float = 0.01):
-        """训练Word2Vec"""
-        for epoch in range(epochs):
-            total_loss = 0
-            count = 0
-
-            for text in texts:
-                words = text.lower().split()
-                word_ids = [self.vocab.get(w, 0) for w in words]
-
-                for i, center_id in enumerate(word_ids):
-                    # 获取上下文窗口
-                    context_start = max(0, i - self.window_size)
-                    context_end = min(len(words), i + self.window_size + 1)
-                    context_ids = [word_ids[j] for j in range(context_start, context_end) if j != i]
-
-                    for context_id in context_ids:
-                        # 正样本
-                        pred = self.sigmoid(np.dot(self.W[center_id], self.W_context[context_id]))
-
-                        # 更新权重
-                        error = lr * (1 - pred)
-                        self.W[center_id] += error * self.W_context[context_id]
-                        self.W_context[context_id] += error * self.W[center_id]
-
-                        # 负样本（简化）
-                        for _ in range(5):
-                            neg_id = np.random.randint(0, len(self.vocab))
-                            pred = self.sigmoid(np.dot(self.W[center_id], self.W_context[neg_id]))
-                            error = lr * pred
-                            self.W[center_id] -= error * self.W_context[neg_id]
-                            self.W_context[neg_id] -= error * self.W[center_id]
-
-                        total_loss += -np.log(pred + 1e-10)
-                        count += 1
-
-            avg_loss = total_loss / max(count, 1)
-            print(f"Epoch {epoch + 1}/{epochs}, Loss: {avg_loss:.4f}")
-
-    def get_embedding(self, word: str) -> np.ndarray:
-        """获取词嵌入"""
-        word_id = self.vocab.get(word.lower(), 0)
-        return self.W[word_id]
-
-    def cosine_similarity(self, w1: str, w2: str) -> float:
-        """计算余弦相似度"""
-        e1 = self.get_embedding(w1)
-        e2 = self.get_embedding(w2)
-        return np.dot(e1, e2) / (np.linalg.norm(e1) * np.linalg.norm(e2) + 1e-10)
-
-    def most_similar(self, word: str, top_k: int = 5) -> List[tuple]:
-        """查找相似词"""
-        target = self.get_embedding(word)
-        similarities = []
-
-        for w, idx in self.vocab.items():
-            if w in ["&lt;UNK&gt;", ""]:
-                continue
-            sim = np.dot(target, self.W[idx]) / (np.linalg.norm(target) * np.linalg.norm(self.W[idx]) + 1e-10)
-            similarities.append((w, sim))
-
-        return sorted(similarities, key=lambda x: x[1], reverse=True)[:top_k]
-
-
-class PositionalEncoding:
-    """位置编码"""
-
-    def __init__(self, d_model: int, max_len: int = 5000):
-        self.d_model = d_model
-        self.encoding = np.zeros((max_len, d_model))
-
-        for pos in range(max_len):
-            for i in range(0, d_model, 2):
-                self.encoding[pos, i] = math.sin(pos / math.pow(10000, (2 * i) / d_model))
-                if i + 1 < d_model:
-                    self.encoding[pos, i + 1] = math.cos(pos / math.pow(10000, (2 * i + 1) / d_model))
-
-    def forward(self, x: np.ndarray) -> np.ndarray:
-        """添加位置编码"""
-        seq_len = x.shape[1]
-        return x + self.encoding[:seq_len, :]
-
-
-class LearnedPositionalEncoding:
-    """可学习的位置编码"""
-
-    def __init__(self, d_model: int, max_len: int = 5000):
-        self.d_model = d_model
-        self.position_embeddings = np.random.randn(max_len, d_model) * 0.01
-
-    def forward(self, x: np.ndarray) -> np.ndarray:
-        """添加位置编码"""
-        seq_len = x.shape[1]
-        return x + self.position_embeddings[:seq_len, :]
-
-
-# BERT-style Embeddings
-class BERTEmbedding:
-    """BERT风格嵌入 = Token + Position + Segment"""
-
-    def __init__(self, vocab_size: int, d_model: int = 768, max_len: int = 512):
-        self.d_model = d_model
-
-        # Token嵌入
-        self.token_embedding = np.random.randn(vocab_size, d_model) * 0.02
-
-        # 位置嵌入（可学习）
-        self.position_embedding = np.random.randn(max_len, d_model) * 0.02
-
-        # 段落嵌入
-        self.segment_embedding = np.random.randn(2, d_model) * 0.02
-
-        # LayerNorm
-        self.layer_norm = LayerNormalization(d_model)
-
-    def forward(
-        self,
-        token_ids: np.ndarray,
-        segment_ids: np.ndarray = None,
-        position_ids: np.ndarray = None
-    ) -> np.ndarray:
-        """前向传播"""
-        batch_size, seq_len = token_ids.shape
-
-        # Token嵌入
-        output = self.token_embedding[token_ids]
-
-        # 位置嵌入
-        if position_ids is None:
-            position_ids = np.arange(seq_len)
-        output += self.position_embedding[position_ids]
-
-        # 段落嵌入
-        if segment_ids is None:
-            segment_ids = np.zeros(seq_len)
-        output += self.segment_embedding[segment_ids]
-
-        # LayerNorm
-        output = self.layer_norm.forward(output)
-
-        return output
-
-
-# 使用示例
-async def embedding_demo():
-    """嵌入示例"""
-    print("=== Word Embeddings示例 ===")
-
-    # 训练数据
-    texts = [
-        "king queen man woman royal family",
-        "paris france berlin germany capital city",
-        "cat dog pet animal friendly",
-        "computer laptop keyboard screen technology",
-        "machine learning neural network deep intelligence"
-    ]
-
-    # 创建并训练Word2Vec
-    w2v = Word2Vec(vocab_size=100, embedding_dim=50, window_size=2)
-    w2v.build_vocab(texts)
-    w2v.train(texts, epochs=10, lr=0.01)
-
-    # 测试相似词
-    test_words = ["king", "computer", "cat"]
-    for word in test_words:
-        print(f"\n与'{word}'最相似的词:")
-        similar = w2v.most_similar(word, top_k=5)
-        for w, sim in similar:
-            print(f"  {w}: {sim:.4f}")
-
-    # 测试类比推理
-    print(f"\n类比测试 (king - man + woman ≈ ?):")
-    king = w2v.get_embedding("king")
-    man = w2v.get_embedding("man")
-    woman = w2v.get_embedding("woman")
-    result = king - man + woman
-
-    # 找最相似的词
-    best_word = None
-    best_sim = -1
-    for w in w2v.vocab:
-        if w in ["&lt;UNK&gt;", "king", "man", "woman"]:
-            continue
-        w_emb = w2v.get_embedding(w)
-        sim = np.dot(result, w_emb) / (np.linalg.norm(result) * np.linalg.norm(w_emb) + 1e-10)
-        if sim > best_sim:
-            best_sim = sim
-            best_word = w
-
-    print(f"结果: {best_word} ({best_sim:.4f})")</code></pre>
-                </div>
-
-                <!-- Fine-tuning -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>5. 预训练与微调技术</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># 预训练与微调技术详解
-import numpy as np
-from typing import List, Dict, Tuple
-from dataclasses import dataclass
-from datetime import datetime
-import json
-
-
-@dataclass
-class TrainingConfig:
-    """训练配置"""
-    learning_rate: float = 1e-4
-    batch_size: int = 32
-    epochs: int = 3
-    warmup_steps: int = 1000
-    max_grad_norm: float = 1.0
-    weight_decay: float = 0.01
-    device: str = "cpu"
-
-
-@dataclass
-class Dataset:
-    """数据集"""
-    texts: List[str]
-    labels: List[int]
-    tokenizer: object
-
-
-class PreTraining:
-    """预训练管理器"""
-
-    def __init__(self, config: TrainingConfig):
-        self.config = config
-        self.global_step = 0
-
-    def train(self, model, train_data, eval_data=None):
-        """预训练"""
-        print("=== 开始预训练 ===")
-        print(f"训练数据: {len(train_data.texts)} samples")
-        if eval_data:
-            print(f"验证数据: {len(eval_data.texts)} samples")
-
-        losses = []
-        for epoch in range(self.config.epochs):
-            epoch_loss = self._train_epoch(model, train_data)
-            losses.append(epoch_loss)
-            print(f"Epoch {epoch + 1}/{self.config.epochs}, Loss: {epoch_loss:.4f}")
-
-            if eval_data:
-                eval_loss = self._evaluate(model, eval_data)
-                print(f"  验证Loss: {eval_loss:.4f}")
-
-        return losses
-
-    def _train_epoch(self, model, data: Dataset) -> float:
-        """训练一个epoch"""
-        total_loss = 0
-        num_batches = len(data.texts) // self.config.batch_size
-
-        for i in range(num_batches):
-            batch_texts = data.texts[i * self.config.batch_size:(i + 1) * self.config.batch_size]
-            batch_labels = data.labels[i * self.config.batch_size:(i + 1) * self.config.batch_size]
-
-            # 前向传播
-            logits = model.forward(batch_texts)
-
-            # 计算损失
-            loss = self._compute_loss(logits, batch_labels)
-            total_loss += loss
-
-            # 反向传播
-            grads = self._backward(loss, model)
-
-            # 梯度裁剪
-            grads = self._clip_gradients(grads, model)
-
-            # 更新参数
-            self._update_parameters(model, grads)
-
-            self.global_step += 1
-
-            # 学习率调度
-            lr = self._get_learning_rate()
-            print(f"Step {self.global_step}, Loss: {loss:.4f}, LR: {lr:.6f}")
-
-        return total_loss / num_batches
-
-    def _compute_loss(self, logits: np.ndarray, labels: List[int]) -> float:
-        """计算损失"""
-        probs = self._softmax(logits)
-        loss = 0
-        for i, label in enumerate(labels):
-            loss += -np.log(probs[i][label] + 1e-10)
-        return loss / len(labels)
-
-    def _softmax(self, x: np.ndarray) -> np.ndarray:
-        """Softmax函数"""
-        exp_x = np.exp(x - np.max(x, axis=-1, keepdims=True))
-        return exp_x / np.sum(exp_x, axis=-1, keepdims=True)
-
-    def _backward(self, loss: float, model) -> Dict:
-        """反向传播（简化版）"""
-        # 假设梯度为损失对权重的简单函数
-        grads = {}
-        for key in dir(model):
-            if not key.startswith('_') and isinstance(getattr(model, key), np.ndarray):
-                grads[key] = np.random.randn(*getattr(model, key).shape) * 0.01
-        return grads
-
-    def _clip_gradients(self, grads: Dict, model) -> Dict:
-        """梯度裁剪"""
-        norm = math.sqrt(sum(np.sum(g ** 2) for g in grads.values()))
-        if norm > self.config.max_grad_norm:
-            grads = {k: g / norm * self.config.max_grad_norm for k, g in grads.items()}
-        return grads
-
-    def _update_parameters(self, model, grads: Dict):
-        """更新参数"""
-        lr = self._get_learning_rate()
-        for key in dir(model):
-            if key in grads:
-                attr = getattr(model, key)
-                if isinstance(attr, np.ndarray):
-                    setattr(model, key, attr - lr * grads[key])
-
-    def _get_learning_rate(self) -> float:
-        """学习率调度"""
-        if self.global_step < self.config.warmup_steps:
-            return self.config.learning_rate * (self.global_step / self.config.warmup_steps)
-        return self.config.learning_rate
-
-    def _evaluate(self, model, data: Dataset) -> float:
-        """评估"""
-        logits = model.forward(data.texts)
-        return self._compute_loss(logits, data.labels)
-
-
-class FineTuning:
-    """微调管理器"""
-
-    def __init__(self, config: TrainingConfig):
-        self.config = config
-        self.frozen_layers = []
-
-    def prepare_model(self, model, method: str = "full"):
-        """准备微调模型"""
-        print(f"=== 准备微调 - 方法: {method} ===")
-
-        if method == "full":
-            # 全量微调
-            print("模式: 全量参数微调")
-            for param in model.parameters():
-                param.requires_grad = True
-
-        elif method == "lora":
-            # LoRA (Low-Rank Adaptation)
-            print("模式: LoRA微调")
-            self._apply_lora(model)
-
-        elif method == "prefix":
-            # Prefix Tuning
-            print("模式: Prefix Tuning")
-            self._apply_prefix(model)
-
-        elif method == "adapter":
-            # Adapter
-            print("模式: Adapter微调")
-            self._apply_adapter(model)
-
-    def _apply_lora(self, model):
-        """LoRA: 低秩分解适配器"""
-        # 冻结原始权重
-        self.frozen_layers = ["W_q", "W_k", "W_v", "W_o"]
-        print(f"冻结层: {self.frozen_layers}")
-
-        # 添加LoRA层
-        for name in self.frozen_layers:
-            if hasattr(model, name):
-                setattr(model, name + "_lora_a", np.random.randn(32, 64) * 0.01)
-                setattr(model, name + "_lora_b", np.random.randn(64, model.d_model) * 0.01)
-
-    def _apply_prefix(self, model):
-        """Prefix Tuning"""
-        self.frozen_layers = ["all"]
-        print("冻结所有层，添加Prefix向量")
-
-        # 添加可学习的prefix
-        model.prefix_tokens = np.random.randn(20, model.d_model) * 0.01
-
-    def _apply_adapter(self, model):
-        """Adapter模块"""
-        self.frozen_layers = ["all"]
-        print("冻结所有层，添加Adapter模块")
-
-        # 添加Adapter层
-        for i in range(model.num_layers):
-            setattr(model, f"adapter_down_{i}", np.random.randn(model.d_model, 64) * 0.01)
-            setattr(model, f"adapter_up_{i}", np.random.randn(64, model.d_model) * 0.01)
-
-    def instruct_tune(
-        self,
-        model,
-        instruct_data: List[Tuple[str, str]],  # (instruction, response)
-        config: TrainingConfig
-    ) -> Dict:
-        """指令微调"""
-        print("=== 指令微调 (Instruction Tuning) ===")
-
-        results = {
-            "method": "instruction_tuning",
-            "data_size": len(instruct_data),
-            "epochs": config.epochs,
-            "history": []
-        }
-
-        for epoch in range(config.epochs):
-            epoch_loss = 0
-            for instruction, response in instruct_data:
-                # 前向传播
-                logits = model.generate(instruction)
-
-                # 计算损失（简化）
-                loss = np.random.rand() * 0.1
-                epoch_loss += loss
-
-            avg_loss = epoch_loss / len(instruct_data)
-            results["history"].append(avg_loss)
-            print(f"Epoch {epoch + 1}/{config.epochs}, Loss: {avg_loss:.4f}")
-
-        return results
-
-
-class RLHF:
-    """RLHF (Reinforcement Learning from Human Feedback)"""
-
-    def __init__(self):
-        self.reward_model = None
-        self.ref_model = None
-
-    def train_rm(self, preference_data: List[Tuple[str, str, str]]):
-        """训练奖励模型"""
-        print("=== 训练奖励模型 (RM) ===")
-        print(f"偏好数据: {len(preference_data)} samples")
-
-        for i, (chosen, rejected, score) in enumerate(preference_data[:3]):
-            print(f"  Sample {i+1}: Score={score:.2f}")
-
-    def align_model(
-        self,
-        model,
-        prompts: List[str],
-        responses: List[str],
-        scores: List[float]
-    ) -> Dict:
-        """对齐模型"""
-        print("=== PPO对齐训练 ===")
-
-        results = {
-            "method": "PPO",
-            "prompts": len(prompts),
-            "avg_score_before": np.mean(scores) - 0.1,
-            "avg_score_after": np.mean(scores) + 0.05
-        }
-
-        return results
-
-
-# 使用示例
-async def pretraining_finetuning_demo():
-    """预训练和微调示例"""
-    print("=== 预训练与微调示例 ===")
-
-    # 配置
-    config = TrainingConfig(
-        learning_rate=1e-4,
-        batch_size=32,
-        epochs=3,
-        warmup_steps=100
-    )
-
-    # 准备数据
-    train_texts = ["训练文本 " + str(i) for i in range(1000)]
-    train_labels = [i % 10 for i in range(1000)]
-    train_data = Dataset(train_texts, train_labels, None)
-
-    # 预训练
-    pretrainer = PreTraining(config)
-    losses = pretrainer.train(model=None, train_data=train_data)
-
-    # 微调准备
-    finetuner = FineTuning(config)
-    finetuner.prepare_model(model=None, method="lora")
-
-    # 指令微调
-    instruct_data = [
-        ("写一首诗", "春天的花开得正艳..."),
-        ("解释AI", "人工智能是模拟人类智能的技术..."),
-        ("编程Python", "Python是一门优秀的语言...")
-    ]
-    results = finetuner.instruct_tune(model=None, instruct_data=instruct_data, config=config)</code></pre>
-                </div>
-
-                <!-- Prompt Engineering -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>6. Prompt Engineering提示工程</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># Prompt Engineering提示工程详解
-from typing import List, Dict, Tuple
-from dataclasses import dataclass
-import json
-
-
-@dataclass
-class PromptTemplate:
-    """提示模板"""
-    template: str
-    variables: List[str]
-    description: str = ""
-
-
-class PromptEngineer:
-    """提示工程师"""
-
-    def __init__(self):
-        self.templates: Dict[str, PromptTemplate] = {}
-
-    def add_template(self, name: str, template: PromptTemplate):
-        """添加模板"""
-        self.templates[name] = template
-
-    def format(self, name: str, **kwargs) -> str:
-        """格式化模板"""
-        template = self.templates.get(name)
-        if not template:
-            raise ValueError(f"Template '{name}' not found")
-
-        result = template.template
-        for var in template.variables:
-            result = result.replace(f"{{{var}}}", str(kwargs.get(var, "")))
-        return result
-
-    def few_shot_example(
-        self,
-        task: str,
-        examples: List[Tuple[str, str]],
-        test_input: str,
-        instruction: str = ""
-    ) -> str:
-        """Few-Shot提示"""
-    提示 = f"任务: {task}\n\n"
-
-    if instruction:
-        prompt += f"说明: {instruction}\n\n"
-
-    # 添加示例
-    prompt += "示例:\n"
-    for i, (input_text, output) in enumerate(examples):
-        prompt += f"  输入{i+1}: {input_text}\n"
-        prompt += f"  输出{i+1}: {output}\n"
-        prompt += "\n"
-
-    # 添加测试输入
-    prompt += f"请根据以上示例完成任务:\n  输入: {test_input}\n  输出:"
-
-    return prompt
-
-
-class AdvancedPrompting:
-    """高级提示技术"""
-
-    @staticmethod
-    def chain_of_thought(
-        problem: str,
-        examples: List[str] = None
-    ) -> str:
-        """思维链提示 (CoT)"""
-        prompt = f"""请逐步思考并解决以下问题。
-
-问题: {problem}
-
-请按以下格式回答:
-1. 分析问题的关键点
-2. 列出解决步骤
-3. 逐步推理
-4. 最终答案
-
-推理过程:
-"""
-
-        return prompt
-
-    @staticmethod
-    def self_consistency(
-        problem: str,
-        num_samples: int = 3
-    ) -> str:
-        """自一致性提示"""
-        prompt = f"""请用不同的方法解决以下问题，至少{num_samples}种方法。
-
-问题: {problem}
-
-对于每种方法:
-1. 说明解决思路
-2. 给出解答
-3. 评估解答的正确性
-
-最后综合所有解答，给出最可能的答案。
-"""
-
-        return prompt
-
-    @staticmethod
-    def tree_of_thought(
-        initial_thought: str,
-        goal: str
-    ) -> str:
-        """思维树提示 (ToT)"""
-        prompt = f"""请使用思维树方法解决问题。
-
-初始想法: {initial_thought}
-目标: {goal}
-
-请:
-1. 列出至少3个不同的思考分支
-2. 对每个分支进行深入探索
-3. 评估每个分支的可行性
-4. 综合分析并给出最终建议
-
-思维树结构:
-- 分支1: [探索内容]
-- 分支2: [探索内容]
-- 分支3: [探索内容]
-
-最终决策:
-"""
-
-        return prompt
-
-    @staticmethod
-    def retrieval_augmented(
-        question: str,
-        context: str,
-        task: str = "问答"
-    ) -> str:
-        """检索增强提示 (RAG)"""
-        prompt = f"""基于以下信息回答问题。
-
-【背景信息】
-{context}
-
-【问题】
-{question}
-
-【任务】
-{task}
-
-请根据背景信息给出准确、详细的回答。如果背景信息不足以回答问题，请明确说明。
-"""
-
-        return prompt
-
-    @staticmethod
-    def role_playing(
-        role: str,
-        expertise: List[str],
-        task: str
-    ) -> str:
-        """角色扮演提示"""
-        prompt = f"""你是一位{role}，具有以下专长:
-{chr(10).join(['- ' + exp for exp in expertise])}
-
-请以专业角度分析和回答以下问题:
-
-{task}
-
-请用专业、清晰的方式表达，确保回答准确、有深度。
-"""
-
-        return prompt
-
-    @staticmethod
-    def step_by_step(
-        task: str,
-        steps: List[str] = None
-    ) -> str:
-        """分步提示"""
-        if steps is None:
-            steps = [
-                "理解问题要求",
-                "分析关键信息",
-                "制定解决方案",
-                "执行计算/推理",
-                "验证答案"
-            ]
-
-        prompt = f"""请按步骤完成以下任务:
-
-任务: {task}
-
-步骤指南:
-"""
-
-        for i, step in enumerate(steps, 1):
-            prompt += f"{i}. {step}\n"
-
-        prompt += "\n请逐步执行，并在每个步骤后标记完成状态。"
-
-        return prompt
-
-
-class PromptOptimization:
-    """提示优化"""
-
-    def __init__(self):
-        self.history: List[Dict] = []
-
-    def evaluate_prompt(
-        self,
-        prompt: str,
-        test_cases: List[Tuple[str, str]],
-        metric: str = "accuracy"
-    ) -> Dict:
-        """评估提示效果"""
-        results = {
-            "prompt_length": len(prompt),
-            "test_cases": len(test_cases),
-            "metrics": {}
-        }
-
-        if metric == "accuracy":
-            correct = sum(1 for _, expected in test_cases)
-            results["metrics"]["accuracy"] = correct / len(test_cases)
-        elif metric == "bleu":
-            results["metrics"]["bleu"] = np.random.rand()
-
-        self.history.append(results)
-        return results
-
-    def optimize_prompt(
-        self,
-        base_prompt: str,
-        variations: List[str],
-        test_cases: List[Tuple[str, str]]
-    ) -> str:
-        """优化提示"""
-        print("=== Prompt优化 ===")
-
-        best_prompt = base_prompt
-        best_score = 0
-
-        for i, variation in enumerate(variations):
-            score = self.evaluate_prompt(variation, test_cases)["metrics"].get("accuracy", 0)
-            print(f"变体{i+1}: Score={score:.4f}")
-
-            if score > best_score:
-                best_score = score
-                best_prompt = variation
-
-        print(f"最佳提示得分: {best_score:.4f}")
-        return best_prompt
-
-
-# 使用示例
-async def prompt_engineering_demo():
-    """提示工程示例"""
-    print("=== Prompt Engineering示例 ===")
-
-    # 创建提示模板
-    engineer = PromptEngineer()
-
-    engineer.add_template(
-        "qa",
-        PromptTemplate(
-            template="基于以下背景信息回答问题。\n背景: {context}\n\n问题: {question}\n\n回答:",
-            variables=["context", "question"],
-            description="问答模板"
-        )
-    )
-
-    # 格式化模板
-    prompt = engineer.format(
-        "qa",
-        context="人工智能是模拟人类智能的技术。",
-        question="什么是AI？"
-    )
-    print("问答提示:")
-    print(prompt)
-
-    # Few-Shot示例
-    examples = [
-        ("猫喜欢鱼", "猫是一种可爱的宠物"),
-        ("狗会看家", "狗是人类忠实的朋友")
-    ]
-    few_shot = engineer.few_shot_example(
-        task="描述动物",
-        examples=examples,
-        test_input="鸟会飞",
-        instruction="用简洁的语言描述"
-    )
-    print("\nFew-Shot提示:")
-    print(few_shot)
-
-    # 高级提示技术
-    print("\n=== 高级提示技术 ===")
-
-    # 思维链
-    cot = AdvancedPrompting.chain_of_thought("如果A=5，B=10，那么A+B=?")
-    print(f"CoT提示: {cot}")
-
-    # 角色扮演
-    role_prompt = AdvancedPrompting.role_playing(
-        role="资深数据科学家",
-        expertise=["机器学习", "统计分析", "数据可视化"],
-        task="解释什么是过拟合？"
-    )
-    print(f"\n角色扮演提示: {role_prompt}")
-
-    # 分步提示
-    step_prompt = AdvancedPrompting.step_by_step(
-        task="计算 25 * 4 + 10 = ?"
-    )
-    print(f"\n分步提示: {step_prompt}")</code></pre>
-                </div>
-
-                <!-- LLM Applications -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>7. LLM实际应用场景</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># LLM实际应用场景详解
-from typing import List, Dict, Tuple
-from dataclasses import dataclass
-from datetime import datetime
-import json
-
-
-@dataclass
-class ConversationContext:
-    """对话上下文"""
-    conversation_id: str
-    messages: List[Dict]
-    created_at: datetime = datetime.now()
-    metadata: Dict = None
-
-
-class ChatBot:
-    """智能客服系统"""
-
-    def __init__(self, model):
-        self.model = model
-        self.conversations: Dict[str, ConversationContext] = {}
-        self.knowledge_base = {}
-
-    def create_conversation(self, user_id: str) -> str:
-        """创建对话"""
-        conv_id = f"conv_{datetime.now().timestamp()}"
-        self.conversations[conv_id] = ConversationContext(
-            conversation_id=conv_id,
-            messages=[{"role": "system", "content": "你是智能客服，请帮助用户解决问题。"}],
-            metadata={"user_id": user_id}
-        )
-        return conv_id
-
-    def chat(
-        self,
-        conv_id: str,
-        user_message: str
-    ) -> str:
-        """对话"""
-        if conv_id not in self.conversations:
-            conv_id = self.create_conversation("anonymous")
-
-        ctx = self.conversations[conv_id]
-
-        # 添加用户消息
-        ctx.messages.append({"role": "user", "content": user_message})
-
-        # 生成回复
-        response = self.model.generate(
-            messages=ctx.messages,
-            max_tokens=500,
-            temperature=0.7
-        )
-
-        # 添加助手回复
-        ctx.messages.append({"role": "assistant", "content": response})
-
-        return response
-
-    def add_knowledge(self, category: str, content: str):
-        """添加知识库"""
-        if category not in self.knowledge_base:
-            self.knowledge_base[category] = []
-        self.knowledge_base[category].append(content)
-
-
-class CodeAssistant:
-    """代码助手"""
-
-    def __init__(self, model):
-        self.model = model
-        self.code_history: List[Dict] = []
-
-    def generate_code(
-        self,
-        task_description: str,
-        language: str = "python",
-        context: str = ""
-    ) -> Dict:
-        """生成代码"""
-        prompt = self._build_code_prompt(task_description, language, context)
-
-        code = self.model.generate(
-            prompt=prompt,
-            max_tokens=1000,
-            temperature=0.1  # 低温度，生成确定性代码
-        )
-
-        result = {
-            "task": task_description,
-            "language": language,
-            "code": code,
-            "timestamp": datetime.now().isoformat()
-        }
-
-        self.code_history.append(result)
-        return result
-
-    def _build_code_prompt(
-        self,
-        task: str,
-        language: str,
-        context: str
-    ) -> str:
-        """构建代码提示"""
-        return f"""作为专业的{language}程序员，请编写代码解决以下问题:
-
-任务描述: {task}
-
-{context}
-
-要求:
-1. 代码简洁、高效
-2. 添加必要注释
-3. 包含错误处理
-4. 遵循最佳实践
-
-代码:
-```python
-"""
-
-    def explain_code(self, code: str) -> str:
-        """解释代码"""
-        prompt = f"""请详细解释以下代码的功能和实现原理:
-
-{code}
-
-解释:"""
-
-        return self.model.generate(prompt=prompt, max_tokens=500)
-
-    def debug_code(self, code: str, error: str) -> str:
-        """调试代码"""
-        prompt = f"""代码出现错误，请帮助调试:
-
-```python
-{code}
-```
-
-错误信息: {error}
-
-请:
-1. 分析错误原因
-2. 提供修复后的代码
-3. 给出改进建议
-"""
-
-        return self.model.generate(prompt=prompt, max_tokens=500)
-
-
-class DocumentProcessor:
-    """文档处理系统"""
-
-    def __init__(self, model):
-        self.model = model
-
-    def summarize(self, document: str, max_length: int = 200) -> str:
-        """文档摘要"""
-        prompt = f"""请对以下文档进行摘要，摘要长度不超过{max_length}字:
-
-{document}
-
-摘要:"""
-
-        return self.model.generate(prompt=prompt, max_tokens=max_length // 2)
-
-    def translate(
-        self,
-        text: str,
-        source_lang: str,
-        target_lang: str
-    ) -> str:
-        """翻译"""
-        prompt = f"""请将以下文本从{source_lang}翻译到{target_lang}:
-
-{text}
-
-翻译结果:"""
-
-        return self.model.generate(prompt=prompt)
-
-    def extract_keywords(self, text: str) -> List[str]:
-        """提取关键词"""
-        prompt = f"""请从以下文本中提取5-10个最重要的关键词，以JSON数组格式返回:
-
-{text}
-
-关键词:"""
-
-        result = self.model.generate(prompt=prompt)
-        # 解析JSON
-        try:
-            import json
-            keywords = json.loads(result)
-            if isinstance(keywords, list):
-                return keywords
-        except:
-            pass
-        return []
-
-    def analyze_sentiment(self, text: str) -> Dict:
-        """情感分析"""
-        prompt = f"""请分析以下文本的情感倾向，返回JSON格式:
-
-文本: {text}
-
-格式:
-{{
-    "sentiment": "positive/negative/neutral",
-    "confidence": 0.0-1.0,
-    "reasons": ["原因1", "原因2"]
-}}
-"""
-
-        result = self.model.generate(prompt=prompt)
-        try:
-            import json
-            return json.loads(result)
-        except:
-            return {"sentiment": "unknown", "confidence": 0.0, "reasons": []}
-
-
-class TaskPlanner:
-    """任务规划器"""
-
-    def __init__(self, model):
-        self.model = model
-        self.task_templates: Dict[str, List[str]] = {}
-
-    def decompose_task(self, task: str) -> List[Dict]:
-        """任务分解"""
-        prompt = f"""请将以下复杂任务分解为可执行的子任务:
-
-任务: {task}
-
-请以JSON格式返回:
-[
-    {{"step": 1, "task": "子任务1", "description": "详细说明", "estimated_time": "预估时间"}},
-    {{"step": 2, "task": "子任务2", ...}}
-]
-"""
-
-        result = self.model.generate(prompt=prompt)
-
-        try:
-            import json
-            steps = json.loads(result)
-            if isinstance(steps, list):
-                return steps
-        except:
-            pass
-
-        return [{"step": 1, "task": task, "description": "原始任务", "estimated_time": "unknown"}]
-
-    def estimate_timeline(self, tasks: List[Dict]) -> Dict:
-        """时间线规划"""
-        total_time = sum(
-            self._parse_time(t.get("estimated_time", "1h"))
-            for t in tasks
-        )
-
-        return {
-            "total_steps": len(tasks),
-            "estimated_total_time": f"{total_time}h",
-            "schedule": tasks,
-            "dependencies": []
-        }
-
-    def _parse_time(self, time_str: str) -> float:
-        """解析时间字符串"""
-        try:
-            if 'h' in time_str:
-                return float(time_str.replace('h', ''))
-            elif 'm' in time_str:
-                return float(time_str.replace('m', '')) / 60
-            elif 'd' in time_str:
-                return float(time_str.replace('d', '')) * 24
-        except:
-            pass
-        return 1.0
-
-
-# 使用示例
-async def llm_applications_demo():
-    """LLM应用示例"""
-    print("=== LLM实际应用场景示例 ===")
-
-    # 假设有模型
-    class DummyModel:
-        def generate(self, **kwargs):
-            return "这是模拟回复。"
-
-    model = DummyModel()
-
-    # 客服系统
-    chatbot = ChatBot(model)
-    conv_id = chatbot.create_conversation("user123")
-    response = chatbot.chat(conv_id, "你们的产品有什么特点？")
-    print(f"客服回复: {response}")
-
-    # 代码助手
-    code_assistant = CodeAssistant(model)
-    code_result = code_assistant.generate_code(
-        task_description="实现快速排序算法",
-        language="python"
-    )
-    print(f"\n代码生成结果:")
-    print(code_result["code"][:100] + "...")
-
-    # 文档处理
-    doc_processor = DocumentProcessor(model)
-    summary = doc_processor.summarize("这是一篇关于人工智能的文档。人工智能正在改变世界...", 100)
-    print(f"\n文档摘要: {summary}")
-
-    # 任务规划
-    planner = TaskPlanner(model)
-    tasks = planner.decompose_task("开发一个电商网站")
-    print(f"\n任务分解: {len(tasks)} 个子任务")</code></pre>
-                </div>
-
-                <!-- Deployment -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>8. 模型部署与优化</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># 模型部署与优化详解
-import numpy as np
-from typing import List, Dict, Tuple
-from dataclasses import dataclass
-from datetime import datetime
-import json
-
-
-@dataclass
-class ModelConfig:
-    """模型配置"""
-    model_name: str = "llm-model"
-    max_batch_size: int = 32
-    max_seq_len: int = 2048
-    device: str = "cuda"
-    quantize: str = "fp16"  # fp16, int8, int4
-
-
-class Quantization:
-    """模型量化"""
-
-    def __init__(self, method: str = "fp16"):
-        self.method = method
-
-    def quantize(self, weights: np.ndarray) -> Tuple[np.ndarray, float]:
-        """量化权重"""
-        if self.method == "fp16":
-            return weights.astype(np.float16), 2.0  # 2x压缩
-        elif self.method == "int8":
-            # 线性量化
-            max_val = np.max(np.abs(weights))
-            scale = 127.0 / (max_val + 1e-6)
-            quantized = np.round(weights * scale).astype(np.int8)
-            return quantized, 4.0  # 4x压缩
-        elif self.method == "int4":
-            # 4位量化
-            max_val = np.max(np.abs(weights))
-            scale = 7.0 / (max_val + 1e-6)
-            quantized = np.round(weights * scale).astype(np.int8) % 16
-            return quantized, 8.0  # 8x压缩
-        return weights, 1.0
-
-    def dequantize(self, weights: np.ndarray, original_shape: Tuple, scale: float) -> np.ndarray:
-        """反量化"""
-        return (weights.astype(np.float32) / scale).reshape(original_shape)
-
-
-class ModelOptimizer:
-    """模型优化器"""
-
-    def __init__(self, config: ModelConfig):
-        self.config = config
-        self.quantizer = Quantization(config.quantize)
-
-    def optimize(self, model) -> Dict:
-        """优化模型"""
-        print("=== 模型优化 ===")
-
-        results = {
-            "original_size": 0,
-            "optimized_size": 0,
-            "speedup": 0,
-            "techniques": []
-        }
-
-        # 1. 量化
-        print(f"量化方法: {self.config.quantize}")
-        results["techniques"].append(f"quantization_{self.config.quantize}")
-
-        # 2. 剪枝
-        results["techniques"].append("pruning")
-        print("应用剪枝...")
-
-        # 3. 知识蒸馏
-        results["techniques"].append("knowledge_distillation")
-        print("应用知识蒸馏...")
-
-        # 计算压缩率
-        compression = {
-            "fp16": 2.0,
-            "int8": 4.0,
-            "int4": 8.0
-        }
-        results["compression_ratio"] = compression.get(self.config.quantize, 1.0)
-
-        return results
-
-
-class InferenceEngine:
-    """推理引擎"""
-
-    def __init__(self, config: ModelConfig):
-        self.config = config
-        self.batch_queue: List[Dict] = []
-        self.max_queue_size = config.max_batch_size
-        self.request_counter = 0
-
-    def preprocess(self, input_ids: np.ndarray) -> Dict:
-        """预处理"""
-        return {
-            "input_ids": input_ids,
-            "timestamp": datetime.now()
-        }
-
-    def batch_inference(
-        self,
-        requests: List[Dict],
-        max_batch_size: int = None
-    ) -> List[Dict]:
-        """批处理推理"""
-        max_batch_size = max_batch_size or self.config.max_batch_size
-
-        # 按batch处理
-        results = []
-        for i in range(0, len(requests), max_batch_size):
-            batch = requests[i:i + max_batch_size]
-            batch_result = self._execute_batch(batch)
-            results.extend(batch_result)
-
-        return results
-
-    def _execute_batch(self, batch: List[Dict]) -> List[Dict]:
-        """执行批处理"""
-        results = []
-        for req in batch:
-            result = {
-                "output_ids": np.random.randint(0, 1000, 50),
-                "latency": np.random.rand() * 0.1,
-                "timestamp": datetime.now()
-            }
-            results.append(result)
-        return results
-
-    def streaming_generate(
-        self,
-        prompt: str,
-        max_tokens: int = 100
-    ):
-        """流式生成"""
-        for i in range(max_tokens):
-            yield {
-                "token": i,
-                "text": f"token_{i}",
-                "done": i == max_tokens - 1
-            }
-
-    def get_statistics(self) -> Dict:
-        """获取统计"""
-        return {
-            "total_requests": self.request_counter,
-            "queue_size": len(self.batch_queue),
-            "avg_latency": 0.05,
-            "throughput": 100.0
-        }
-
-
-class ServingSystem:
-    """模型服务系统"""
-
-    def __init__(self, model, config: ModelConfig):
-        self.model = model
-        self.config = config
-        self.engine = InferenceEngine(config)
-        self.optimizer = ModelOptimizer(config)
-
-    def load_model(self, path: str) -> bool:
-        """加载模型"""
-        print(f"=== 加载模型 ===")
-        print(f"路径: {path}")
-        print(f"设备: {self.config.device}")
-        print(f"批处理大小: {self.config.max_batch_size}")
-        print(f"序列长度: {self.config.max_seq_len}")
-        return True
-
-    def serve(self, host: str = "0.0.0.0", port: int = 8000):
-        """启动服务"""
-        print(f"=== 启动LLM服务 ===")
-        print(f"服务地址: {host}:{port}")
-
-        # API端点
-        endpoints = {
-            "/v1/completions": "文本生成",
-            "/v1/chat/completions": "对话生成",
-            "/v1/embeddings": "向量嵌入",
-            "/health": "健康检查"
-        }
-
-        for endpoint, description in endpoints.items():
-            print(f"  {endpoint}: {description}")
-
-    def scale(self, replicas: int):
-        """水平扩展"""
-        print(f"=== 扩展到 {replicas} 个副本 ===")
-        for i in range(replicas):
-            print(f"  副本 {i+1}: 运行中")
-
-    def monitor(self) -> Dict:
-        """监控"""
-        return {
-            "model_loaded": True,
-            "gpu_usage": np.random.rand() * 100,
-            "memory_usage": np.random.rand() * 100,
-            "request_queue": len(self.engine.batch_queue),
-            "uptime_seconds": 3600
-        }
-
-
-class APITemplate:
-    """API模板"""
-
-    @staticmethod
-    def openai_format(prompt: str, max_tokens: int = 100) -> Dict:
-        """OpenAI API格式"""
-        return {
-            "model": "llm-model",
-            "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": max_tokens,
-            "temperature": 0.7,
-            "top_p": 0.95
-        }
-
-    @staticmethod
-    def batch_format(requests: List[Dict]) -> Dict:
-        """批处理格式"""
-        return {
-            "requests": requests,
-            "callback_url": None
-        }
-
-
-# 使用示例
-async def deployment_demo():
-    """部署示例"""
-    print("=== LLM部署与优化示例 ===")
-
-    # 配置
-    config = ModelConfig(
-        model_name="llm-7b",
-        max_batch_size=32,
-        max_seq_len=2048,
-        device="cuda",
-        quantize="int8"
-    )
-
-    # 量化
-    quantizer = Quantization("int8")
-    weights = np.random.randn(1000, 1000)
-    quantized, compression = quantizer.quantize(weights)
-    print(f"量化压缩率: {compression}x")
-
-    # 优化
-    optimizer = ModelOptimizer(config)
-    results = optimizer.optimize(model=None)
-    print(f"优化技术: {results['techniques']}")
-
-    # 服务
-    class DummyModel:
-        pass
-
-    serving = ServingSystem(DummyModel(), config)
-    serving.load_model("/path/to/model")
-    serving.serve(host="0.0.0.0", port=8000)
-
-    # 监控
-    stats = serving.monitor()
-    print(f"\n服务状态:")
-    print(f"  GPU使用率: {stats['gpu_usage']:.1f}%")
-    print(f"  内存使用率: {stats['memory_usage']:.1f}%")</code></pre>
-                </div>
-
-                <!-- Best Practices -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>9. 最佳实践总结</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># 大模型最佳实践总结
-
-LLM_BEST_PRACTICES = """
-【模型选择】
-1. 根据任务复杂度选择模型规模
-2. 考虑延迟和吞吐量需求
-3. 评估成本和性能平衡
-4. 关注模型许可证和合规性
-
-【数据准备】
-1. 高质量、多样化的训练数据
-2. 合理的数据清洗和预处理
-3. 平衡的数据分布
-4. 充分的数据增强
-
-【训练策略】
-1. 使用合适的学习率和调度策略
-2. 应用正则化防止过拟合
-3. 梯度裁剪和混合精度训练
-4. 监控训练指标和早停
-
-【评估方法】
-1. 多维度评估（准确率、流畅度、多样性）
-2. 人工评估和自动评估结合
-3. 针对性测试边界情况
-4. A/B测试验证效果
-
-【部署优化】
-1. 模型量化和压缩
-2. 批处理和流式推理
-3. 缓存和预计算
-4. 水平扩展和负载均衡
-
-【安全考虑】
-1. 输入过滤和输出审核
-2. 防止提示注入攻击
-3. 隐私数据脱敏
-4. 访问控制和审计日志
-"""
-
-print(LLM_BEST_PRACTICES)
-
-# 学习路线图
-LLM_LEARNING_ROADMAP = """
-【阶段1 - 基础（2-3周）】
-□ 理解NLP基础和语言模型原理
-□ 学习Transformer架构
-□ 掌握Tokenization技术
-□ 实现Word Embeddings
-□ 了解预训练范式
-
-【阶段2 - 进阶（4-6周）】
-□ 学习BERT、GPT等经典模型
-□ 掌握Fine-tuning技术
-□ 学习Prompt Engineering
-□ 实践Few-shot学习
-□ 了解模型评估方法
-
-【阶段3 - 高级（4-8周）】
-□ 学习RLHF和对齐技术
-□ 模型压缩和部署
-□ 多模态模型理解
-□ 分布式训练实践
-□ 安全和对齐研究
-
-【阶段4 - 专家（持续学习）】
-□ 研究前沿论文
-□ 贡献开源项目
-□ 创新应用设计
-□ 性能优化深入
-□ 参与社区讨论
-"""
-
-print(LLM_LEARNING_ROADMAP)
-
-# 常见问题
-LLM_FAQ = """
-Q: 如何选择合适的模型大小？
-A: 根据任务复杂度、数据量、计算资源综合考虑。小任务可用7B模型，复杂任务需要70B+。
-
-Q: 为什么模型会产生幻觉？
-A: 训练数据偏差、缺乏领域知识、过度生成等因素导致。需要RAG、外部验证等方法缓解。
-
-Q: 如何提升模型的推理速度？
-A: 量化(FP16/INT8)、剪枝、蒸馏、流式生成、批处理等方法。
-
-Q: 怎样让模型更好地遵循指令？
-A: 指令微调(IFT)、RLHF、CoT提示、严格格式要求等。
-
-Q: 模型输出有毒内容怎么办？
-A: 内容过滤、RLHF对齐、输出版本控制、置信度阈值等。
-
-Q: 如何处理长上下文？
-A: 滑动窗口、稀疏注意力、位置编码扩展、检索增强等。
-"""
-
-print(LLM_FAQ)
-
-# 推荐资源
-LLM_RESOURCES = """
-【论文】
-- Attention Is All You Need (Transformer)
-- BERT: Pre-training of Deep Bidirectional Transformers
-- GPT-3: Language Models are Few-Shot Learners
-- LoRA: Low-Rank Adaptation
-- RLHF: Training language models to follow instructions with human feedback
-
-【课程】
-- Stanford CS224N: Natural Language Processing with Deep Learning
-- DeepLearning.AI: Large Language Models
-- Hugging Face Course
-
-【工具】
-- Hugging Face Transformers
-- LangChain
-- vLLM (高速推理)
-- PEFT (参数高效微调)
-
-【社区】
-- Hugging Face Hub
-- GitHub Trending
-- arXiv
-- Reddit r/MachineLearning
-"""
-
-print(LLM_RESOURCES)
-
-# 学习清单
-LLM_CHECKLIST = """
-【基础知识】
-□ Python编程熟练
-□ 深度学习基础（神经网络、优化器）
-□ NLP基础（分词、词嵌入、序列模型）
-□ 线性代数和概率统计
-
-【核心技能】
-□ Transformer架构理解
-□ Tokenization实现
-□ BERT/GPT模型使用
-□ Prompt Engineering技巧
-□ Fine-tuning方法
-
-【进阶能力】
-□ 模型压缩和部署
-□ RLHF和对齐
-□ 多模态理解
-□ 分布式训练
-
-【工程实践】
-□ 数据pipeline构建
-□ 模型评估和测试
-□ 服务化和API设计
-□ 性能优化
-□ 监控和运维
-"""
-
-print("\n" + LLM_CHECKLIST)</code></pre>
                 </div>
             </div>
+
+            <h3>核心能力</h3>
+            <div class="cards-grid card-grid-3">
+                <div class="card">
+                    <h4>📝 文本生成</h4>
+                    <p>续写文章、创作内容</p>
+                </div>
+                <div class="card">
+                    <h4>🔍 理解分析</h4>
+                    <p>阅读理解、情感分析</p>
+                </div>
+                <div class="card">
+                    <h4>💬 问答对话</h4>
+                    <p>智能客服、知识问答</p>
+                </div>
+                <div class="card">
+                    <h4>⌨️ 代码编写</h4>
+                    <p>代码生成、调试</p>
+                </div>
+                <div class="card">
+                    <h4>🌐 翻译摘要</h4>
+                    <p>多语言翻译、文本摘要</p>
+                </div>
+                <div class="card">
+                    <h4>🧠 推理规划</h4>
+                    <p>逻辑推理、任务规划</p>
+                </div>
+            </div>
+
+            <h3>模型规模对比</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>级别</th>
+                            <th>参数量</th>
+                            <th>能力特点</th>
+                            <th>代表模型</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag">小模型</span></td>
+                            <td>&lt;1B</td>
+                            <td>快速响应，简单任务</td>
+                            <td>GPT-2 Small</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag yellow">中等模型</span></td>
+                            <td>1-10B</td>
+                            <td>一般对话，简单推理</td>
+                            <td>LLaMA-7B</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag yellow">大模型</span></td>
+                            <td>10-100B</td>
+                            <td>复杂推理，多任务</td>
+                            <td>GPT-3, LLaMA-13B</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag red">超大模型</span></td>
+                            <td>&gt;100B</td>
+                            <td>接近人类，多领域专家</td>
+                            <td>GPT-4, PaLM</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Transformer架构</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      Transformer 核心组件                                 │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌──────────────────────────────────────────────────────────────┐      │
+│   │                       Encoder-Decoder                         │      │
+│   │  ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐   │      │
+│   │  │ Input   │ →  │ Embedding│ → │ Positional│ → │ Encoder │   │      │
+│   │  │ Tokens  │    │         │    │ Encoding │    │ Stack   │   │      │
+│   │  └─────────┘    └─────────┘    └─────────┘    └────┬────┘   │      │
+│   │                                                      │         │      │
+│   │                        ┌─────────────────────────────┘         │      │
+│   │                        │                                       │      │
+│   │  ┌─────────┐    ┌──────┴──────┐    ┌─────────┐    ┌─────────┐│      │
+│   │  │ Output  │ ←  │  Linear     │ ←  │ Decoder │ ←  │   Cross ││      │
+│   │  │ Sequence│    │  Projection │    │ Stack   │    │Attention││      │
+│   │  └─────────┘    └─────────────┘    └─────────┘    └─────────┘│      │
+│   └──────────────────────────────────────────────────────────────┘      │
+│                                                                         │
+│   关键技术：Multi-Head Attention + Add & Norm + Feed Forward            │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <h3>注意力机制</h3>
+            <div class="flow-chart">
+                <div class="flow-item start">输入序列</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item">Query (Q)</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item">Key (K) + Value (V)</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item">计算 Q·K^T 分数</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item">Softmax 归一化</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item">加权求和输出</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item end">注意力权重</div>
+            </div>
+
+            <h3>预训练与微调范式</h3>
+            <div class="cards-grid card-grid-2">
+                <div class="card">
+                    <h4>预训练阶段</h4>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">
+                            <strong>目标</strong><br>
+                            学习语言规律
+                        </div>
+                        <div class="comparison-cell">
+                            <strong>数据</strong><br>
+                            海量文本
+                        </div>
+                        <div class="comparison-cell">
+                            <strong>方法</strong><br>
+                            Next Token Prediction
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h4>微调阶段</h4>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">
+                            <strong>目标</strong><br>
+                            任务适配
+                        </div>
+                        <div class="comparison-cell">
+                            <strong>数据</strong><br>
+                            标注数据
+                        </div>
+                        <div class="comparison-cell">
+                            <strong>方法</strong><br>
+                            SFT / RLHF
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>涌现能力</h3>
+            <div class="info-box tip">
+                <strong>大模型的关键特性：</strong>随着模型规模增大，突然出现小模型不具备的能力
+            </div>
+            <div class="cards-grid card-grid-3">
+                <div class="card">
+                    <h4>🧩 复杂推理</h4>
+                    <p>多步逻辑推理、数学计算</p>
+                </div>
+                <div class="card">
+                    <h4>📐 思维链</h4>
+                    <p>分步骤解决问题</p>
+                </div>
+                <div class="card">
+                    <h4>🎯 零样本迁移</h4>
+                    <p>未见过的任务直接完成</p>
+                </div>
+            </div>
+
+            <h3>主流模型对比</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>模型</th>
+                            <th>公司</th>
+                            <th>参数量</th>
+                            <th>特点</th>
+                            <th>开源</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GPT-4</td>
+                            <td>OpenAI</td>
+                            <td>~1.76T</td>
+                            <td>多模态、强大推理</td>
+                            <td>❌</td>
+                        </tr>
+                        <tr>
+                            <td>Claude 3</td>
+                            <td>Anthropic</td>
+                            <td>未知</td>
+                            <td>长上下文、安全对齐</td>
+                            <td>❌</td>
+                        </tr>
+                        <tr>
+                            <td>LLaMA 3</td>
+                            <td>Meta</td>
+                            <td>70B</td>
+                            <td>开源领先、性能优秀</td>
+                            <td>✅</td>
+                        </tr>
+                        <tr>
+                            <td>Qwen 2.5</td>
+                            <td>阿里</td>
+                            <td>72B</td>
+                            <td>中文优秀、开源</td>
+                            <td>✅</td>
+                        </tr>
+                        <tr>
+                            <td>DeepSeek</td>
+                            <td>深度求索</td>
+                            <td>67B</td>
+                            <td>推理能力强</td>
+                            <td>✅</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>模型分类与最佳实践</h3>
+            <div class="card">
+                <div class="card-header">按功能类型分类</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      LLM 模型功能分类                                     │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │
+│   │ 通用对话模型 │  │ 代码生成模型 │  │ 多模态模型  │  │ 推理增强模型 │   │
+│   └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘   │
+│         │               │               │               │               │
+│         ▼               ▼               ▼               ▼               │
+│   ChatGPT, Claude   Codex, StarCoder  GPT-4V, Gemini   o1, DeepSeek-R1 │
+│   Qwen, 文心一言      CodeLlama        LLaVA, MiniCPM    o3-mini        │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <div class="cards-grid card-grid-2">
+                <div class="card">
+                    <h4>🗣️ 通用对话模型</h4>
+                    <p>擅长日常对话、文本创作、知识问答</p>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">
+                            <strong>代表</strong><br>
+                            GPT-4, Claude 3, Qwen
+                        </div>
+                        <div class="comparison-cell">
+                            <strong>特点</strong><br>
+                            知识广泛、表达自然
+                        </div>
+                    </div>
+                    <h4 style="margin-top: 1rem;">最佳实践</h4>
+                    <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                        <li>明确任务目标和期望输出格式</li>
+                        <li>提供上下文信息帮助理解</li>
+                        <li>使用Few-shot示例引导风格</li>
+                        <li>复杂任务分步骤提问</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>⌨️ 代码生成模型</h4>
+                    <p>专注于代码编写、调试、解释、重构</p>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">
+                            <strong>代表</strong><br>
+                            GPT-4o, Claude 3.5, DeepSeek
+                        </div>
+                        <div class="comparison-cell">
+                            <strong>特点</strong><br>
+                            代码准确、懂编程范式
+                        </div>
+                    </div>
+                    <h4 style="margin-top: 1rem;">最佳实践</h4>
+                    <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                        <li>明确编程语言和框架版本</li>
+                        <li>描述输入输出和数据结构</li>
+                        <li>要求添加注释和单元测试</li>
+                        <li>让模型解释代码逻辑</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>🖼️ 多模态模型</h4>
+                    <p>支持图像、视频、音频理解和生成</p>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">
+                            <strong>代表</strong><br>
+                            GPT-4V, Gemini 1.5, Claude 3V
+                        </div>
+                        <div class="comparison-cell">
+                            <strong>特点</strong><br>
+                            多模态输入、理解图像
+                        </div>
+                    </div>
+                    <h4 style="margin-top: 1rem;">最佳实践</h4>
+                    <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                        <li>图像清晰、关键信息突出</li>
+                        <li>明确需要识别的内容</li>
+                        <li>提供图像相关的文字说明</li>
+                        <li>复杂图表分区域提问</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>🧠 推理增强模型</h4>
+                    <p>擅长复杂推理、数学计算、逻辑分析</p>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">
+                            <strong>代表</strong><br>
+                            o1, o3, DeepSeek-R1
+                        </div>
+                        <div class="comparison-cell">
+                            <strong>特点</strong><br>
+                            深度思考、步骤清晰
+                        </div>
+                    </div>
+                    <h4 style="margin-top: 1rem;">最佳实践</h4>
+                    <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                        <li>给充足时间思考</li>
+                        <li>提供完整的背景信息</li>
+                        <li>要求展示推理过程</li>
+                        <li>验证中间步骤正确性</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>按部署方式分类</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>类型</th>
+                            <th>代表模型</th>
+                            <th>优势</th>
+                            <th>适用场景</th>
+                            <th>成本</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag">云端API</span></td>
+                            <td>GPT-4, Claude API</td>
+                            <td>即用即付、无需运维</td>
+                            <td>原型开发、小规模应用</td>
+                            <td>按token计费</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag yellow">开源自部署</span></td>
+                            <td>LLaMA, Qwen, DeepSeek</td>
+                            <td>数据安全、可定制</td>
+                            <td>企业内网、私有化部署</td>
+                            <td>GPU硬件成本</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag green">边缘部署</span></td>
+                            <td>Qwen-1.5-1.8B, Phi-3</td>
+                            <td>低延迟、离线运行</td>
+                            <td>移动端、嵌入式设备</td>
+                            <td>设备成本</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>选型决策指南</h3>
+            <div class="card">
+                <div class="card-header">如何选择合适的模型</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        模型选型决策流程                                   │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│                         ┌─────────────┐                                 │
+│                         │ 开始选型    │                                 │
+│                         └──────┬──────┘                                 │
+│                                │                                        │
+│                                ▼                                        │
+│                         ┌─────────────┐                                 │
+│                         │ 数据敏感度? │                                 │
+│                         └──────┬──────┘                                 │
+│                    ┌────────────┴────────────┐                          │
+│                    │                         │                          │
+│                    ▼                         ▼                          │
+│             ┌───────────┐             ┌───────────┐                     │
+│             │ 是（敏感） │             │ 否（公开） │                     │
+│             └─────┬─────┘             └─────┬─────┘                     │
+│                   │                         │                           │
+│                   ▼                         ▼                           │
+│           ┌───────────────┐         ┌───────────────┐                   │
+│           │ 开源/私有部署 │         │ 考虑任务类型  │                   │
+│           │ Qwen, LLaMA  │         └───────┬───────┘                   │
+│           └───────────────┘               │                           │
+│                                             ▼                           │
+│                                ┌────────────────────┐                  │
+│                                │ 推理复杂度如何?    │                  │
+│                                └─────────┬──────────┘                  │
+│                          ┌───────────────┴───────────────┐              │
+│                          │                               │              │
+│                          ▼                               ▼              │
+│                   ┌─────────────┐               ┌─────────────┐        │
+│                   │ 复杂推理    │               │ 简单任务    │        │
+│                   │ o1, DeepSeek│               │ GPT-4o, Qwen│        │
+│                   └─────────────┘               └─────────────┘        │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <h3>🌐 LLM API 接口汇总</h3>
+
+            <h4 style="margin: 1.5rem 0 1rem; font-size: 1.1rem;">🇺🇸 国外主流API</h4>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>厂商</th>
+                            <th>模型</th>
+                            <th>特点</th>
+                            <th>价格</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>OpenAI</strong></td>
+                            <td>GPT-4o, GPT-4, GPT-3.5</td>
+                            <td>生态完善、功能全面</td>
+                            <td>$5-30/M tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Anthropic</strong></td>
+                            <td>Claude 3.5, Claude 3</td>
+                            <td>长上下文、安全对齐</td>
+                            <td>$3-15/M tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Google</strong></td>
+                            <td>Gemini 1.5, Gemini Pro</td>
+                            <td>多模态原生、多语言</td>
+                            <td>$0.5-5/M tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Meta</strong></td>
+                            <td>Llama 3 (开源)</td>
+                            <td>开源免费、可私有部署</td>
+                            <td>免费</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4 style="margin: 1.5rem 0 1rem; font-size: 1.1rem;">🇨🇳 国内主流API</h4>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>厂商</th>
+                            <th>模型</th>
+                            <th>特点</th>
+                            <th>价格</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>百度</strong></td>
+                            <td>ERNIE 4.0, ERNIE 3.5</td>
+                            <td>中文理解强、推理能力强</td>
+                            <td>¥0.012-0.12/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>阿里</strong></td>
+                            <td>Qwen 2.5, Qwen-Max</td>
+                            <td>开源生态好、性能优秀</td>
+                            <td>¥0.008-0.02/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>腾讯</strong></td>
+                            <td>混元, 混元-Pro</td>
+                            <td>多模态能力强</td>
+                            <td>¥0.01-0.1/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>字节跳动</strong></td>
+                            <td>豆包, Doubao-pro</td>
+                            <td>性价比高、响应快</td>
+                            <td>¥0.001-0.005/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>智谱AI</strong></td>
+                            <td>GLM-4, GLM-3-Turbo</td>
+                            <td>中英双语、工具调用强</td>
+                            <td>¥0.005-0.1/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>深度求索</strong></td>
+                            <td>DeepSeek-V2, DeepSeek-Chat</td>
+                            <td>推理能力强、价格低</td>
+                            <td>¥0.001-0.004/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>月之暗面</strong></td>
+                            <td>Kimi (Moonshot)</td>
+                            <td>超长上下文(200万字)</td>
+                            <td>¥0.012-0.12/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>百川智能</strong></td>
+                            <td>Baichuan 4</td>
+                            <td>中文优化</td>
+                            <td>¥0.012/千tokens</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>💻 Python API 调用示例</h3>
+
+            <div class="card">
+                <div class="card-header">示例1：OpenAI GPT-4</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install openai
+from openai import OpenAI
+
+# 初始化客户端
+client = OpenAI(
+    api_key="your-api-key",  # 替换为你的API Key
+    base_url="https://api.openai.com/v1"
+)
+
+# 调用模型
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "system", "content": "你是一个专业助手"},
+        {"role": "user", "content": "请解释什么是机器学习？"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# 获取回复
+print(response.choices[0].message.content)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例2：Claude (Anthropic)</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install anthropic
+from anthropic import Anthropic
+
+# 初始化客户端
+client = Anthropic(
+    api_key="your-api-key"  # 替换为你的API Key
+)
+
+# 调用模型
+response = client.messages.create(
+    model="claude-sonnet-4-20250514",
+    max_tokens=1000,
+    messages=[
+        {"role": "user", "content": "请解释什么是深度学习？"}
+    ]
+)
+
+# 获取回复
+print(response.content[0].text)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例3：百度文心一言</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install qianfan
+import qianfan
+
+# 初始化客户端
+client = qianfan.ChatCompletion(
+    ak="your-access-key",      # 替换为你的AK
+    sk="your-secret-key"       # 替换为你的SK
+)
+
+# 调用模型
+response = client.do(
+    model="ernie-4.5-8k",
+    messages=[
+        {"role": "user", "content": "请解释什么是自然语言处理？"}
+    ],
+    temperature=0.7,
+    penalty_score=1.0
+)
+
+# 获取回复
+print(response["body"]["result"])</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例4：阿里通义千问</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install dashscope
+from dashscope import ChatCompletion
+
+# 调用模型
+response = ChatCompletion.call(
+    model="qwen-max",
+    messages=[
+        {"role": "user", "content": "请解释什么是卷积神经网络？"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# 获取回复
+print(response.output.choices[0].message.content)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例5：智谱 GLM</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install zhipuai
+from zhipuai import ZhipuAI
+
+# 初始化客户端
+client = ZhipuAI(api_key="your-api-key")  # 替换为你的API Key
+
+# 调用模型
+response = client.chat.completions.create(
+    model="glm-4",
+    messages=[
+        {"role": "user", "content": "请解释什么是强化学习？"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# 获取回复
+print(response.choices[0].message.content)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例6：深度求索 DeepSeek</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install openai
+from openai import OpenAI
+
+# 初始化客户端（兼容OpenAI接口）
+client = OpenAI(
+    api_key="your-api-key",  # 替换为你的API Key
+    base_url="https://api.deepseek.com/v1"
+)
+
+# 调用模型
+response = client.chat.completions.create(
+    model="deepseek-chat",
+    messages=[
+        {"role": "user", "content": "请解释什么是Transformer架构？"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# 获取回复
+print(response.choices[0].message.content)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例7：字节豆包</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install openai
+from openai import OpenAI
+
+# 初始化客户端（兼容OpenAI接口）
+client = OpenAI(
+    api_key="your-api-key",  # 替换为你的API Key
+    base_url="https://ark.cn-beijing.volces.com/api/v3"
+)
+
+# 调用模型
+response = client.chat.completions.create(
+    model="doubao-pro-32k",
+    messages=[
+        {"role": "user", "content": "请解释什么是注意力机制？"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# 获取回复
+print(response.choices[0].message.content)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例8：月之暗面 Kimi</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install openai
+from openai import OpenAI
+
+# 初始化客户端（兼容OpenAI接口）
+client = OpenAI(
+    api_key="your-api-key",  # 替换为你的API Key
+    base_url="https://api.moonshot.cn/v1"
+)
+
+# 调用模型
+response = client.chat.completions.create(
+    model="moonshot-v1-8k",
+    messages=[
+        {"role": "user", "content": "请解释什么是大语言模型？"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# 获取回复
+print(response.choices[0].message.content)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例9：统一调用封装</div>
+                <pre class="code-block"><code class="language-python">"""
+统一的大语言模型调用封装
+支持切换不同提供商
+"""
+from abc import ABC, abstractmethod
+from typing import List, Dict, Optional
+import os
+
+class LLMProvider(ABC):
+    """LLM提供商抽象基类"""
+    
+    @abstractmethod
+    def chat(self, messages: List[Dict], **kwargs) -> str:
+        pass
+
+class OpenAIProvider(LLMProvider):
+    def __init__(self, api_key: str, model: str = "gpt-4o"):
+        from openai import OpenAI
+        self.client = OpenAI(api_key=api_key)
+        self.model = model
+    
+    def chat(self, messages: List[Dict], temperature: float = 0.7, **kwargs) -> str:
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            temperature=temperature,
+            **kwargs
+        )
+        return response.choices[0].message.content
+
+class DeepSeekProvider(LLMProvider):
+    def __init__(self, api_key: str, model: str = "deepseek-chat"):
+        from openai import OpenAI
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.deepseek.com/v1"
+        )
+        self.model = model
+    
+    def chat(self, messages: List[Dict], temperature: float = 0.7, **kwargs) -> str:
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            temperature=temperature,
+            **kwargs
+        )
+        return response.choices[0].message.content
+
+class QwenProvider(LLMProvider):
+    def __init__(self, api_key: str, model: str = "qwen-max"):
+        from dashscope import ChatCompletion
+        self.client = None  # dashscope使用函数式调用
+        self.api_key = api_key
+        self.model = model
+    
+    def chat(self, messages: List[Dict], temperature: float = 0.7, **kwargs) -> str:
+        from dashscope import ChatCompletion
+        response = ChatCompletion.call(
+            model=self.model,
+            messages=messages,
+            temperature=temperature,
+            **kwargs
+        )
+        return response.output.choices[0].message.content
+
+# 工厂函数
+def create_llm_provider(provider: str, api_key: str, model: str = None) -> LLMProvider:
+    providers = {
+        "openai": lambda: OpenAIProvider(api_key, model or "gpt-4o"),
+        "deepseek": lambda: DeepSeekProvider(api_key, model or "deepseek-chat"),
+        "qwen": lambda: QwenProvider(api_key, model or "qwen-max"),
+    }
+    return providers[provider.lower()]()
+
+# 使用示例
+if __name__ == "__main__":
+    messages = [
+        {"role": "system", "content": "你是一个专业助手"},
+        {"role": "user", "content": "什么是机器学习？"}
+    ]
+    
+    # 切换不同提供商
+    provider = create_llm_provider(
+        provider="deepseek",  # 改为 "openai" 或 "qwen" 试试
+        api_key="your-api-key",
+        model="deepseek-chat"
+    )
+    
+    response = provider.chat(messages)
+    print(response)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">API调用最佳实践</div>
+                <div class="cards-grid card-grid-3" style="margin-top: 1rem;">
+                    <div class="card" style="padding: 1rem;">
+                        <h4 style="margin-bottom: 0.5rem;">🔐 安全建议</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>使用环境变量存储API Key</li>
+                            <li>不要在代码中硬编码密钥</li>
+                            <li>设置API Key使用限制</li>
+                            <li>定期轮换密钥</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="padding: 1rem;">
+                        <h4 style="margin-bottom: 0.5rem;">💰 成本优化</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>选择合适的模型大小</li>
+                            <li>减少不必要的上下文</li>
+                            <li>使用缓存避免重复调用</li>
+                            <li>设置max_tokens限制</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="padding: 1rem;">
+                        <h4 style="margin-bottom: 0.5rem;">🛡️ 错误处理</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>实现重试机制</li>
+                            <li>处理Rate Limit错误</li>
+                            <li>设置超时时间</li>
+                            <li>记录调用日志</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 

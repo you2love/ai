@@ -9,1697 +9,526 @@
 <body>
     <section class="section">
         <div class="container">
-            <h2 class="section-title">AI智能体详解</h2>
-            <p class="section-subtitle">从入门到精通，掌握AI智能体开发</p>
+            <h2 class="section-title">🤖 AI智能体详解</h2>
+            <p class="section-subtitle">自主完成复杂任务的AI系统</p>
 
-            <div class="code-sections">
-                <!-- 什么是智能体 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>1. 什么是AI智能体？</h3>
+            <!-- 什么是智能体 -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <div class="card-icon">🤖</div>
+                    <div>
+                        <div class="card-title">什么是AI智能体？</div>
+                        <div class="card-subtitle">Agent = 感知 + 推理 + 行动</div>
                     </div>
-                    <pre class="code-block"><code class="language-python"># AI智能体（Agent）详解
-#
-# 智能体是一个能够感知环境、做出决策并采取行动的系统
-# 核心特性：自主性、反应性、目标导向、社会性
-
-# 智能体的核心能力
-AGENT_CAPABILITIES = """
-1. 感知（Perception）：获取环境信息
-2. 推理（Reasoning）：分析和处理信息
-3. 规划（Planning）：制定行动策略
-4. 行动（Action）：执行具体操作
-5. 学习（Learning）：从经验中改进
-6. 协作（Collaboration）：与其他智能体交互
-
-# 智能体 vs 传统程序
-# 传统程序：预定义规则，明确的输入输出
-# 智能体：自适应行为，动态决策，基于目标行动
-"""
-
-print("智能体的核心设计理念：")
-print("1. 让AI系统能够自主完成复杂任务")
-print("2. 支持目标导向的决策和规划")
-print("3. 实现环境交互和反馈循环")
-print("4. 支持多智能体协作")
-
-# 智能体架构
-AGENT_ARCHITECTURE = """
-智能体系统架构通常包含：
-
-┌─────────────────────────────────────────┐
-│           智能体核心（Agent Core）       │
-│  ┌─────────┐  ┌─────────┐  ┌───────┐ │
-│  │ 感知模块 │→│ 决策模块 │→│ 执行模块│ │
-│  └─────────┘  └─────────┘  └───────┘ │
-│        ↑              ↓               │
-│  ┌─────────────────────────────────┐ │
-│  │      记忆系统（Memory）          │ │
-│  └─────────────────────────────────┘ │
-└─────────────────────────────────────────┘
-        ↓              ↓
-   ┌──────────┐  ┌──────────┐
-   │ 工具库   │  │ 知识库   │
-   │ Tools    │  │ Knowledge │
-   └──────────┘  └──────────┘
-"""
-
-print(AGENT_ARCHITECTURE)</code></pre>
                 </div>
-
-                <!-- 智能体基础架构 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>2. 智能体基础架构</h3>
+                <div class="card-body">
+                    <div class="diagram-box">
+                        <div class="diagram-title">智能体核心能力</div>
+                        <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│   感知环境 → 分析推理 → 制定计划 → 执行行动 → 学习改进           │
+│                                                                 │
+│   ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    │
+│   │  感知  │ ➜  │  推理  │ ➜  │  规划  │ ➜  │  行动  │    │
+│   └─────────┘    └─────────┘    └─────────┘    └─────────┘    │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+                        </div>
                     </div>
-                    <pre class="code-block"><code class="language-python"># 智能体基础架构实现
-from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Tuple
-from dataclasses import dataclass, field
-from enum import Enum
-from datetime import datetime
-import json
-import logging
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-class AgentState(Enum):
-    IDLE = "idle"
-    THINKING = "thinking"
-    ACTING = "acting"
-    WAITING = "waiting"
-    ERROR = "error"
-
-@dataclass
-class Message:
-    """智能体消息"""
-    sender: str
-    receiver: str
-    content: Any
-    timestamp: datetime = field(default_factory=datetime.now)
-    message_type: str = "text"
-
-@dataclass
-class Observation:
-    """环境观察"""
-    perception: Dict[str, Any]
-    timestamp: datetime = field(default_factory=datetime.now)
-    confidence: float = 1.0
-
-@dataclass
-class Action:
-    """智能体行动"""
-    name: str
-    parameters: Dict[str, Any] = field(default_factory=dict)
-    confidence: float = 1.0
-    reasoning: str = ""
-
-class BaseAgent(ABC):
-    """智能体基类"""
-    
-    def __init__(self, name: str, role: str):
-        self.name = name
-        self.role = role
-        self.state = AgentState.IDLE
-        self.memory: List[Dict] = []
-        self.tools: Dict[str, Any] = {}
-        self.knowledge_base: Dict[str, Any] = {}
-        self Goals: List[Dict] = []
-        self.config: Dict[str, Any] = {}
-    
-    @abstractmethod
-    async def perceive(self, environment: Dict) -> Observation:
-        """感知环境"""
-        pass
-    
-    @abstractmethod
-    async def think(self, observation: Observation) -> Action:
-        """思考决策"""
-        pass
-    
-    @abstractmethod
-    async def act(self, action: Action) -> Dict:
-        """执行行动"""
-        pass
-    
-    @abstractmethod
-    async def learn(self, experience: Dict):
-        """从经验中学习"""
-        pass
-    
-    async def run_cycle(self, environment: Dict) -> Tuple[AgentState, Dict]:
-        """运行一个智能体周期"""
-        try:
-            self.state = AgentState.THINKING
-            
-            # 1. 感知
-            observation = await self.perceive(environment)
-            
-            # 2. 思考
-            action = await self.think(observation)
-            
-            if action is None:
-                self.state = AgentState.IDLE
-                return self.state, {"status": "no action needed"}
-            
-            # 3. 行动
-            self.state = AgentState.ACTING
-            result = await self.act(action)
-            
-            # 4. 学习
-            experience = {
-                "observation": observation,
-                "action": action,
-                "result": result,
-                "timestamp": datetime.now()
-            }
-            await self.learn(experience)
-            
-            # 5. 记录到记忆
-            self.memory.append(experience)
-            
-            self.state = AgentState.IDLE
-            return self.state, result
-            
-        except Exception as e:
-            logger.error(f"Agent {self.name} error: {e}")
-            self.state = AgentState.ERROR
-            return self.state, {"error": str(e)}
-    
-    def add_tool(self, name: str, tool: Any):
-        """添加工具"""
-        self.tools[name] = tool
-        logger.info(f"Tool {name} added to agent {self.name}")
-    
-    def set_goal(self, goal: Dict):
-        """设置目标"""
-        self.Goals.append(goal)
-        logger.info(f"Goal set for agent {self.name}: {goal}")
-    
-    def get_status(self) -> Dict:
-        """获取智能体状态"""
-        return {
-            "name": self.name,
-            "role": self.role,
-            "state": self.state.value,
-            "memory_count": len(self.memory),
-            "tools_count": len(self.tools),
-            "goals_count": len(self.Goals)
-        }
-
-# 使用示例
-class SimpleAgent(BaseAgent):
-    """简单智能体示例"""
-    
-    def __init__(self, name: str, role: str):
-        super().__init__(name, role)
-        self.current_goal = None
-    
-    async def perceive(self, environment: Dict) -> Observation:
-        """感知环境"""
-        return Observation(
-            perception={
-                "input": environment.get("input", ""),
-                "context": environment.get("context", {})
-            }
-        )
-    
-    async def think(self, observation: Observation) -> Action:
-        """简单思考：根据观察决定行动"""
-        perception = observation.perception
-        input_text = perception.get("input", "")
-        
-        if "计算" in input_text or any(op in input_text for op in ["+", "-", "*", "/"]):
-            return Action(
-                name="calculate",
-                parameters={"expression": input_text},
-                reasoning="检测到计算需求"
-            )
-        elif "搜索" in input_text:
-            return Action(
-                name="search",
-                parameters={"query": input_text},
-                reasoning="检测到搜索需求"
-            )
-        else:
-            return Action(
-                name="respond",
-                parameters={"message": f"收到: {input_text}"},
-                reasoning="默认响应"
-            )
-    
-    async def act(self, action: Action) -> Dict:
-        """执行行动"""
-        if action.name == "calculate":
-            expr = action.parameters.get("expression", "")
-            try:
-                result = eval(expr)
-                return {"result": result, "action": action.name}
-            except:
-                return {"error": "计算失败", "action": action.name}
-        elif action.name == "search":
-            return {"result": f"搜索: {action.parameters.get('query', '')}", "action": action.name}
-        else:
-            return {"message": action.parameters.get("message", ""), "action": action.name}
-    
-    async def learn(self, experience: Dict):
-        """简单学习：记录经验"""
-        self.memory.append({
-            "action": experience["action"].name,
-            "result": experience.get("result", {}),
-            "timestamp": datetime.now()
-        })
-
-# 运行智能体示例
-async def agent_demo():
-    agent = SimpleAgent("助手", "助手")
-    
-    print("智能体状态：")
-    print(json.dumps(agent.get_status(), ensure_ascii=False, indent=2))
-    
-    # 处理任务
-    environments = [
-        {"input": "计算 25 + 17"},
-        {"input": "搜索 AI 技术"},
-        {"input": "你好"}
-    ]
-    
-    for env in environments:
-        print(f"\n处理环境: {env}")
-        state, result = await agent.run_cycle(env)
-        print(f"状态: {state.value}")
-        print(f"结果: {json.dumps(result, ensure_ascii=False)}")</code></pre>
-                </div>
-
-                <!-- 反应式智能体 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>3. 反应式智能体</h3>
+                    <div class="comparison-row" style="margin-top: 1rem;">
+                        <div class="comparison-cell" style="font-weight:600;">对比</div>
+                        <div class="comparison-cell" style="background:#fef2f2;">传统程序</div>
+                        <div class="comparison-cell" style="background:#ecfdf5;">AI智能体</div>
                     </div>
-                    <pre class="code-block"><code class="language-python"># 反应式智能体：基于规则的直接响应
-from typing import Any, Dict, List, Callable
-from dataclasses import dataclass
-
-@dataclass
-class Rule:
-    """规则定义"""
-    condition: Callable[[Dict], bool]
-    action: str
-    priority: int = 0
-
-class ReactiveAgent:
-    """反应式智能体"""
-    
-    def __init__(self, name: str):
-        self.name = name
-        self.rules: List[Rule] = []
-        self.state: Dict[str, Any] = {}
-        self.action_history: List[Dict] = []
-    
-    def add_rule(self, condition: Callable, action: str, priority: int = 0):
-        """添加规则"""
-        self.rules.append(Rule(condition, action, priority))
-        # 按优先级排序
-        self.rules.sort(key=lambda r: r.priority, reverse=True)
-    
-    def perceive(self, environment: Dict) -> Dict:
-        """感知"""
-        self.state.update(environment)
-        return self.state
-    
-    def decide(self) -> Dict:
-        """决策：匹配第一个满足条件的规则"""
-        for rule in self.rules:
-            if rule.condition(self.state):
-                return {"action": rule.action, "reason": rule.action}
-        return {"action": "default", "reason": "no rule matched"}
-    
-    def act(self, decision: Dict) -> Dict:
-        """执行"""
-        action_name = decision["action"]
-        self.action_history.append({
-            "action": action_name,
-            "state": self.state.copy(),
-            "timestamp": datetime.now()
-        })
-        return {"executed": action_name, "state": self.state}
-    
-    async def run_cycle(self, environment: Dict) -> Dict:
-        """运行周期"""
-        self.perceive(environment)
-        decision = self.decide()
-        result = self.act(decision)
-        return result
-
-# 聊天机器人反应式智能体
-class ChatReactiveAgent(ReactiveAgent):
-    """聊天反应式智能体"""
-    
-    def __init__(self, name: str):
-        super().__init__(name)
-        self._setup_chat_rules()
-    
-    def _setup_chat_rules(self):
-        """设置聊天规则"""
-        import re
-        
-        def contains_keyword(keywords):
-            def condition(state):
-                text = state.get("message", "").lower()
-                return any(kw.lower() in text for kw in keywords)
-            return condition
-        
-        self.add_rule(
-            condition=contains_keyword(["你好", "hello", "hi"]),
-            action="greet",
-            priority=10
-        )
-        
-        self.add_rule(
-            condition=contains_keyword(["帮助", "help", "怎么"]),
-            action="help",
-            priority=10
-        )
-        
-        self.add_rule(
-            condition=contains_keyword(["天气", "weather"]),
-            action="weather_query",
-            priority=10
-        )
-        
-        self.add_rule(
-            condition=contains_keyword(["谢谢", "thanks", "感谢"]),
-            action="thank",
-            priority=10
-        )
-        
-        self.add_rule(
-            condition=contains_keyword(["bye", "再见", "拜拜"]),
-            action="goodbye",
-            priority=10
-        )
-    
-    def respond(self, message: str) -> str:
-        """生成响应"""
-        self.perceive({"message": message})
-        decision = self.decide()
-        
-        responses = {
-            "greet": "你好！我是智能助手，很高兴为你服务。有什么我可以帮助你的吗？",
-            "help": "我可以帮你：\n1. 回答问题\n2. 搜索信息\n3. 计算数学\n4. 聊天交流\n请告诉我你需要什么？",
-            "weather_query": "查询天气功能开发中...",
-            "thank": "不客气！这是我的职责。",
-            "goodbye": "再见！期待下次为你服务。",
-            "default": f"收到你说的话：'{message}'。请告诉我你需要什么帮助？"
-        }
-        
-        return responses.get(decision["action"], responses["default"])
-
-# 使用反应式智能体
-async def reactive_agent_demo():
-    agent = ChatReactiveAgent("小助手")
-    
-    messages = [
-        "你好！",
-        "怎么使用？",
-        "今天天气怎么样？",
-        "谢谢你的帮助！",
-        "再见！"
-    ]
-    
-    print("=== 反应式智能体对话 ===")
-    for msg in messages:
-        response = agent.respond(msg)
-        print(f"\n用户: {msg}")
-        print(f"助手: {response}")</code></pre>
-                </div>
-
-                <!-- 基于目标的智能体 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>4. 基于目标的智能体</h3>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">行为模式</div>
+                        <div class="comparison-cell">预定义规则</div>
+                        <div class="comparison-cell">自适应学习</div>
                     </div>
-                    <pre class="code-block"><code class="language-python"># 基于目标的智能体：Goal-Based Agent
-from typing import Any, Dict, List, Optional
-from dataclasses import dataclass, field
-from enum import Enum
-from datetime import datetime
-import heapq
-
-class GoalStatus(Enum):
-    PENDING = "pending"
-    ACTIVE = "active"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
-
-@dataclass
-class Goal:
-    """目标定义"""
-    goal_id: str
-    description: str
-    target_state: Dict[str, Any]
-    priority: int = 0
-    deadline: Optional[datetime] = None
-    subtasks: List['Goal'] = field(default_factory=list)
-    status: GoalStatus = GoalStatus.PENDING
-    progress: float = 0.0
-
-class GoalBasedAgent:
-    """基于目标的智能体"""
-    
-    def __init__(self, name: str):
-        self.name = name
-        self.goals: List[Goal] = []
-        self.current_goal: Optional[Goal] = None
-        self.plan: List[Dict] = []
-        self.world_model: Dict[str, Any] = {}
-        self.action_history: List[Dict] = []
-    
-    def add_goal(self, goal: Goal):
-        """添加目标"""
-        self.goals.append(goal)
-        # 按优先级排序
-        self.goals.sort(key=lambda g: g.priority, reverse=True)
-    
-    def select_goal(self) -> Optional[Goal]:
-        """选择下一个要追求的目标"""
-        for goal in self.goals:
-            if goal.status == GoalStatus.PENDING:
-                goal.status = GoalStatus.ACTIVE
-                self.current_goal = goal
-                return goal
-        return None
-    
-    def is_goal_achieved(self, goal: Goal) -> bool:
-        """检查目标是否达成"""
-        for key, target_value in goal.target_state.items():
-            current_value = self.world_model.get(key)
-            if current_value != target_value:
-                return False
-        return True
-    
-    def update_world_model(self, observation: Dict):
-        """更新世界模型"""
-        self.world_model.update(observation)
-    
-    async def plan_actions(self, goal: Goal) -> List[Dict]:
-        """规划行动步骤"""
-        # 简单规划器：根据目标差值生成行动
-        actions = []
-        
-        for key, target_value in goal.target_state.items():
-            current_value = self.world_model.get(key)
-            
-            if current_value is None:
-                # 需要先获取该值
-                actions.append({
-                    "action": "acquire",
-                    "target": key,
-                    "reason": f"获取 {key} 的当前值"
-                })
-            elif current_value != target_value:
-                # 需要改变该值
-                if isinstance(target_value, (int, float)):
-                    diff = target_value - current_value
-                    actions.append({
-                        "action": "adjust",
-                        "target": key,
-                        "current": current_value,
-                        "target": target_value,
-                        "change": diff,
-                        "reason": f"调整 {key} 从 {current_value} 到 {target_value}"
-                    })
-                else:
-                    actions.append({
-                        "action": "set",
-                        "target": key,
-                        "value": target_value,
-                        "reason": f"设置 {key} 为 {target_value}"
-                    })
-        
-        return actions
-    
-    async def execute_plan(self, plan: List[Dict]) -> bool:
-        """执行计划"""
-        success = True
-        for step in plan:
-            action = step["action"]
-            # 模拟执行
-            result = await self._execute_action(action, step)
-            self.action_history.append({
-                "step": step,
-                "result": result,
-                "timestamp": datetime.now()
-            })
-            
-            if not result.get("success", True):
-                success = False
-                break
-        
-        return success
-    
-    async def _execute_action(self, action: str, params: Dict) -> Dict:
-        """执行单个行动"""
-        # 模拟行动执行
-        if action == "acquire":
-            key = params.get("target")
-            return {"success": True, "acquired": key, "value": self.world_model.get(key)}
-        elif action == "adjust":
-            key = params.get("target")
-            new_value = params.get("target")
-            self.world_model[key] = new_value
-            return {"success": True, "adjusted": key, "new_value": new_value}
-        elif action == "set":
-            key = params.get("target")
-            value = params.get("value")
-            self.world_model[key] = value
-            return {"success": True, "set": key, "value": value}
-        else:
-            return {"success": False, "error": f"Unknown action: {action}"}
-    
-    async def run_goal_cycle(self, observations: List[Dict] = None) -> Dict:
-        """运行目标导向周期"""
-        observations = observations or []
-        
-        # 更新世界模型
-        for obs in observations:
-            self.update_world_model(obs)
-        
-        # 选择目标
-        goal = self.select_goal()
-        if not goal:
-            return {"status": "no goals", "world_model": self.world_model}
-        
-        # 检查是否达成
-        if self.is_goal_achieved(goal):
-            goal.status = GoalStatus.COMPLETED
-            goal.progress = 1.0
-            return {"status": "goal achieved", "goal": goal.description}
-        
-        # 规划和执行
-        plan = await self.plan_actions(goal)
-        success = await self.execute_plan(plan)
-        
-        if success:
-            if self.is_goal_achieved(goal):
-                goal.status = GoalStatus.COMPLETED
-                goal.progress = 1.0
-                return {"status": "goal completed", "goal": goal.description}
-        
-        return {"status": "in progress", "plan": plan, "world_model": self.world_model}
-
-# 使用基于目标的智能体
-async def goal_based_agent_demo():
-    agent = GoalBasedAgent("任务助手")
-    
-    # 设置初始世界状态
-    agent.world_model = {
-        "temperature": 25.0,
-        "lights_on": False,
-        "music_playing": False,
-        "user_present": True
-    }
-    
-    print("初始世界状态：")
-    print(json.dumps(agent.world_model, ensure_ascii=False, indent=2))
-    
-    # 添加目标
-    agent.add_goal(Goal(
-        goal_id="goal1",
-        description="准备舒适的工作环境",
-        target_state={
-            "lights_on": True,
-            "music_playing": True,
-            "temperature": 24.0
-        },
-        priority=10
-    ))
-    
-    # 运行目标周期
-    result = await agent.run_goal_cycle()
-    print("\n执行结果：")
-    print(json.dumps(result, ensure_ascii=False, indent=2))
-    
-    print("\n最终世界状态：")
-    print(json.dumps(agent.world_model, ensure_ascii=False, indent=2))</code></pre>
-                </div>
-
-                <!-- 规划式智能体 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>5. 规划式智能体</h3>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">决策方式</div>
+                        <div class="comparison-cell">固定逻辑</div>
+                        <div class="comparison-cell">动态推理</div>
                     </div>
-                    <pre class="code-block"><code class="language-python"># 规划式智能体：使用规划算法制定行动序列
-from typing import Any, Dict, List, Set, Tuple
-from dataclasses import dataclass
-from dataclasses import field
-from datetime import datetime
-import copy
-
-@dataclass
-class Predicate:
-    """谓词：描述世界状态"""
-    name: str
-    args: List[str] = field(default_factory=list)
-    
-    def __hash__(self):
-        return hash((self.name, tuple(self.args)))
-    
-    def __eq__(self, other):
-        return self.name == other.name and self.args == other.args
-
-@dataclass
-class Action:
-    """行动定义"""
-    name: str
-    parameters: List[str] = field(default_factory=list)
-    preconditions: List[Predicate] = field(default_factory=list)
-    effects: List[Predicate] = field(default_factory=list)
-    cost: float = 1.0
-
-class PlanningAgent:
-    """规划式智能体"""
-    
-    def __init__(self, name: str):
-        self.name = name
-        self.domain_actions: List[Action] = []
-        self.operators: Dict[str, Action] = {}
-    
-    def add_action(self, action: Action):
-        """添加行动模板"""
-        self.domain_actions.append(action)
-        self.operators[action.name] = action
-    
-    def get_operators(self, state: Set[Predicate]) -> List[Action]:
-        """获取在当前状态下可用的操作"""
-        available = []
-        for action in self.domain_actions:
-            # 检查前置条件是否满足
-            can_execute = True
-            for pre in action.preconditions:
-                if pre not in state:
-                    can_execute = False
-                    break
-            if can_execute:
-                available.append(action)
-        return available
-    
-    def apply_effects(self, state: Set[Predicate], action: Action) -> Set[Predicate]:
-        """应用行动效果"""
-        new_state = set(state)
-        
-        # 删除删除效果
-        for effect in action.effects:
-            if effect.name.startswith("not "):
-                pred_to_remove = Predicate(effect.name[4:], effect.args)
-                new_state.discard(pred_to_remove)
-        
-        # 添加添加效果
-        for effect in action.effects:
-            if not effect.name.startswith("not "):
-                new_state.add(effect)
-        
-        return new_state
-    
-    async def planning(
-        self,
-        initial_state: Set[Predicate],
-        goal_state: Set[Predicate],
-        max_depth: int = 10
-    ) -> Tuple[bool, List[Action], Set[Predicate]]:
-        """规划算法：搜索从初始状态到目标状态的路径"""
-        
-        # BFS搜索
-        visited = {frozenset(initial_state)}
-        queue = [(initial_state, [])]
-        
-        while queue:
-            current_state, path = queue.pop(0)
-            
-            # 检查是否达到目标
-            goal_achieved = all(g in current_state for g in goal_state)
-            if goal_achieved:
-                return True, path, current_state
-            
-            if len(path) >= max_depth:
-                continue
-            
-            # 获取可用操作
-            available_ops = self.get_operators(current_state)
-            
-            for op in available_ops:
-                new_state = self.apply_effects(current_state, op)
-                new_state_frozen = frozenset(new_state)
-                
-                if new_state_frozen not in visited:
-                    visited.add(new_state_frozen)
-                    queue.append((new_state, path + [op]))
-        
-        return False, [], initial_state
-    
-    def generate_plan_text(self, plan: List[Action]) -> str:
-        """生成计划文本"""
-        lines = ["计划步骤："]
-        for i, action in enumerate(plan, 1):
-            if action.parameters:
-                params = ", ".join(action.parameters)
-                lines.append(f"  {i}. {action.name}({params})")
-            else:
-                lines.append(f"  {i}. {action.name}")
-        return "\n".join(lines)
-
-# 示例：家务规划问题
-class HomePlanningAgent(PlanningAgent):
-    """家务规划智能体"""
-    
-    def __init__(self, name: str):
-        super().__init__(name)
-        self._setup_home_actions()
-    
-    def _setup_home_actions(self):
-        """设置家务规划操作"""
-        
-        # 开灯
-        self.add_action(Action(
-            name="turn_on_light",
-            parameters=["room"],
-            preconditions=[],
-            effects=[Predicate("light_on", ["room"])]
-        ))
-        
-        # 关灯
-        self.add_action(Action(
-            name="turn_off_light",
-            parameters=["room"],
-            preconditions=[Predicate("light_on", ["room"])],
-            effects=[]
-        ))
-        
-        # 开门
-        self.add_action(Action(
-            name="open_door",
-            parameters=["room"],
-            preconditions=[],
-            effects=[Predicate("door_open", ["room"])]
-        ))
-        
-        # 进入房间
-        self.add_action(Action(
-            name="enter_room",
-            parameters=["room"],
-            preconditions=[Predicate("door_open", ["room"])],
-            effects=[Predicate("in_room", ["room"])]
-        ))
-        
-        # 打开电视
-        self.add_action(Action(
-            name="turn_on_tv",
-            parameters=[],
-            preconditions=[Predicate("in_room", ["living_room"])],
-            effects=[Predicate("tv_on", [])]
-        ))
-        
-        # 准备饭菜
-        self.add_action(Action(
-            name="prepare_meal",
-            parameters=["meal"],
-            preconditions=[],
-            effects=[Predicate("meal_ready", ["meal"])]
-        ))
-
-# 使用规划式智能体
-async def planning_agent_demo():
-    agent = HomePlanningAgent("家务助手")
-    
-    # 定义初始状态
-    initial = {
-        Predicate("light_on", ["living_room"]),
-        Predicate("door_open", ["bedroom"]),
-    }
-    
-    # 定义目标状态
-    goal = {
-        Predicate("in_room", ["living_room"]),
-        Predicate("tv_on", []),
-    }
-    
-    print("初始状态：")
-    for p in initial:
-        print(f"  {p.name}({', '.join(p.args)})")
-    
-    print("\n目标状态：")
-    for p in goal:
-        print(f"  {p.name}({', '.join(p.args)})")
-    
-    # 执行规划
-    success, plan, final_state = await agent.planning(initial, goal, max_depth=10)
-    
-    if success:
-        print("\n" + agent.generate_plan_text(plan))
-    else:
-        print("\n无法找到计划")
-    
-    print("\n最终状态：")
-    for p in final_state:
-        print(f"  {p.name}({', '.join(p.args)})")</code></pre>
-                </div>
-
-                <!-- 学习式智能体 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>6. 学习式智能体</h3>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">目标导向</div>
+                        <div class="comparison-cell">需人工规划</div>
+                        <div class="comparison-cell">自主规划</div>
                     </div>
-                    <pre class="code-block"><code class="language-python"># 学习式智能体：从经验中改进策略
-from typing import Any, Dict, List, Tuple
-from dataclasses import dataclass, field
-from datetime import datetime
-import random
-import math
-
-@dataclass
-class Experience:
-    """经验"""
-    state: Any
-    action: Any
-    reward: float
-    next_state: Any
-    done: bool
-
-@dataclass
-class Policy:
-    """策略"""
-    action: str
-    q_value: float
-    probability: float = 0.0
-
-class LearningAgent:
-    """学习式智能体基类"""
-    
-    def __init__(self, name: str, learning_rate: float = 0.1, discount_factor: float = 0.9):
-        self.name = name
-        self.learning_rate = learning_rate
-        self.discount_factor = discount_factor
-        self.experiences: List[Experience] = []
-        self.q_table: Dict[str, Dict[Any, float]] = {}
-        self.policy_table: Dict[str, Dict[Any, Policy]] = {}
-        self.episode_count = 0
-        self.total_reward = 0
-    
-    def get_state_key(self, state: Any) -> str:
-        """将状态转换为键"""
-        if isinstance(state, dict):
-            return str(sorted(state.items()))
-        elif isinstance(state, (list, tuple)):
-            return str(state)
-        return str(state)
-    
-    def get_q_value(self, state: Any, action: Any) -> float:
-        """获取Q值"""
-        state_key = self.get_state_key(state)
-        if state_key not in self.q_table:
-            self.q_table[state_key] = {}
-        return self.q_table[state_key].get(action, 0.0)
-    
-    def update_q_value(self, state: Any, action: Any, value: float):
-        """更新Q值"""
-        state_key = self.get_state_key(state)
-        if state_key not in self.q_table:
-            self.q_table[state_key] = {}
-        self.q_table[state_key][action] = value
-    
-    async def select_action(self, state: Any, actions: List, 
-                          exploration_rate: float = 0.1) -> Any:
-        """选择动作（epsilon-greedy策略）"""
-        if random.random() < exploration_rate:
-            return random.choice(actions)
-        else:
-            # 选择Q值最高的动作
-            q_values = [(a, self.get_q_value(state, a)) for a in actions]
-            max_q = max(q_values, key=lambda x: x[1])[1]
-            best_actions = [a for a, q in q_values if q == max_q]
-            return random.choice(best_actions)
-    
-    async def learn(self, experience: Experience):
-        """学习（Q-Learning）"""
-        state = experience.state
-        action = experience.action
-        reward = experience.reward
-        next_state = experience.next_state
-        done = experience.done
-        
-        # 计算目标Q值
-        if done:
-            target = reward
-        else:
-            max_q = max(
-                self.get_q_value(next_state, a) 
-                for a in [experience.next_state]  # 简化处理
-            )
-            target = reward + self.discount_factor * max_q
-        
-        # 更新Q值
-        current_q = self.get_q_value(state, action)
-        new_q = current_q + self.learning_rate * (target - current_q)
-        self.update_q_value(state, action, new_q)
-        
-        self.experiences.append(experience)
-        self.total_reward += reward
-    
-    def get_policy(self, state: Any, actions: List) -> Dict[Any, Policy]:
-        """获取策略"""
-        state_key = self.get_state_key(state)
-        
-        if state_key not in self.policy_table:
-            q_values = {a: self.get_q_value(state, a) for a in actions}
-            max_q = max(q_values.values())
-            total_q = sum(math.exp(q) for q in q_values.values())
-            
-            self.policy_table[state_key] = {
-                a: Policy(
-                    action=a,
-                    q_value=q,
-                    probability=math.exp(q) / total_q if total_q > 0 else 1.0 / len(actions)
-                )
-                for a, q in q_values.items()
-            }
-        
-        return self.policy_table[state_key]
-    
-    def end_episode(self):
-        """结束一轮"""
-        self.episode_count += 1
-    
-    def get_learning_stats(self) -> Dict:
-        """获取学习统计"""
-        return {
-            "episodes": self.episode_count,
-            "total_experiences": len(self.experiences),
-            "total_reward": self.total_reward,
-            "avg_reward": self.total_reward / max(1, self.episode_count),
-            "q_table_size": sum(len(v) for v in self.q_table.values())
-        }
-
-# 使用学习式智能体
-class QLearningAgent(LearningAgent):
-    """Q-Learning智能体"""
-    
-    def __init__(self, name: str):
-        super().__init__(name)
-    
-    async def run_episode(self, environment: Dict, max_steps: int = 100) -> float:
-        """运行一轮"""
-        state = environment.get("initial_state", {})
-        total_reward = 0
-        
-        for step in range(max_steps):
-            # 获取可用动作
-            actions = environment.get("actions", ["left", "right", "stay"])
-            
-            # 选择动作
-            action = await self.select_action(state, actions)
-            
-            # 执行动作，获取奖励
-            next_state, reward, done = self._execute_action(state, action, environment)
-            
-            # 记录经验并学习
-            experience = Experience(
-                state=state,
-                action=action,
-                reward=reward,
-                next_state=next_state,
-                done=done
-            )
-            await self.learn(experience)
-            
-            total_reward += reward
-            state = next_state
-            
-            if done:
-                break
-        
-        self.end_episode()
-        return total_reward
-    
-    def _execute_action(self, state: Dict, action: str, env: Dict) -> Tuple[Dict, float, bool]:
-        """执行动作"""
-        next_state = state.copy()
-        
-        if action == "right":
-            next_state["position"] = state.get("position", 0) + 1
-        elif action == "left":
-            next_state["position"] = state.get("position", 0) - 1
-        
-        # 奖励函数
-        target = env.get("target_position", 10)
-        position = next_state.get("position", 0)
-        
-        reward = -1  # 每步惩罚
-        if position == target:
-            reward = 100  # 到达目标奖励
-            done = True
-        elif position < 0:
-            reward = -50  # 出界惩罚
-            next_state["position"] = 0
-            done = False
-        else:
-            # 靠近目标奖励
-            reward += (target - position) * 0.1
-            done = False
-        
-        return next_state, reward, done
-
-# 训练Q-Learning智能体
-async def learning_agent_demo():
-    agent = QLearningAgent("学习助手")
-    
-    env = {
-        "initial_state": {"position": 0},
-        "target_position": 10,
-        "actions": ["left", "right", "stay"]
-    }
-    
-    print("=== Q-Learning 智能体训练 ===")
-    
-    # 训练多轮
-    for episode in range(100):
-        reward = await agent.run_episode(env, max_steps=50)
-        
-        if episode % 20 == 0:
-            stats = agent.get_learning_stats()
-            print(f"Episode {episode}: 奖励={reward:.1f}, 平均奖励={stats['avg_reward']:.2f}")
-    
-    print("\n学习完成！")
-    print(json.dumps(agent.get_learning_stats(), ensure_ascii=False, indent=2))</code></pre>
-                </div>
-
-                <!-- 多智能体协作 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>7. 多智能体协作</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># 多智能体系统：协作完成复杂任务
-from typing import Any, Dict, List, Optional
-from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
-import asyncio
-
-class MessageType(Enum):
-    REQUEST = "request"
-    RESPONSE = "response"
-    INFORM = "inform"
-    QUERY = "query"
-
-@dataclass
-class AgentMessage:
-    """智能体间消息"""
-    sender: str
-    receiver: str
-    type: MessageType
-    content: Any
-    timestamp: datetime = field(default_factory=datetime.now)
-
-class MultiAgentSystem:
-    """多智能体系统"""
-    
-    def __init__(self, name: str):
-        self.name = name
-        self.agents: Dict[str, BaseAgent] = {}
-        self.message_queue: List[AgentMessage] = []
-        self.shared_knowledge: Dict[str, Any] = {}
-        self.coordinator: Optional[str] = None
-    
-    def register_agent(self, agent: BaseAgent):
-        """注册智能体"""
-        self.agents[agent.name] = agent
-        print(f"智能体 {agent.name} 已注册")
-    
-    def set_coordinator(self, agent_name: str):
-        """设置协调者"""
-        self.coordinator = agent_name
-    
-    def broadcast(self, message: AgentMessage):
-        """广播消息"""
-        self.message_queue.append(message)
-        for agent in self.agents.values():
-            if agent.name != message.sender:
-                agent.perceive({"message": message})
-    
-    async def send_message(
-        self,
-        sender: str,
-        receiver: str,
-        msg_type: MessageType,
-        content: Any
-    ):
-        """发送消息"""
-        message = AgentMessage(
-            sender=sender,
-            receiver=receiver,
-            type=msg_type,
-            content=content
-        )
-        self.message_queue.append(message)
-        
-        receiver_agent = self.agents.get(receiver)
-        if receiver_agent:
-            await receiver_agent.perceive({"message": message})
-    
-    def share_knowledge(self, key: str, value: Any):
-        """共享知识"""
-        self.shared_knowledge[key] = value
-    
-    def get_shared_knowledge(self, key: str) -> Any:
-        """获取共享知识"""
-        return self.shared_knowledge.get(key)
-
-# 任务分解与协作
-class CoordinatorAgent(BaseAgent):
-    """协调者智能体"""
-    
-    def __init__(self, name: str, system: MultiAgentSystem):
-        super().__init__(name, "coordinator")
-        self.system = system
-        self.tasks: List[Dict] = []
-        self.task_results: Dict[str, Any] = {}
-    
-    async def decompose_task(self, task: Dict) -> List[Dict]:
-        """分解任务"""
-        # 简单任务分解
-        subtasks = []
-        
-        if task.get("type") == "analysis":
-            subtasks = [
-                {"name": "data_collection", "assigned_to": None, "status": "pending"},
-                {"name": "data_processing", "assigned_to": None, "status": "pending"},
-                {"name": "report_generation", "assigned_to": None, "status": "pending"}
-            ]
-        else:
-            subtasks = [{"name": "general_task", "assigned_to": None, "status": "pending"}]
-        
-        self.tasks = subtasks
-        return subtasks
-    
-    async def assign_tasks(self) -> Dict:
-        """分配任务"""
-        # 简单分配策略
-        agent_names = list(self.system.agents.keys())
-        agent_names.remove(self.name)  # 排除自己
-        
-        assignments = {}
-        for i, task in enumerate(self.tasks):
-            if task["status"] == "pending":
-                agent = agent_names[i % len(agent_names)]
-                task["assigned_to"] = agent
-                task["status"] = "assigned"
-                assignments[task["name"]] = agent
-                
-                await self.system.send_message(
-                    sender=self.name,
-                    receiver=agent,
-                    msg_type=MessageType.REQUEST,
-                    content={"task": task}
-                )
-        
-        return assignments
-    
-    async def collect_results(self) -> Dict:
-        """收集结果"""
-        results = {}
-        for task in self.tasks:
-            if task["assigned_to"]:
-                # 等待结果（简化版）
-                await asyncio.sleep(0.1)
-                results[task["name"]] = self.task_results.get(task["assigned_to"], {})
-        return results
-    
-    async def perceive(self, environment: Dict) -> Observation:
-        return Observation(perception=environment)
-    
-    async def think(self, observation: Observation) -> Action:
-        if "task_result" in observation.perception:
-            self.task_results[observation.perception.get("sender", "")] = \
-                observation.perception["task_result"]
-        return None
-    
-    async def act(self, action: Action) -> Dict:
-        return {"status": "action completed"}
-    
-    async def learn(self, experience: Dict):
-        pass
-
-# 专家智能体
-class ExpertAgent(BaseAgent):
-    """专家智能体"""
-    
-    def __init__(self, name: str, expertise: str, system: MultiAgentSystem):
-        super().__init__(name, expertise)
-        self.expertise = expertise
-        self.system = system
-    
-    async def perceive(self, environment: Dict) -> Observation:
-        if "message" in environment:
-            msg = environment["message"]
-            if msg.type == MessageType.REQUEST:
-                return Observation(perception={"task": msg.content.get("task")})
-        return Observation(perception=environment)
-    
-    async def think(self, observation: Observation) -> Optional[Action]:
-        task = observation.perception.get("task")
-        if task:
-            return Action(
-                name="execute_task",
-                parameters={"task": task},
-                reasoning=f"执行专业任务：{task.get('name')}"
-            )
-        return None
-    
-    async def act(self, action: Action) -> Dict:
-        task = action.parameters.get("task", {})
-        task_name = task.get("name", "unknown")
-        
-        # 模拟执行任务
-        result = f"任务 {task_name} 执行结果"
-        
-        # 发送结果给协调者
-        if self.system and self.system.coordinator:
-            await self.system.send_message(
-                sender=self.name,
-                receiver=self.system.coordinator,
-                msg_type=MessageType.RESPONSE,
-                content={"task_result": {task_name: result}}
-            )
-        
-        return {"task": task_name, "result": result}
-    
-    async def learn(self, experience: Dict):
-        pass
-
-# 使用多智能体系统
-async def multi_agent_demo():
-    # 创建系统
-    system = MultiAgentSystem("项目团队")
-    
-    # 创建协调者
-    coordinator = CoordinatorAgent("项目经理", system)
-    system.register_agent(coordinator)
-    system.set_coordinator("项目经理")
-    
-    # 创建专家智能体
-    experts = [
-        ExpertAgent("数据师", "数据分析", system),
-        ExpertAgent("分析师", "数据处理", system),
-        ExpertAgent("报告员", "报告生成", system)
-    ]
-    
-    for expert in experts:
-        system.register_agent(expert)
-    
-    print("\n=== 多智能体协作示例 ===")
-    
-    # 分解任务
-    task = {"type": "analysis", "description": "数据分析项目"}
-    subtasks = await coordinator.decompose_task(task)
-    print(f"任务分解：{len(subtasks)} 个子任务")
-    
-    # 分配任务
-    assignments = await coordinator.assign_tasks()
-    print(f"任务分配：{assignments}")
-    
-    # 收集结果
-    results = await coordinator.collect_results()
-    print(f"\n协作结果：")
-    print(json.dumps(results, ensure_ascii=False, indent=2))</code></pre>
-                </div>
-
-                <!-- 智能体工具集成 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>8. 智能体工具集成</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># 智能体工具系统：扩展智能体能力
-from typing import Any, Dict, List, Optional, Callable
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from datetime import datetime
-import json
-
-@dataclass
-class ToolResult:
-    """工具执行结果"""
-    success: bool
-    data: Any = None
-    error: str = None
-    execution_time: float = 0
-
-class BaseTool(ABC):
-    """工具基类"""
-    
-    def __init__(self, name: str, description: str):
-        self.name = name
-        self.description = description
-        self.usage_count = 0
-    
-    @abstractmethod
-    async def execute(self, **kwargs) -> ToolResult:
-        pass
-    
-    def get_schema(self) -> Dict:
-        """获取工具模式"""
-        return {
-            "name": self.name,
-            "description": self.description
-        }
-
-class CalculatorTool(BaseTool):
-    """计算器工具"""
-    
-    def __init__(self):
-        super().__init__("calculator", "执行数学计算")
-    
-    async def execute(self, expression: str = None, 
-                     a: float = None, b: float = None,
-                     operation: str = "add") -> ToolResult:
-        import time
-        start = time.time()
-        
-        try:
-            if expression:
-                result = eval(expression)
-            elif a is not None and b is not None:
-                operations = {
-                    "add": a + b,
-                    "subtract": a - b,
-                    "multiply": a * b,
-                    "divide": a / b if b != 0 else None
-                }
-                result = operations.get(operation, "未知操作")
-            else:
-                return ToolResult(success=False, error="需要提供expression或a, b参数")
-            
-            return ToolResult(
-                success=True,
-                data={"result": result},
-                execution_time=time.time() - start
-            )
-        except Exception as e:
-            return ToolResult(
-                success=False,
-                error=str(e),
-                execution_time=time.time() - start
-            )
-
-class WebSearchTool(BaseTool):
-    """网络搜索工具"""
-    
-    def __init__(self):
-        super().__init__("web_search", "搜索网络信息")
-        self.cache: Dict[str, Dict] = {}
-    
-    async def execute(self, query: str, max_results: int = 5) -> ToolResult:
-        import time
-        start = time.time()
-        
-        # 模拟搜索结果
-        results = [
-            {"title": f"关于 {query} 的结果 1", "url": "https://example1.com"},
-            {"title": f"关于 {query} 的结果 2", "url": "https://example2.com"},
-            {"title": f"关于 {query} 的结果 3", "url": "https://example3.com"}
-        ][:max_results]
-        
-        return ToolResult(
-            success=True,
-            data={"results": results, "count": len(results)},
-            execution_time=time.time() - start
-        )
-
-class FileTool(BaseTool):
-    """文件操作工具"""
-    
-    def __init__(self, base_path: str = "./"):
-        super().__init__("file_operation", "读写文件")
-        self.base_path = base_path
-        self.files: Dict[str, str] = {}
-    
-    async def execute(self, operation: str, 
-                     path: str = None, content: str = None) -> ToolResult:
-        import time
-        start = time.time()
-        
-        try:
-            if operation == "read":
-                if path in self.files:
-                    return ToolResult(
-                        success=True,
-                        data={"content": self.files[path]},
-                        execution_time=time.time() - start
-                    )
-                else:
-                    return ToolResult(
-                        success=False,
-                        error=f"文件不存在: {path}",
-                        execution_time=time.time() - start
-                    )
-            
-            elif operation == "write":
-                self.files[path] = content
-                return ToolResult(
-                    success=True,
-                    data={"path": path, "status": "written"},
-                    execution_time=time.time() - start
-                )
-            
-            elif operation == "list":
-                file_list = list(self.files.keys())
-                return ToolResult(
-                    success=True,
-                    data={"files": file_list},
-                    execution_time=time.time() - start
-                )
-            
-            else:
-                return ToolResult(
-                    success=False,
-                    error=f"未知操作: {operation}",
-                    execution_time=time.time() - start
-                )
-        except Exception as e:
-            return ToolResult(
-                success=False,
-                error=str(e),
-                execution_time=time.time() - start
-            )
-
-class ToolUsingAgent:
-    """使用工具的智能体"""
-    
-    def __init__(self, name: str):
-        self.name = name
-        self.tools: Dict[str, BaseTool] = {}
-        self.tool_history: List[Dict] = []
-    
-    def add_tool(self, tool: BaseTool):
-        """添加工具"""
-        self.tools[tool.name] = tool
-        print(f"工具 {tool.name} 已添加")
-    
-    async def use_tool(self, tool_name: str, **kwargs) -> ToolResult:
-        """使用工具"""
-        tool = self.tools.get(tool_name)
-        if not tool:
-            return ToolResult(
-                success=False,
-                error=f"工具不存在: {tool_name}"
-            )
-        
-        result = await tool.execute(**kwargs)
-        tool.usage_count += 1
-        
-        self.tool_history.append({
-            "tool": tool_name,
-            "params": kwargs,
-            "result": result,
-            "timestamp": datetime.now()
-        )
-        
-        return result
-    
-    def get_available_tools(self) -> List[Dict]:
-        """获取可用工具"""
-        return [tool.get_schema() for tool in self.tools.values()]
-    
-    async def plan_tool_use(self, goal: str) -> List[Dict]:
-        """规划工具使用"""
-        plan = []
-        
-        if "计算" in goal or "计算" in goal:
-            plan.append({"tool": "calculator", "reason": "需要计算"})
-        
-        if "搜索" in goal or "查找" in goal:
-            plan.append({"tool": "web_search", "reason": "需要搜索信息"})
-        
-        if "保存" in goal or "写入" in goal:
-            plan.append({"tool": "file_operation", "reason": "需要保存文件"})
-        
-        return plan
-
-# 使用工具的智能体示例
-async def tool_agent_demo():
-    agent = ToolUsingAgent("工具助手")
-    
-    # 添加工具
-    agent.add_tool(CalculatorTool())
-    agent.add_tool(WebSearchTool())
-    agent.add_tool(FileTool())
-    
-    print("可用工具：")
-    print(json.dumps(agent.get_available_tools(), ensure_ascii=False, indent=2))
-    
-    # 使用计算器
-    print("\n=== 使用计算器 ===")
-    result = await agent.use_tool("calculator", expression="25 * 4 + 10")
-    print(f"计算结果: {result.data}")
-    
-    # 使用搜索
-    print("\n=== 使用搜索 ===")
-    result = await agent.use_tool("web_search", query="AI智能体")
-    print(f"搜索结果: {json.dumps(result.data, ensure_ascii=False)}")
-    
-    # 使用文件
-    print("\n=== 使用文件 ===")
-    await agent.use_tool("file_operation", operation="write", 
-                         path="test.txt", content="Hello, Agent!")
-    result = await agent.use_tool("file_operation", operation="read", path="test.txt")
-    print(f"文件内容: {result.data}")
-    
-    print("\n工具使用历史：")
-    print(json.dumps(agent.tool_history, ensure_ascii=False, indent=2))</code></pre>
-                </div>
-
-                <!-- 智能体最佳实践 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>9. 智能体最佳实践总结</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># 智能体最佳实践总结
-
-AGENT_BEST_PRACTICES = """
-【设计原则】
-1. 明确智能体角色和职责
-2. 设计清晰的目标和奖励函数
-3. 实现容错和错误恢复机制
-4. 保证可解释性和可控性
-
-【架构设计】
-1. 模块化设计，便于扩展
-2. 分离感知、决策、执行逻辑
-3. 实现高效的记忆系统
-4. 支持工具调用和能力扩展
-
-【安全性】
-1. 实现权限控制和访问限制
-2. 防止恶意输入和注入攻击
-3. 设置行为边界和约束
-4. 监控异常行为
-
-【性能优化】
-1. 使用异步处理提高并发能力
-2. 实现结果缓存减少重复计算
-3. 优化决策算法降低延迟
-4. 资源使用监控和限制
-
-【测试策略】
-1. 单元测试覆盖核心逻辑
-2. 集成测试验证协作能力
-3. 模拟环境测试极端情况
-4. A/B测试评估不同策略
-
-【部署运维】
-1. 实现健康检查和监控
-2. 支持动态配置更新
-3. 设计优雅降级策略
-4. 记录详细日志便于调试
-"""
-
-print(AGENT_BEST_PRACTICES)
-
-# 智能体学习路线图
-AGENT_LEARNING_ROADMAP = """
-【阶段1 - 入门（1-2周）】
-□ 理解智能体基本概念
-□ 实现简单反应式智能体
-□ 学习状态机和规则引擎
-□ 掌握基本的感知-行动循环
-
-【阶段2 - 基础（2-3周）】
-□ 实现基于目标的智能体
-□ 学习规划算法（STRIPS等）
-□ 掌握Q-Learning等学习算法
-□ 实现简单的工作流自动化
-
-【阶段3 - 中级（3-4周）】
-□ 设计复杂的多智能体系统
-□ 实现智能体协作和通信
-□ 学习层次化任务网络
-□ 掌握工具调用和能力扩展
-
-【阶段4 - 高级（4周+）】
-□ 实现自适应的学习系统
-□ 设计安全的智能体框架
-□ 优化大规模分布式部署
-□ 探索前沿研究方向
-"""
-
-print(AGENT_LEARNING_ROADMAP)
-
-# 智能体应用场景
-AGENT_APPLICATIONS = """
-【当前应用场景】
-1. 智能客服 - 自动问答、问题分类
-2. 个人助理 - 日程管理、信息检索
-3. 自动化测试 - 测试用例生成、执行
-4. 代码助手 - 代码审查、bug修复
-5. 数据分析 - 自动报告、趋势预测
-
-【新兴应用场景】
-1. 多模态理解 - 图文、视频理解
-2. 具身智能 - 机器人控制、导航
-3. 科学发现 - 假设生成、实验设计
-4. 创意生成 - 设计辅助、内容创作
-5. 协作工作流 - 多人任务协调
-
-【未来发展方向】
-1. 通用人工智能（AGI）
-2. 自演进系统
-3. 安全对齐智能体
-4. 可信赖AI系统
-"""
-
-print(AGENT_APPLICATIONS)
-
-# 完整的智能体开发清单
-AGENT_DEVELOPMENT_CHECKLIST = """
-□ 定义智能体角色和目标
-□ 设计感知-决策-执行架构
-□ 实现核心状态管理
-□ 开发工具调用系统
-□ 实现记忆和学习机制
-□ 添加错误处理和恢复
-□ 编写单元测试
-□ 集成测试多智能体协作
-□ 性能测试和优化
-□ 安全审计
-□ 部署和监控
-"""
-
-print("\n" + AGENT_DEVELOPMENT_CHECKLIST)</code></pre>
                 </div>
             </div>
+
+            <!-- 智能体类型 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">📋 智能体类型</h3>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card level-card level-1">
+                    <div class="level-badge">🔰 简单反射</div>
+                    <p style="font-size:0.9rem; color:#666;">基于规则直接响应</p>
+                    <p style="font-size:0.8rem; margin-top:0.5rem; color:#888;">条件→动作</p>
+                </div>
+                <div class="card level-card level-2">
+                    <div class="level-badge">🧠 基于模型</div>
+                    <p style="font-size:0.9rem; color:#666;">维护环境模型</p>
+                    <p style="font-size:0.8rem; margin-top:0.5rem; color:#888;">状态→模型→动作</p>
+                </div>
+                <div class="card level-card level-2">
+                    <div class="level-badge">🎯 目标导向</div>
+                    <p style="font-size:0.9rem; color:#666;">搜索目标路径</p>
+                    <p style="font-size:0.8rem; margin-top:0.5rem; color:#888;">目标→规划→执行</p>
+                </div>
+                <div class="card level-card level-3">
+                    <div class="level-badge">🔄 规划智能体</div>
+                    <p style="font-size:0.9rem; color:#666;">分治策略</p>
+                    <p style="font-size:0.8rem; margin-top:0.5rem; color:#888;">分解→解决→整合</p>
+                </div>
+                <div class="card level-card level-3">
+                    <div class="level-badge">📚 学习智能体</div>
+                    <p style="font-size:0.9rem; color:#666;">从经验学习</p>
+                    <p style="font-size:0.8rem; margin-top:0.5rem; color:#888;">试错→强化→改进</p>
+                </div>
+                <div class="card level-card level-3">
+                    <div class="level-badge">👥 多智能体</div>
+                    <p style="font-size:0.9rem; color:#666;">协作与通信</p>
+                    <p style="font-size:0.8rem; margin-top:0.5rem; color:#888;">分工→协作→共识</p>
+                </div>
+            </div>
+
+            <!-- 核心组件 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🧩 智能体核心组件</h3>
+
+            <div class="cards-grid card-grid-2">
+                <div class="card">
+                    <h4 style="margin-bottom: 1rem;">🛠️ 工具集 (Tools)</h4>
+                    <div class="tags">
+                        <span class="tag">搜索</span>
+                        <span class="tag">计算</span>
+                        <span class="tag">API</span>
+                        <span class="tag">数据库</span>
+                    </div>
+                    <p style="font-size:0.85rem; margin-top:0.75rem; color:#666;">
+                        智能体可调用的外部能力
+                    </p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 1rem;">🧠 记忆系统</h4>
+                    <div class="tags">
+                        <span class="tag">短期记忆</span>
+                        <span class="tag">长期记忆</span>
+                        <span class="tag">向量存储</span>
+                    </div>
+                    <p style="font-size:0.85rem; margin-top:0.75rem; color:#666;">
+                        存储对话历史和经验
+                    </p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 1rem;">📝 提示工程</h4>
+                    <div class="tags">
+                        <span class="tag">系统提示</span>
+                        <span class="tag">few-shot</span>
+                        <span class="tag">CoT</span>
+                    </div>
+                    <p style="font-size:0.85rem; margin-top:0.75rem; color:#666;">
+                        引导智能体行为模式
+                    </p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 1rem;">🔄 执行引擎</h4>
+                    <div class="tags">
+                        <span class="tag">ReAct</span>
+                        <span class="tag">Plan-Exec</span>
+                        <span class="tag">Tool Use</span>
+                    </div>
+                    <p style="font-size:0.85rem; margin-top:0.75rem; color:#666;">
+                        决策循环和执行逻辑
+                    </p>
+                </div>
+            </div>
+
+            <!-- ReAct模式 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🔄 ReAct模式</h3>
+
+            <div class="diagram-box">
+                <div class="diagram-title">ReAct = Reasoning + Acting</div>
+                <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│   思考(Thought) → 行动(Action) → 观察(Observation) → 循环        │
+│                                                                 │
+│   1. Thought: 我需要搜索信息来回答这个问题                       │
+│   2. Action: search[AI发展历史]                                 │
+│   3. Observation: AI始于1956年达特茅斯会议...                    │
+│   4. Thought: 找到答案了，可以总结了                            │
+│   5. Final Answer: ...                                         │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+                </div>
+            </div>
+
+            <!-- 工具类型 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🔧 常见工具类型</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>工具类型</th>
+                            <th>示例</th>
+                            <th>用途</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>搜索</td><td>SerpAPI, Wikipedia</td><td>网络信息查询</td></tr>
+                        <tr><td>计算</td><td>Python REPL, Calculator</td><td>数学计算</td></tr>
+                        <tr><td>数据库</td><td>SQL, MongoDB</td><td>数据查询</td></tr>
+                        <tr><td>API</td><td>HTTP请求</td><td>第三方服务</td></tr>
+                        <tr><td>文件</td><td>读/写文件</td><td>文档处理</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 应用场景 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🚀 应用场景</h3>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">💬 智能客服</h4>
+                    <p style="font-size:0.85rem; color:#666;">多轮对话、问题解答</p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">📊 研究助手</h4>
+                    <p style="font-size:0.85rem; color:#666;">信息搜集、分析总结</p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">💻 代码助手</h4>
+                    <p style="font-size:0.85rem; color:#666;">代码编写、调试、测试</p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">📝 写作助手</h4>
+                    <p style="font-size:0.85rem; color:#666;">内容创作、编辑校对</p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">🔄 工作流</h4>
+                    <p style="font-size:0.85rem; color:#666;">自动化流程编排</p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">🌐 数据采集</h4>
+                    <p style="font-size:0.85rem; color:#666;">信息抓取、整理</p>
+                </div>
+            </div>
+
+            <h3>💻 代码示例</h3>
+
+            <div class="card">
+                <div class="card-header">示例：ReAct智能体实现</div>
+                <pre class="code-block"><code class="language-python">"""
+ReAct智能体实现：Thought → Action → Observation → ...
+- 搜索工具
+- 计算工具
+- 文件读取工具
+- 智能体核心逻辑
+"""
+from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from enum import Enum
+import json
+import math
+import re
+
+class ActionType(Enum):
+    SEARCH = "search"
+    CALCULATE = "calculate"
+    READ_FILE = "read_file"
+    LIST_FILES = "list_files"
+    FINISH = "finish"
+
+@dataclass
+class Action:
+    type: ActionType
+    input: str
+
+@dataclass
+class Step:
+    thought: str
+    action: Optional[Action]
+    observation: str
+
+class Tool:
+    """工具基类"""
+    
+    @property
+    def name(self) -> str:
+        raise NotImplementedError
+    
+    @property
+    def description(self) -> str:
+        raise NotImplementedError
+    
+    def execute(self, input: str) -> str:
+        raise NotImplementedError
+
+class SearchTool(Tool):
+    """搜索工具（模拟）"""
+    
+    @property
+    def name(self) -> str:
+        return "search"
+    
+    @property
+    def description(self) -> str:
+        return "搜索网络信息，返回相关结果"
+    
+    def execute(self, query: str) -> str:
+        # 模拟搜索结果
+        knowledge_base = {
+            "人工智能": "AI是 Artificial Intelligence 的缩写，研究让机器具有智能的科学。",
+            "机器学习": "Machine Learning，让计算机从数据中学习规律的技术。",
+            "深度学习": "Deep Learning，使用多层神经网络的机器学习方法。",
+            "python": "Python是一种流行的编程语言，适合AI开发。",
+            "langchain": "LangChain是一个LLM应用开发框架。"
+        }
+        
+        for key, value in knowledge_base.items():
+            if key in query.lower():
+                return value
+        return f"关于'{query}'的搜索结果：这是一条模拟的搜索结果。"
+
+class CalculatorTool(Tool):
+    """计算工具"""
+    
+    @property
+    def name(self) -> str:
+        return "calculate"
+    
+    @property
+    def description(self) -> str:
+        return "执行数学计算，支持四则运算和函数"
+    
+    def execute(self, expression: str) -> str:
+        try:
+            # 安全计算
+            allowed_chars = set("0123456789+-*/(). ")
+            if not all(c in allowed_chars for c in expression):
+                return "错误：包含不允许的字符"
+            
+            result = eval(expression)
+            return f"计算结果: {result}"
+        except Exception as e:
+            return f"计算错误: {e}"
+
+class FileTool(Tool):
+    """文件操作工具"""
+    
+    def __init__(self):
+        self.files = {
+            "readme.txt": "这是一个示例文件。\n包含多行文本。",
+            "notes.txt": "待办事项：\n1. 学习AI\n2. 实践项目"
+        }
+    
+    @property
+    def name(self) -> str:
+        return "read_file"
+    
+    @property
+    def description(self) -> str:
+        return "读取文件内容"
+    
+    def execute(self, filename: str) -> str:
+        if filename in self.files:
+            return self.files[filename]
+        return f"文件不存在: {filename}"
+
+class ListFilesTool(Tool):
+    """列出文件工具"""
+    
+    @property
+    def name(self) -> str:
+        return "list_files"
+    
+    @property
+    def description(self) -> str:
+        return "列出可用文件"
+    
+    def execute(self, input: str) -> str:
+        return "可用文件: readme.txt, notes.txt"
+
+class ReActAgent:
+    """ReAct智能体 - Reasoning + Acting"""
+    
+    def __init__(self, tools: List[Tool], max_steps: int = 10):
+        self.tools = {tool.name: tool for tool in tools}
+        self.max_steps = max_steps
+        self.history: List[Step] = []
+    
+    def think(self, query: str) -> str:
+        """生成思考（使用LLM时这里是LLM调用）"""
+        # 简化版：基于规则生成思考
+        history_text = "\n".join([
+            f"思考: {step.thought}\n行动: {step.action}\n观察: {step.observation}"
+            for step in self.history[-3:]
+        ]) if self.history else "无历史"
+        
+        prompt = f"""你是一个ReAct智能体，需要通过思考和行动来回答问题。
+
+任务：{query}
+
+历史：
+{history_text}
+
+请按照以下格式思考下一步：
+Thought: [分析当前情况，决定下一步行动]
+Action: [工具名称]([参数]) 或 Finish([最终答案])
+
+可用的工具：
+{self._format_tools()}"""
+
+        # 这里简化处理，实际应调用LLM
+        return self._simple_reasoning(query)
+    
+    def _simple_reasoning(self, query: str) -> str:
+        """简化推理逻辑（实际使用LLM）"""
+        query_lower = query.lower()
+        
+        # 检查是否需要搜索
+        if any(kw in query_lower for kw in ["什么", "定义", "解释", "介绍"]):
+            if "计算" in query or any(op in query for op in ["+", "-", "*", "/", "×", "÷"]):
+                return "我需要先提取表达式，然后使用计算工具。"
+            return "我需要搜索相关信息来回答这个问题。"
+        
+        # 检查是否需要文件
+        if any(kw in query_lower for kw in ["文件", "内容", "read"]):
+            return "我需要读取文件来获取信息。"
+        
+        # 检查是否完成
+        if any(kw in query_lower for kw in ["谢谢", "好的", "明白了"]):
+            return "Finish(任务完成)"
+        
+        return "我需要搜索更多信息来回答这个问题。"
+    
+    def _format_tools(self) -> str:
+        return "\n".join([f"- {t.name}: {t.description}" for t in self.tools.values()])
+    
+    def parse_action(self, thought: str) -> Tuple[Optional[Action], str]:
+        """解析行动"""
+        # 检查是否结束
+        if "Finish(" in thought:
+            answer = re.search(r'Finish\((.+?)\)', thought)
+            return Action(ActionType.FINISH, answer.group(1) if answer else ""), "finished"
+        
+        # 解析行动
+        for tool_name in self.tools:
+            if f"{tool_name}(" in thought:
+                param = re.search(rf'{tool_name}\((.+?)\)', thought)
+                return Action(ActionType(tool_name), param.group(1) if param else ""), tool_name
+        
+        return None, "continue"
+    
+    def run(self, query: str) -> str:
+        """执行ReAct循环"""
+        self.history = []
+        current_query = query
+        
+        for step_num in range(self.max_steps):
+            print(f"\n🔄 步骤 {step_num + 1}")
+            
+            # 1. Thought
+            thought = self.think(current_query)
+            print(f"💭 Thought: {thought}")
+            
+            # 2. Parse Action
+            action, status = self.parse_action(thought)
+            observation = ""
+            
+            # 3. Action & Observation
+            if action and action.type != ActionType.FINISH:
+                print(f"⚡ Action: {action.type.value}[{action.input}]")
+                
+                tool = self.tools.get(action.type.value)
+                if tool:
+                    observation = tool.execute(action.input)
+                else:
+                    observation = "未知工具"
+                
+                print(f"👀 Observation: {observation}")
+            elif status == "finished":
+                print(f"✅ 完成: {action.input}")
+                return action.input
+            
+            # 4. 记录步骤
+            self.history.append(Step(thought, action, observation))
+            
+            # 5. 更新查询（包含观察结果）
+            current_query = f"基于观察：{observation}\n继续回答：{query}"
+        
+        return "达到最大步数限制"
+
+
+# 使用示例
+def main():
+    # 1. 创建工具
+    tools = [
+        SearchTool(),
+        CalculatorTool(),
+        FileTool(),
+        ListFilesTool()
+    ]
+    
+    # 2. 创建智能体
+    agent = ReActAgent(tools, max_steps=6)
+    
+    # 3. 测试不同任务
+    test_queries = [
+        "什么是人工智能？",
+        "计算 25 * 4 + 10",
+        "readme.txt的内容是什么？"
+    ]
+    
+    for query in test_queries:
+        print(f"\n{'='*50}")
+        print(f"📝 任务: {query}")
+        print("="*50)
+        result = agent.run(query)
+        print(f"\n🎯 最终答案: {result}")
+
+main()</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">代码说明</div>
+                <div class="cards-grid card-grid-3" style="margin-top: 1rem;">
+                    <div class="card" style="padding: 1rem;">
+                        <h4 style="margin-bottom: 0.5rem;">🛠️ 工具类型</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>SearchTool - 搜索信息</li>
+                            <li>CalculatorTool - 数学计算</li>
+                            <li>FileTool - 读取文件</li>
+                            <li>ListFilesTool - 列出文件</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="padding: 1rem;">
+                        <h4 style="margin-bottom: 0.5rem;">🔄 ReAct循环</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>Thought - 分析情况</li>
+                            <li>Action - 选择工具</li>
+                            <li>Observation - 观察结果</li>
+                            <li>循环直到完成</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="padding: 1rem;">
+                        <h4 style="margin-bottom: 0.5rem;">📊 关键组件</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>Tool基类 - 定义工具接口</li>
+                            <li>Action类型 - 区分行动</li>
+                            <li>历史记录 - 上下文记忆</li>
+                            <li>最大步数 - 防止无限循环</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
-
-    <script src="js/main.js"></script>
 </body>
 </html>

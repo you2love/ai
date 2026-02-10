@@ -9,1132 +9,351 @@
 <body>
     <section class="section">
         <div class="container">
-            <h2 class="section-title">AI基础概念</h2>
-            <p class="section-subtitle">从零开始理解人工智能的核心概念与原理</p>
+            <h2 class="section-title">📖 AI基础概念</h2>
+            <p class="section-subtitle">机器学习核心知识体系</p>
 
-            <div class="code-sections">
-                <!-- 人工智能概述 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>1. 人工智能概述</h3>
+            <!-- AI研究领域 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🎯 AI研究领域</h3>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🧠</div>
+                        <div>
+                            <div class="card-title">机器学习 ML</div>
+                        </div>
                     </div>
-                    <pre class="code-block"><code class="language-python"># 人工智能基础概念
-#
-# 人工智能（Artificial Intelligence，简称AI）
-# 是计算机科学的一个分支，致力于创建能够模拟人类智能的系统
-#
-# AI发展历程：
-# 1. 1950s - 达特茅斯会议，AI概念诞生
-# 2. 1960s - 专家系统兴起
-# 3. 1980s - 机器学习快速发展
-# 4. 2010s - 深度学习突破
-# 2020s - 大语言模型时代
-
-# AI研究领域
-AI_DOMAINS = """
-┌─────────────────────────────────────────────────────┐
-│                    人工智能                          │
-├─────────────┬─────────────┬─────────────┬───────────┤
-│  机器学习   │   自然语言  │   计算机    │   知识    │
-│  (ML)       │   处理(NLP) │   视觉(CV)  │   表示    │
-├─────────────┴─────────────┴─────────────┴───────────┤
-│  规划、推理、学习、感知、语言理解、行动执行            │
-└─────────────────────────────────────────────────────┘
-"""
-
-# AI分类
-AI_CATEGORIES = """
-按能力划分：
-├── 弱人工智能（Narrow AI）：特定任务，AlphaGo、ChatGPT
-├── 强人工智能（AGI）：通用智能，类似人类
-└── 超级人工智能（Superintelligence）：超越人类
-
-按学习方式划分：
-├── 监督学习：标签数据
-├── 无监督学习：无标签数据
-├── 强化学习：奖励信号
-└── 半监督学习：少量标签 + 大量无标签
-"""
-
-print("=== 人工智能概述 ===")
-print(AI_DOMAINS)
-print(AI_CATEGORIES)</code></pre>
+                    <div class="card-body">
+                        <p>让机器从数据中自动学习规律，是AI的核心基础</p>
+                        <div class="tags">
+                            <span class="tag">核心</span>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 机器学习基础 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>2. 机器学习基础</h3>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📝</div>
+                        <div>
+                            <div class="card-title">自然语言处理 NLP</div>
+                        </div>
                     </div>
-                    <pre class="code-block"><code class="language-python"># 机器学习基础
-#
-# 机器学习（Machine Learning）
-# 让计算机通过数据学习规律，而不需要明确编程
-#
-# 核心问题类型：
-# 1. 分类（Classification）：离散标签
-# 2. 回归（Regression）：连续值预测
-# 3. 聚类（Clustering）：无标签分组
-# 4. 降维（Dimensionality Reduction）：特征压缩
-
-from sklearn.linear_model import LinearRegression
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.cluster import KMeans
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, mean_squared_error
-import numpy as np
-
-# 1. 线性回归示例
-X = np.array([[1], [2], [3], [4], [5]])  # 特征：面积
-y = np.array([100, 150, 200, 250, 300])  # 标签：价格
-
-model = LinearRegression()
-model.fit(X, y)
-
-# 预测
-area = np.array([[6]])
-price = model.predict(area)
-print(f"6平方米预测价格: {price[0]:.2f}万")
-
-# 2. 分类示例
-from sklearn.datasets import load_iris
-iris = load_iris()
-X_train, X_test, y_train, y_test = train_test_split(
-    iris.data, iris.target, test_size=0.2
-)
-
-clf = DecisionTreeClassifier()
-clf.fit(X_train, y_train)
-accuracy = accuracy_score(y_test, clf.predict(X_test))
-print(f"分类准确率: {accuracy:.2%}")
-
-# 3. 聚类示例
-X = np.array([[1, 2], [1, 4], [1, 0], [10, 2], [10, 4], [10, 0]])
-kmeans = KMeans(n_clusters=2)
-kmeans.fit(X)
-labels = kmeans.predict([[5, 3]])
-print(f"新样本聚类标签: {labels[0]}")
-
-# 机器学习流程
-ML_PIPELINE = """
-机器学习标准流程：
-1. 数据收集 → 收集相关数据
-2. 数据清洗 → 处理缺失值、异常值
-3. 特征工程 → 选择、构造特征
-4. 数据划分 → 训练集、验证集、测试集
-5. 模型选择 → 选择算法
-6. 模型训练 → 拟合数据
-7. 模型评估 → 评估指标
-8. 模型优化 → 调参、改进
-9. 模型部署 → 上线应用
-"""
-print(ML_PIPELINE)</code></pre>
+                    <div class="card-body">
+                        <p>让机器理解和生成人类语言</p>
+                        <div class="tags">
+                            <span class="tag">文本</span>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 深度学习基础 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>3. 深度学习基础</h3>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">👁️</div>
+                        <div>
+                            <div class="card-title">计算机视觉 CV</div>
+                        </div>
                     </div>
-                    <pre class="code-block"><code class="language-python"># 深度学习基础
-#
-# 深度学习（Deep Learning）
-# 基于人工神经网络的机器学习，使用多层网络学习数据表示
-
-import torch
-import torch.nn as nn
-import torch.optim as optim
-
-# 1. 张量基础
-print("=== PyTorch张量操作 ===")
-tensor = torch.tensor([1, 2, 3, 4, 5], dtype=torch.float32)
-print(f"张量: {tensor}")
-print(f"形状: {tensor.shape}")
-print(f"设备: {tensor.device}")
-
-# 2. 神经网络定义
-class NeuralNetwork(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.layer1 = nn.Linear(10, 64)
-        self.layer2 = nn.Linear(64, 32)
-        self.output = nn.Linear(32, 1)
-
-    def forward(self, x):
-        x = torch.relu(self.layer1(x))
-        x = torch.relu(self.layer2(x))
-        x = torch.sigmoid(self.output(x))
-        return x
-
-# 3. 简单神经网络训练
-model = NeuralNetwork()
-criterion = nn.BCELoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
-
-# 模拟训练
-dummy_input = torch.randn(32, 10)  # 批量大小32，输入特征10
-dummy_target = torch.randn(32, 1)  # 目标
-
-for epoch in range(100):
-    optimizer.zero_grad()
-    output = model(dummy_input)
-    loss = criterion(output, dummy_target)
-    loss.backward()
-    optimizer.step()
-    if (epoch + 1) % 20 == 0:
-        print(f"Epoch {epoch+1}, Loss: {loss.item():.4f}")
-
-# 深度学习核心概念
-DL_CONCEPTS = """
-深度学习核心概念：
-
-1. 神经元（Neuron）：基本计算单元
-   output = activation(Σ(weight * input) + bias)
-
-2. 激活函数（Activation Function）：
-   - ReLU: max(0, x) - 最常用
-   - Sigmoid: 1/(1+e^-x) - 二分类
-   - Softmax: 多分类输出
-   - Tanh: -1到1之间
-
-3. 损失函数（Loss Function）：
-   - MSE: 均方误差（回归）
-   - Cross Entropy: 交叉熵（分类）
-
-4. 优化器（Optimizer）：
-   - SGD: 随机梯度下降
-   - Adam: 自适应学习率
-
-5. 正则化：
-   - Dropout: 随机丢弃神经元
-   - L2 Regularization: 权重衰减
-"""
-print(DL_CONCEPTS)</code></pre>
-                </div>
-
-                <!-- 自然语言处理 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>4. 自然语言处理</h3>
+                    <div class="card-body">
+                        <p>让机器"看懂"图像和视频</p>
+                        <div class="tags">
+                            <span class="tag">图像</span>
+                        </div>
                     </div>
-                    <pre class="code-block"><code class="language-python"># 自然语言处理（NLP）
-#
-# NLP使计算机能够理解、解释、生成人类语言
-
-# 1. 文本预处理
-import re
-from collections import Counter
-
-def preprocess_text(text):
-    """文本预处理"""
-    # 转小写
-    text = text.lower()
-    # 去除标点
-    text = re.sub(r'[^\w\s]', '', text)
-    # 分词
-    words = text.split()
-    # 去除停用词
-    stopwords = {'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been'}
-    words = [w for w in words if w not in stopwords]
-    return words
-
-text = "Hello, World! This is a sample text for NLP processing."
-tokens = preprocess_text(text)
-print(f"分词结果: {tokens}")
-print(f"词频统计: {Counter(tokens)}")
-
-# 2. 词嵌入（Word Embedding）
-from sklearn.feature_extraction.text import TfidfVectorizer
-
-# TF-IDF向量化
-corpus = [
-    "This is the first document.",
-    "This document is the second document.",
-    "And this is the third one."
-]
-vectorizer = TfidfVectorizer()
-tfidf_matrix = vectorizer.fit_transform(corpus)
-print(f"TF-IDF矩阵形状: {tfidf_matrix.shape}")
-print(f"词汇表: {vectorizer.get_feature_names_out()}")
-
-# 3. 文本分类
-from sklearn.naive_bayes import MultinomialNB
-
-# 模拟分类任务
-X_train = ["good movie", "bad service", "great product", "terrible experience"]
-y_train = ["positive", "negative", "positive", "negative"]
-
-# TF-IDF特征
-X_tfidf = vectorizer.fit_transform(X_train)
-
-# 训练分类器
-classifier = MultinomialNB()
-classifier.fit(X_tfidf, y_train)
-
-# 预测
-test_text = ["awesome quality"]
-test_tfidf = vectorizer.transform(test_text)
-prediction = classifier.predict(test_tfidf)
-print(f"预测结果: {prediction}")
-
-# NLP任务概览
-NLP_TASKS = """
-NLP主要任务：
-
-1. 文本分类
-   - 情感分析
-   - 垃圾邮件检测
-   - 主题分类
-
-2. 序列标注
-   - 命名实体识别（NER）
-   - 词性标注（POS）
-   - 依存句法分析
-
-3. 文本生成
-   - 机器翻译
-   - 文本摘要
-   - 对话生成
-
-4. 问答系统
-   - 阅读理解
-   - 知识问答
-   - 常识推理
-
-5. 信息提取
-   - 实体抽取
-   - 关系抽取
-   - 事件抽取
-"""
-print(NLP_TASKS)</code></pre>
                 </div>
-
-                <!-- 计算机视觉 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>5. 计算机视觉</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># 计算机视觉（CV）
-#
-# CV使计算机能够获取、处理、分析理解数字图像
-
-# 1. 图像基本操作
-import numpy as np
-
-# 模拟图像（灰度图）
-image = np.random.randint(0, 256, (100, 100), dtype=np.uint8)
-print(f"图像形状: {image.shape}")
-print(f"像素值范围: [{image.min()}, {image.max()}]")
-
-# 2. 图像处理操作
-def grayscale_to_rgb(gray):
-    """灰度图转RGB"""
-    return np.stack([gray] * 3, axis=-1)
-
-def resize_image(image, target_size):
-    """简单图像缩放（最近邻插值）"""
-    h, w = image.shape[:2]
-    th, tw = target_size
-    scale_h, scale_w = h / th, w / tw
-    new_image = np.zeros((*target_size, 3) if len(image.shape) == 3 else target_size)
-    for i in range(th):
-        for j in range(tw):
-            src_i, src_j = int(i * scale_h), int(j * scale_w)
-            src_i, src_j = min(src_i, h-1), min(src_j, w-1)
-            new_image[i, j] = image[src_i, src_j]
-    return new_image
-
-def normalize_image(image):
-    """归一化"""
-    return (image - image.min()) / (image.max() - image.min() + 1e-8)
-
-# 3. 卷积神经网络（CNN）
-import torch
-import torch.nn as nn
-
-class CNN(nn.Module):
-    def __init__(self, num_classes=10):
-        super().__init__()
-        self.features = nn.Sequential(
-            nn.Conv2d(3, 32, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2),
-            nn.Conv2d(32, 64, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2),
-        )
-        self.classifier = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(64 * 8 * 8, 128),
-            nn.ReLU(),
-            nn.Linear(128, num_classes)
-        )
-
-    def forward(self, x):
-        x = self.features(x)
-        x = self.classifier(x)
-        return x
-
-# 测试模型
-model = CNN(num_classes=10)
-dummy_input = torch.randn(1, 3, 32, 32)
-output = model(dummy_input)
-print(f"输出形状: {output.shape}")
-
-# CV任务概览
-CV_TASKS = """
-计算机视觉主要任务：
-
-1. 图像分类
-   - ImageNet分类
-   - 人脸识别
-   - 场景分类
-
-2. 目标检测
-   - YOLO, Faster R-CNN
-   - 人脸检测
-   - 车辆检测
-
-3. 语义分割
-   - FCN, U-Net
-   - 医学图像分割
-   - 自动驾驶
-
-4. 目标跟踪
-   - 单目标跟踪
-   - 多目标跟踪
-
-5. 图像生成
-   - GAN, Diffusion
-   - 图像修复
-   - 超分辨率
-"""
-print(CV_TASKS)</code></pre>
-                </div>
-
-                <!-- 强化学习 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>6. 强化学习</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># 强化学习（RL）
-#
-# 强化学习是一种通过与环境交互来学习最优策略的机器学习方法
-
-import numpy as np
-
-# 1. MDP基础
-class MDP:
-    """马尔可夫决策过程"""
-    def __init__(self, states, actions, transitions, rewards, gamma=0.9):
-        self.states = states
-        self.actions = actions
-        self.transitions = transitions  # P(s'|s,a)
-        self.rewards = rewards          # R(s,a)
-        self.gamma = gamma
-
-    def value_iteration(self, max_iterations=100, theta=1e-4):
-        """价值迭代"""
-        V = {s: 0 for s in self.states}
-
-        for _ in range(max_iterations):
-            delta = 0
-            for s in self.states:
-                v = V[s]
-                V[s] = max(
-                    sum(self.transitions[s][a].get(s_prime, 0) *
-                        (self.rewards.get((s, a), 0) + self.gamma * V[s_prime])
-                        for s_prime in self.states)
-                    for a in self.actions
-                )
-                delta = max(delta, abs(v - V[s]))
-            if delta < theta:
-                break
-        return V
-
-# 2. Q-Learning
-class QLearningAgent:
-    def __init__(self, n_states, n_actions, learning_rate=0.1,
-                 discount_factor=0.9, epsilon=1.0, epsilon_decay=0.995):
-        self.n_states = n_states
-        self.n_actions = n_actions
-        self.lr = learning_rate
-        self.gamma = discount_factor
-        self.epsilon = epsilon
-        self.epsilon_decay = epsilon_decay
-        self.q_table = np.zeros((n_states, n_actions))
-
-    def select_action(self, state):
-        """epsilon-greedy策略"""
-        if np.random.random() < self.epsilon:
-            return np.random.randint(self.n_actions)
-        return np.argmax(self.q_table[state])
-
-    def learn(self, state, action, reward, next_state):
-        """Q-Learning更新"""
-        best_next = np.max(self.q_table[next_state])
-        td_target = reward + self.gamma * best_next
-        td_error = td_target - self.q_table[state, action]
-        self.q_table[state, action] += self.lr * td_error
-
-    def decay_epsilon(self):
-        self.epsilon = max(0.01, self.epsilon * self.epsilon_decay)
-
-# 3. 简单环境示例
-class GridWorld:
-    """简单网格世界"""
-    def __init__(self, size=4):
-        self.size = size
-        self.start = (0, 0)
-        self.goal = (size-1, size-1)
-        self.state = self.start
-
-    def reset(self):
-        self.state = self.start
-        return self.state
-
-    def step(self, action):
-        # 动作: 0=上, 1=右, 2=下, 3=左
-        moves = [(-1, 0), (0, 1), (1, 0), (0, -1)]
-        new_state = (self.state[0] + moves[action][0],
-                    self.state[1] + moves[action][1])
-
-        # 边界检查
-        new_state = (max(0, min(self.size-1, new_state[0])),
-                    max(0, min(self.size-1, new_state[1])))
-
-        self.state = new_state
-
-        if self.state == self.goal:
-            return self.state, 10, True
-        return self.state, -0.1, False
-
-# 训练Q-Learning智能体
-env = GridWorld(size=4)
-agent = QLearningAgent(n_states=16, n_actions=4)
-
-# 训练
-for episode in range(500):
-    state = env.reset()
-    done = False
-    while not done:
-        action = agent.select_action(state)
-        next_state, reward, done = env.step(action)
-        agent.learn(state, action, reward, next_state)
-        state = next_state
-    agent.decay_epsilon()
-
-print("Q-Learning训练完成！")
-print(f"Q表:\n{agent.q_table}")
-
-# RL核心概念
-RL_CONCEPTS = """
-强化学习核心概念：
-
-1. 智能体（Agent）：学习决策的系统
-2. 环境（Environment）：智能体交互的世界
-3. 状态（State）：环境的描述
-4. 动作（Action）：智能体的行为
-5. 奖励（Reward）：环境对动作的反馈
-6. 策略（Policy）：状态到动作的映射
-7. 价值（Value）：长期累积奖励的期望
-8. 探索 vs 利用：尝试新动作 vs 选择最优动作
-
-主要算法：
-- Q-Learning: 值迭代方法
-- SARSA: 策略上的Q-Learning
-- Policy Gradient: 直接优化策略
-- Actor-Critic: 策略+价值混合
-- PPO, A2C, A3C: 现代策略梯度方法
-"""
-print(RL_CONCEPTS)</code></pre>
-                </div>
-
-                <!-- 神经网络架构 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>7. 神经网络架构详解</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># 神经网络架构详解
-#
-# 各种经典神经网络架构的原理与实现
-
-import torch
-import torch.nn as nn
-
-# 1. 多层感知机（MLP）
-class MLP(nn.Module):
-    """多层感知机"""
-    def __init__(self, input_dim, hidden_dims, output_dim, dropout=0.1):
-        super().__init__()
-        layers = []
-        prev_dim = input_dim
-        for hidden_dim in hidden_dims:
-            layers.extend([
-                nn.Linear(prev_dim, hidden_dim),
-                nn.ReLU(),
-                nn.Dropout(dropout)
-            ])
-            prev_dim = hidden_dim
-        layers.append(nn.Linear(prev_dim, output_dim))
-        self.model = nn.Sequential(*layers)
-
-    def forward(self, x):
-        return self.model(x)
-
-# 2. 卷积神经网络（CNN）
-class ConvNet(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.conv_layers = nn.Sequential(
-            nn.Conv2d(3, 32, 3, padding=1),
-            nn.BatchNorm2d(32),
-            nn.ReLU(),
-            nn.MaxPool2d(2),
-            nn.Conv2d(32, 64, 3, padding=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(),
-            nn.MaxPool2d(2),
-            nn.Conv2d(64, 128, 3, padding=1),
-            nn.BatchNorm2d(128),
-            nn.ReLU(),
-            nn.MaxPool2d(2),
-        )
-        self.fc_layers = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(128 * 4 * 4, 256),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(256, 10)
-        )
-
-    def forward(self, x):
-        x = self.conv_layers(x)
-        return self.fc_layers(x)
-
-# 3. 循环神经网络（RNN）
-class RNN(nn.Module):
-    def __init__(self, input_dim, hidden_dim, num_layers, output_dim):
-        super().__init__()
-        self.hidden_dim = hidden_dim
-        self.num_layers = num_layers
-        self.rnn = nn.RNN(input_dim, hidden_dim, num_layers, batch_first=True)
-        self.fc = nn.Linear(hidden_dim, output_dim)
-
-    def forward(self, x):
-        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_dim)
-        out, _ = self.rnn(x, h0)
-        out = self.fc(out[:, -1, :])
-        return out
-
-# 4. LSTM
-class LSTM(nn.Module):
-    def __init__(self, input_dim, hidden_dim, num_layers, output_dim):
-        super().__init__()
-        self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True)
-        self.fc = nn.Linear(hidden_dim, output_dim)
-
-    def forward(self, x):
-        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_dim)
-        c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_dim)
-        out, _ = self.lstm(x, (h0, c0))
-        out = self.fc(out[:, -1, :])
-        return out
-
-# 5. Transformer
-class TransformerBlock(nn.Module):
-    def __init__(self, d_model, n_heads, d_ff, dropout=0.1):
-        super().__init__()
-        self.attention = nn.MultiheadAttention(d_model, n_heads, dropout=dropout)
-        self.norm1 = nn.LayerNorm(d_model)
-        self.norm2 = nn.LayerNorm(d_model)
-        self.ff = nn.Sequential(
-            nn.Linear(d_model, d_ff),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(d_ff, d_model),
-            nn.Dropout(dropout)
-        )
-        self.dropout = nn.Dropout(dropout)
-
-    def forward(self, x, mask=None):
-        attn_output, _ = self.attention(x, x, x, attn_mask=mask)
-        x = self.norm1(x + self.dropout(attn_output))
-        ff_output = self.ff(x)
-        x = self.norm2(x + ff_output)
-        return x
-
-class Transformer(nn.Module):
-    def __init__(self, d_model, n_heads, d_ff, n_layers, vocab_size, max_len=100):
-        super().__init__()
-        self.embedding = nn.Embedding(vocab_size, d_model)
-        self.pos_encoding = nn.Parameter(torch.randn(1, max_len, d_model))
-        self.layers = nn.ModuleList([
-            TransformerBlock(d_model, n_heads, d_ff) for _ in range(n_layers)
-        ])
-        self.fc = nn.Linear(d_model, vocab_size)
-
-    def forward(self, x, mask=None):
-        x = self.embedding(x) + self.pos_encoding[:, :x.size(1), :]
-        for layer in self.layers:
-            x = layer(x, mask)
-        return self.fc(x)
-
-# 架构对比
-ARCH_COMPARISON = """
-经典神经网络架构对比：
-
-┌─────────────┬─────────────┬─────────────┬─────────────────────┐
-│   架构      │   特点      │   适用场景  │   优点/缺点         │
-├─────────────┼─────────────┼─────────────┼─────────────────────┤
-│   MLP       │ 全连接      │ 表格数据    │ 简单/参数量大       │
-│   CNN       │ 局部连接    │ 图像        │ 参数共享/平移不变   │
-│   RNN       │ 循环结构    │ 序列数据    │ 时序建模/梯度消失   │
-│   LSTM      │ 门控机制    │ 长序列      │ 长依赖/计算复杂     │
-│ Transformer │ 自注意力    │ 任意序列    │ 并行/长依赖/O(n²)   │
-└─────────────┴─────────────┴─────────────┴─────────────────────┘
-"""
-print(ARCH_COMPARISON)</code></pre>
-                </div>
-
-                <!-- 大模型基础 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>8. 大语言模型基础</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># 大语言模型（LLM）基础
-#
-# LLM是基于Transformer的大规模预训练语言模型
-
-# 1. Tokenization（分词）
-class Tokenizer:
-    """简单分词器"""
-    def __init__(self):
-        self.vocab = {}
-        self.inv_vocab = {}
-
-    def train(self, texts, vocab_size=1000):
-        """构建词表"""
-        from collections import Counter
-        counter = Counter()
-        for text in texts:
-            tokens = text.split()
-            counter.update(tokens)
-
-        self.vocab = {w: i for i, (w, _) in enumerate(counter.most_common(vocab_size))}
-        self.vocab['<UNK>'] = len(self.vocab)
-        self.vocab['<PAD>'] = len(self.vocab)
-        self.inv_vocab = {i: w for w, i in self.vocab.items()}
-
-    def encode(self, text):
-        """编码"""
-        return [self.vocab.get(w, self.vocab['<UNK>']) for w in text.split()]
-
-    def decode(self, ids):
-        """解码"""
-        return ' '.join([self.inv_vocab.get(i, '<UNK>') for i in ids])
-
-# 2. 注意力机制
-class SelfAttention(nn.Module):
-    def __init__(self, d_model, n_heads):
-        super().__init__()
-        self.d_model = d_model
-        self.n_heads = n_heads
-        self.d_k = d_model // n_heads
-
-        self.W_q = nn.Linear(d_model, d_model)
-        self.W_k = nn.Linear(d_model, d_model)
-        self.W_v = nn.Linear(d_model, d_model)
-        self.W_o = nn.Linear(d_model, d_model)
-
-    def forward(self, x, mask=None):
-        batch_size, seq_len, _ = x.size()
-
-        # 分割多头
-        Q = self.W_q(x).view(batch_size, seq_len, self.n_heads, self.d_k).transpose(1, 2)
-        K = self.W_k(x).view(batch_size, seq_len, self.n_heads, self.d_k).transpose(1, 2)
-        V = self.W_v(x).view(batch_size, seq_len, self.n_heads, self.d_k).transpose(1, 2)
-
-        # 注意力分数
-        scores = torch.matmul(Q, K.transpose(-2, -1)) / (self.d_k ** 0.5)
-
-        if mask is not None:
-            scores = scores.masked_fill(mask == 0, -1e9)
-
-        attention = torch.softmax(scores, dim=-1)
-        context = torch.matmul(attention, V)
-
-        context = context.transpose(1, 2).contiguous().view(batch_size, seq_len, self.d_model)
-        return self.W_o(context)
-
-# 3. GPT风格语言模型
-class GPTModel(nn.Module):
-    def __init__(self, vocab_size, d_model, n_heads, n_layers, d_ff, max_len, dropout=0.1):
-        super().__init__()
-        self.token_embedding = nn.Embedding(vocab_size, d_model)
-        self.position_embedding = nn.Parameter(torch.randn(1, max_len, d_model))
-        self.layers = nn.ModuleList([
-            TransformerBlock(d_model, n_heads, d_ff, dropout) for _ in range(n_layers)
-        ])
-        self.lm_head = nn.Linear(d_model, vocab_size, bias=False)
-
-    def forward(self, x, mask=None):
-        x = self.token_embedding(x) + self.position_embedding[:, :x.size(1), :]
-        for layer in self.layers:
-            x = layer(x, mask)
-        return self.lm_head(x)
-
-# 4. 预训练与微调
-PRETRAINING_CONCEPTS = """
-预训练与微调范式：
-
-预训练（Pre-training）：
-- 在大规模无标签数据上学习语言知识
-- 自监督学习目标：
-  * 因果语言建模（GPT）：预测下一个词
-  * 掩码语言建模（BERT）：预测掩码词
-  * 序列到序列：输入到输出映射
-
-微调（Fine-tuning）：
-- 在特定任务数据上调整预训练模型
-- 方式：
-  * 全量微调：更新所有参数
-  * 提示学习：设计提示模板
-  * LoRA：低秩适配
-  * QLoRA：量化+LoRA
-
-评估指标：
-- 困惑度（Perplexity）：语言模型质量
-- 准确率/召回率：分类任务
-- BLEU/ROUGE：生成任务
-"""
-print(PRETRAINING_CONCEPTS)
-
-# LLM发展历程
-LLM_HISTORY = """
-大语言模型发展：
-
-2020    GPT-3          175B参数
-2021    PaLM           540B参数
-2022    GPT-3.5/ChatGPT
-2023    GPT-4          多模态
-2023    LLaMA          开源崛起
-2023    Claude         安全对齐
-2024    GPT-4o         原生多模态
-2024    Qwen/LLaMA 2   国产模型
-
-关键技术突破：
-- 算力规模化（TPU/GPU集群）
-- 训练技巧（ZeRO, 混合精度）
-- 数据工程（清洗、合成）
-- 对齐技术（RLHF, RLAIF）
-"""
-print(LLM_HISTORY)</code></pre>
-                </div>
-
-                <!-- AI应用场景 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>9. AI应用场景</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># AI应用场景概览
-#
-# 人工智能在各行业的实际应用
-
-# 1. 聊天机器人与虚拟助手
-CHATBOT_ARCHITECTURE = """
-聊天机器人架构：
-
-┌─────────────────────────────────────────────────────────┐
-│                      用户输入                           │
-└──────────────────────────┬──────────────────────────────┘
-                           ▼
-┌─────────────────────────────────────────────────────────┐
-│                   自然语言理解（NLU）                    │
-│  • 意图识别：用户想做什么                                │
-│  • 实体抽取：提取关键信息                                │
-└──────────────────────────┬──────────────────────────────┘
-                           ▼
-┌─────────────────────────────────────────────────────────┐
-│                    对话管理（DM）                       │
-│  • 状态追踪：记住对话历史                                │
-│  • 策略选择：决定回复策略                                │
-└──────────────────────────┬──────────────────────────────┘
-                           ▼
-┌─────────────────────────────────────────────────────────┐
-│                   自然语言生成（NLG）                    │
-│  • 回复生成：生成自然回复                                │
-│  • 格式化输出：结构化响应                                │
-└──────────────────────────┬──────────────────────────────┘
-                           ▼
-┌─────────────────────────────────────────────────────────┐
-│                       用户输出                          │
-└─────────────────────────────────────────────────────────┘
-"""
-
-# 2. 推荐系统
-RECOMMENDATION_SYSTEM = """
-推荐系统类型：
-
-1. 协同过滤
-   - 基于用户：找相似用户
-   - 基于物品：找相似物品
-   - 矩阵分解：SVD, ALS
-
-2. 内容推荐
-   - 特征提取：文本、图像
-   - 相似度计算：余弦相似度
-
-3. 深度学习推荐
-   - Wide & Deep
-   - DIN（Deep Interest Network）
-   - Transformer推荐
-
-4. 大模型推荐
-   - LLM作为特征提取器
-   - LLM生成推荐理由
-   - 个性化提示工程
-"""
-
-# 3. 代码生成
-CODE_GENERATION = """
-代码生成应用：
-
-1. 代码补全
-   - GitHub Copilot
-   - TabNine
-   - Amazon CodeWhisperer
-
-2. 代码解释
-   - 注释生成
-   - 文档编写
-   - 代码审查
-
-3. 代码转换
-   - 语言翻译
-   - 代码重构
-   - Bug修复
-
-4. 测试生成
-   - 单元测试
-   - 集成测试
-   - 模糊测试
-"""
-
-# 4. 图像生成
-IMAGE_GENERATION = """
-图像生成技术：
-
-1. GAN（生成对抗网络）
-   - StyleGAN：高质量人脸
-   - BigGAN：高分辨率
-
-2. Diffusion（扩散模型）
-   - Stable Diffusion：开源
-   - DALL-E：文本到图像
-   - Midjourney：艺术创作
-
-3. 多模态
-   - CLIP：图文对齐
-   - BLIP：图像理解
-   - LLaVA：视觉指令
-
-应用：
-- 艺术创作
-- 产品设计
-- 游戏开发
-- 数据增强
-"""
-
-# 5. 行业应用
-INDUSTRY_APPLICATIONS = """
-AI行业应用：
-
-┌──────────────┬────────────────────────────────────────────┐
-│   行业       │   应用场景                                 │
-├──────────────┼────────────────────────────────────────────┤
-│   医疗       │  影像诊断、药物发现、病历分析               │
-│   金融       │  风控、量化交易、智能客服、反欺诈           │
-│   零售       │  推荐系统、需求预测、供应链优化             │
-│   制造       │  质量检测、预测维护、工艺优化               │
-│   教育       │  个性化学习、智能答疑、作业批改             │
-│   交通       │  自动驾驶、交通预测、智能调度               │
-│   农业       │  病虫害识别、产量预测、自动化种植           │
-└──────────────┴────────────────────────────────────────────┘
-"""
-
-print(CHATBOT_ARCHITECTURE)
-print(RECOMMENDATION_SYSTEM)
-print(CODE_GENERATION)
-print(IMAGE_GENERATION)
-print(INDUSTRY_APPLICATIONS)</code></pre>
-                </div>
-
-                <!-- AI伦理与安全 -->
-                <div class="code-section">
-                    <div class="code-header">
-                        <h3>10. AI伦理与安全</h3>
-                    </div>
-                    <pre class="code-block"><code class="language-python"># AI伦理与安全
-#
-# 人工智能的伦理考量和安全实践
-
-# 1. AI安全风险
-AI_RISKS = """
-AI安全风险分类：
-
-1. 对抗攻击（Adversarial Attacks）
-   - 输入扰动导致错误预测
-   - 图像、文本、语音攻击
-
-2. 隐私泄露
-   - 数据反向工程
-   - 模型逆向
-   - 属性推断
-
-3. 对齐问题
-   - 奖励黑客
-   - 目标误指定
-   - 价值对齐
-
-4. 滥用风险
-   - 深度伪造
-   - 自动化攻击
-   - 虚假信息
-
-5. 社会影响
-   - 就业变革
-   - 偏见歧视
-   - 信息茧房
-"""
-
-# 2. 对抗攻击示例
-import torch
-
-class AdversarialExample:
-    """对抗样本生成"""
-    def __init__(self, model):
-        self.model = model
-
-    def fgsm_attack(self, image, label, epsilon=0.1):
-        """FGSM快速梯度符号攻击"""
-        image.requires_grad = True
-        output = self.model(image)
-        loss = nn.functional.cross_entropy(output, label)
-        self.model.zero_grad()
-        loss.backward()
-
-        # 生成对抗样本
-        perturbed_image = image + epsilon * image.grad.sign()
-        return perturbed_image
-
-# 3. 差分隐私
-class DifferentialPrivacy:
-    """差分隐私保护"""
-    def __init__(self, epsilon=1.0):
-        self.epsilon = epsilon
-
-    def add_noise(self, value, sensitivity=1.0):
-        """拉普拉斯噪声"""
-        scale = sensitivity / self.epsilon
-        noise = np.random.laplace(0, scale)
-        return value + noise
-
-    def clip_gradient(self, gradient, max_norm=1.0):
-        """梯度裁剪"""
-        norm = torch.norm(gradient)
-        if norm > max_norm:
-            gradient = gradient * max_norm / norm
-        return gradient
-
-# 4. AI对齐
-AI_ALIGNMENT = """
-AI对齐方法：
-
-1. RLHF（基于人类反馈的强化学习）
-   - 收集人类偏好
-   - 训练奖励模型
-   - 使用PPO微调策略
-
-2. Constitutional AI
-   - 定义行为准则
-   - 自我批评与修订
-   - 监督微调
-
-3. 红队测试
-   - 故意诱导有害输出
-   - 识别安全漏洞
-   - 迭代改进
-
-4. 可解释性研究
-   - 理解模型决策
-   - 检测异常行为
-   - 确保可控性
-"""
-
-# 5. 伦理准则
-AI_ETHICS = """
-AI伦理原则：
-
-1. 公平性（Fairness）
-   - 避免算法偏见
-   - 平等对待所有群体
-   - 可审计性
-
-2. 透明性（Transparency）
-   - 可解释的决策
-   - 清晰的文档
-   - 开放沟通
-
-3. 隐私保护（Privacy）
-   - 数据最小化
-   - 同意授权
-   - 安全存储
-
-4. 责任（Accountability）
-   - 明确责任主体
-   - 可追溯性
-   - 补救机制
-
-5. 安全（Safety）
-   - 鲁棒性测试
-   - 风险评估
-   - 应急计划
-"""
-
-# 6. 最佳实践
-BEST_PRACTICES = """
-AI开发最佳实践：
-
-1. 数据层面
-   - 数据来源透明
-   - 偏见检测与缓解
-   - 数据质量保证
-
-2. 模型层面
-   - 多轮安全评估
-   - 对抗测试
-   - 性能基准
-
-3. 部署层面
-   - 渐进式发布
-   - 监控与告警
-   - 回滚机制
-
-4. 治理层面
-   - 伦理审查委员会
-   - 风险管理框架
-   - 合规性检查
-"""
-
-print(AI_RISKS)
-print(AI_ALIGNMENT)
-print(AI_ETHICS)
-print(BEST_PRACTICES)</code></pre>
-                </div>
-
             </div>
+
+            <!-- 机器学习类型 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🔄 机器学习三大类型</h3>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card level-card level-1">
+                    <div class="level-badge">🎯 监督学习</div>
+                    <p style="font-size:0.9rem;">有标准答案，学习输入→输出的映射</p>
+                    <div class="tags">
+                        <span class="tag">分类</span>
+                        <span class="tag">回归</span>
+                    </div>
+                    <ul style="font-size:0.8rem; padding-left:1rem; margin-top:0.5rem;">
+                        <li>垃圾邮件识别</li>
+                        <li>房价预测</li>
+                        <li>图像分类</li>
+                    </ul>
+                </div>
+
+                <div class="card level-card level-2">
+                    <div class="level-badge">🔍 无监督学习</div>
+                    <p style="font-size:0.9rem;">无标签，发现数据内在结构</p>
+                    <div class="tags">
+                        <span class="tag">聚类</span>
+                        <span class="tag">降维</span>
+                    </div>
+                    <ul style="font-size:0.8rem; padding-left:1rem; margin-top:0.5rem;">
+                        <li>用户分群</li>
+                        <li>异常检测</li>
+                    </ul>
+                </div>
+
+                <div class="card level-card level-3">
+                    <div class="level-badge">🎮 强化学习</div>
+                    <p style="font-size:0.9rem;">试错+奖励，不断优化策略</p>
+                    <div class="tags">
+                        <span class="tag">决策</span>
+                    </div>
+                    <ul style="font-size:0.8rem; padding-left:1rem; margin-top:0.5rem;">
+                        <li>游戏AI</li>
+                        <li>机器人控制</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 监督学习：回归vs分类 -->
+            <div class="card" style="margin-top: 2rem;">
+                <div class="card-header">
+                    <div class="card-icon">📈</div>
+                    <div>
+                        <div class="card-title">回归 vs 分类</div>
+                        <div class="card-subtitle">监督学习的两大任务</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>对比</th>
+                                    <th style="background: #fef2f2;">回归问题</th>
+                                    <th style="background: #ecfdf5;">分类问题</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>输出</strong></td>
+                                    <td>连续数值（150.5、25.3）</td>
+                                    <td>离散类别（猫、狗、垃圾）</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>例子</strong></td>
+                                    <td>预测房价、温度、销量</td>
+                                    <td>识别猫狗、垃圾邮件</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>指标</strong></td>
+                                    <td>MSE、RMSE</td>
+                                    <td>准确率、精确率</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 机器学习工作流程 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🔄 ML工作流程</h3>
+
+            <div class="flow-chart">
+                <div class="flow-item start">数据收集</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item">数据清洗</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item">特征工程</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item">模型训练</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item">模型评估</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item end">预测应用</div>
+            </div>
+
+            <!-- 核心算法分类 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🔧 算法分类速查</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>类别</th>
+                            <th>典型算法</th>
+                            <th>适用场景</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>回归</strong></td>
+                            <td>线性回归、岭回归</td>
+                            <td>房价预测、销量预测</td>
+                        </tr>
+                        <tr>
+                            <td><strong>分类</strong></td>
+                            <td>逻辑回归、决策树、SVM</td>
+                            <td>垃圾邮件、疾病诊断</td>
+                        </tr>
+                        <tr>
+                            <td><strong>集成</strong></td>
+                            <td>随机森林、XGBoost</td>
+                            <td>竞赛、高精度预测</td>
+                        </tr>
+                        <tr>
+                            <td><strong>聚类</strong></td>
+                            <td>K-Means、DBSCAN</td>
+                            <td>用户分群、异常检测</td>
+                        </tr>
+                        <tr>
+                            <td><strong>降维</strong></td>
+                            <td>PCA、t-SNE</td>
+                            <td>可视化、特征压缩</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">
+                    📚 详细算法说明请参见 <a href="ml-basics.html">机器学习</a> 页面
+                </p>
+            </div>
+
+            <!-- NLP核心任务 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">📝 NLP核心任务</h3>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">📖 文本分类</h4>
+                    <p style="font-size:0.85rem; color:#666;">情感分析、垃圾邮件检测</p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">🔤 命名实体识别</h4>
+                    <p style="font-size:0.85rem; color:#666;">提取人名、地名、机构名</p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">📝 文本生成</h4>
+                    <p style="font-size:0.85rem; color:#666;">机器翻译、摘要、对话</p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">❓ 问答系统</h4>
+                    <p style="font-size:0.85rem; color:#666;">阅读理解、知识问答</p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">💬 对话系统</h4>
+                    <p style="font-size:0.85rem; color:#666;">任务型、开放域聊天</p>
+                </div>
+            </div>
+
+            <!-- CV核心任务 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">👁️ CV核心任务</h3>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">🖼️ 图像分类</h4>
+                    <p style="font-size:0.85rem; color:#666;">ImageNet、人脸识别</p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">🎯 目标检测</h4>
+                    <p style="font-size:0.85rem; color:#666;">YOLO、人脸检测</p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">🎨 语义分割</h4>
+                    <p style="font-size:0.85rem; color:#666;">U-Net、自动驾驶</p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">🖌️ 图像生成</h4>
+                    <p style="font-size:0.85rem; color:#666;">GAN、Diffusion</p>
+                </div>
+            </div>
+
+            <!-- 强化学习核心 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🎮 强化学习核心概念</h3>
+
+            <div class="diagram-box">
+                <div class="diagram-title">Agent-Environment交互</div>
+                <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│   智能体(Agent) ←── 奖励(Reward) ──→ 环境(Environment)          │
+│       │                                    │                     │
+│       │ 动作(Action)                      │ 状态(State)         │
+│       │                                    │                     │
+│       └───────────────────────────────────▶│                     │
+│                                                                 │
+│   核心要素：Agent、环境、状态、动作、奖励、策略                   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+                </div>
+            </div>
+
+            <!-- 大语言模型 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">💬 大语言模型 (LLM)</h3>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">📚 预训练</h4>
+                    <p style="font-size:0.85rem; color:#666;">海量文本学习语言知识</p>
+                    <span class="tag green">自监督学习</span>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">⚙️ 微调</h4>
+                    <p style="font-size:0.85rem; color:#666;">任务特定数据优化</p>
+                    <span class="tag yellow">Fine-tuning</span>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">📝 提示工程</h4>
+                    <p style="font-size:0.85rem; color:#666;">通过提示词引导输出</p>
+                    <span class="tag">Zero-shot</span>
+                </div>
+            </div>
+
+            <p style="margin-top: 1rem; font-size: 0.85rem; color: #666;">
+                📚 详细LLM内容请参见 <a href="llm.html">大语言模型</a> 页面
+            </p>
+            <p style="font-size: 0.85rem; color: #666;">
+                📚 深度学习详细架构请参见 <a href="dl-basics.html">深度学习</a> 页面
+            </p>
+
+            <!-- AI行业应用 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🏢 AI行业应用</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>行业</th>
+                            <th>典型应用</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>医疗</strong></td><td>影像诊断、药物发现、辅助手术</td></tr>
+                        <tr><td><strong>金融</strong></td><td>风控、反欺诈、智能客服、信用评估</td></tr>
+                        <tr><td><strong>零售</strong></td><td>个性化推荐、需求预测、智能定价</td></tr>
+                        <tr><td><strong>制造</strong></td><td>质量检测、预测性维护、机器人控制</td></tr>
+                        <tr><td><strong>交通</strong></td><td>自动驾驶、交通预测、智能调度</td></tr>
+                        <tr><td><strong>教育</strong></td><td>个性化学习、智能答疑、自适应测评</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- AI伦理与安全 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">⚖️ AI伦理与安全</h3>
+
+            <div class="cards-grid card-grid-2">
+                <div class="card">
+                    <h4>⚠️ 主要风险</h4>
+                    <ul style="font-size:0.85rem; padding-left:1.2rem;">
+                        <li>对抗攻击（输入扰动）</li>
+                        <li>隐私泄露（数据逆向）</li>
+                        <li>模型偏见（训练数据）</li>
+                        <li>深度伪造（虚假信息）</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>🛡️ 安全措施</h4>
+                    <ul style="font-size:0.85rem; padding-left:1.2rem;">
+                        <li>红队测试（安全评估）</li>
+                        <li>差分隐私（数据保护）</li>
+                        <li>RLHF（人类反馈对齐）</li>
+                        <li>可解释性研究</li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
     </section>
+
+    <script src="js/main.js"></script>
 </body>
 </html>

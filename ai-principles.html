@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI工具原理 - AI技术学习平台</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">🔬 AI工具原理</h2>
+            <p class="section-subtitle">深入理解主流AI工具的技术原理</p>
+
+            <div class="card">
+                <div class="card-header">为什么了解原理很重要？</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     了解AI原理的价值                                       │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐              │
+│   │  知道能做什么 │  →  │  理解为何有效 │  →  │  能更好使用 │              │
+│   │             │     │             │     │             │              │
+│   │ 使用工具    │     │ 改进提示词  │     │  解决复杂问题│              │
+│   └─────────────┘     └─────────────┘     └─────────────┘              │
+│                                                                         │
+│   表面：ChatGPT会聊天                                                   │
+│   原理：大规模语言模型 + 指令对齐 + RLHF                                 │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <h3>🤖 ChatGPT/GPT-4 原理</h3>
+
+            <div class="card">
+                <div class="card-header">GPT系列核心架构</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      GPT 技术演进                                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   GPT-1 (2018)     GPT-2 (2019)      GPT-3 (2020)      GPT-4 (2023)    │
+│   1.5B参数        15B参数          175B参数         万亿参数          │
+│   无监督预训练    零样本任务      少样本学习       多模态            │
+│                                                                         │
+│   核心技术：                                                         │
+│   1. 预测下一个token (Next Token Prediction)                           │
+│   2. 下一个token预测 = 语言建模 + 知识压缩                              │
+│   3. 规模定律 (Scaling Law): 参数↑ = 能力↑                              │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <div class="cards-grid card-grid-2">
+                <div class="card">
+                    <h4>🧠 GPT训练三阶段</h4>
+                    <div class="flow-chart">
+                        <div class="flow-item start">预训练</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-item">监督微调 (SFT)</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-item end">RLHF对齐</div>
+                    </div>
+                    <ul style="font-size: 0.9rem; padding-left: 1.2rem; margin-top: 1rem;">
+                        <li><strong>预训练</strong>：海量文本学习语言规律</li>
+                        <li><strong>SFT</strong>：高质量对话数据微调</li>
+                        <li><strong>RLHF</strong>：人类反馈强化学习对齐</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>📊 Tokenization</h4>
+                    <div class="diagram-box" style="margin: 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│  文本: "AI是未来"                        │
+│          ↓                               │
+│  Token: [32019, 318, 27214, 234]        │
+│          ↓                               │
+│  每个token约4个字符                       │
+│  GPT-4词汇量 ~ 100K tokens               │
+└─────────────────────────────────────────┘
+                        </div>
+                    </div>
+                    <ul style="font-size: 0.9rem; padding-left: 1.2rem; margin-top: 1rem;">
+                        <li>BPE (Byte Pair Encoding) 编码</li>
+                        <li>中文字符约1-2个token</li>
+                        <li>API按token计费</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🎨 Midjourney/DALL-E 图像生成原理</h3>
+
+            <div class="card">
+                <div class="card-header">扩散模型 (Diffusion Model)</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      扩散模型原理                                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐  │
+│   │  正向扩散       │     │   逆向去噪      │     │  文本引导       │  │
+│   │  Forward       │     │   Reverse       │     │  Guidance       │  │
+│   └────────┬────────┘     └────────┬────────┘     └────────┬────────┘  │
+│            │                       │                       │             │
+│            ▼                       ▼                       ▼             │
+│   ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐  │
+│   │ x₀ ──→ x₁ ──→  │     │ xT ──→ xT-1 ──→ │     │ 文本作为条件    │  │
+│   │ ... ──→ xT      │     │ ... ──→ x₀      │     │ 控制生成内容    │  │
+│   │                 │     │                 │     │                 │  │
+│   │ 逐步加噪声      │     │ 逐步去噪声      │     │ CLIP文本编码   │  │
+│   │ 最终纯噪声      │     │ 恢复清晰图像    │     │ 交叉注意力注入 │  │
+│   └─────────────────┘     └─────────────────┘     └─────────────────┘  │
+│                                                                         │
+│   核心公式：                                                           │
+│   p(xₜ₋₁|xₜ) = 正态分布(均值, 方差)                                    │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card">
+                    <h4>🔄 前向过程</h4>
+                    <p style="font-size:0.9rem;">逐步向图像添加高斯噪声</p>
+                    <ul style="font-size:0.8rem; padding-left:1rem;">
+                        <li>1000步扩散</li>
+                        <li>T时刻完全随机噪声</li>
+                        <li>不可逆过程</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>🔙 逆向过程</h4>
+                    <p style="font-size:0.9rem;">神经网络预测噪声并去除</p>
+                    <ul style="font-size:0.8rem; padding-left:1rem;">
+                        <li>U-Net网络架构</li>
+                        <li>时间步条件嵌入</li>
+                        <li>从纯噪声生成图像</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>📝 文本条件</h4>
+                    <p style="font-size:0.9rem;">CLIP引导生成方向</p>
+                    <ul style="font-size:0.8rem; padding-left:1rem;">
+                        <li>CLIP文本编码器</li>
+                        <li>交叉注意力机制</li>
+                        <li>控制内容一致性</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🎵 AI音乐生成原理</h3>
+
+            <div class="card">
+                <div class="card-header">音乐生成的两大技术路线</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      AI音乐生成技术                                       │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────────────────────────────────────────────────────────┐   │
+│   │                    技术路线对比                                   │   │
+│   ├─────────────────────────────────────────────────────────────────┤   │
+│   │                                                                 │   │
+│   │   方案1: Token化 + 语言模型                                      │   │
+│   │   ┌─────────────────────────────────────────────────────────┐  │   │
+│   │   │  音频 → Mel Spectrogram → Codec Tokens → LLM生成        │  │   │
+│   │   │                         ↓                                 │  │   │
+│   │   │              音乐领域特定Tokenizer                        │  │   │
+│   │   └─────────────────────────────────────────────────────────┘  │   │
+│   │   代表: OpenAI Jukebox, Facebook MusicGen                      │   │
+│   │                                                                 │   │
+│   │   方案2: 扩散模型 + 声码器                                       │   │
+│   │   ┌─────────────────────────────────────────────────────────┐  │   │
+│   │   │  文本条件 → 扩散去噪 → Mel Spectrogram → 音频波形       │  │   │
+│   │   │                    ↓                                      │  │   │
+│   │   │              HiFi-GAN声码器                              │  │   │
+│   │   └─────────────────────────────────────────────────────────┘  │   │
+│   │   代表: Google MusicLM, Stability Audio                        │   │
+│   │                                                                 │   │
+│   └─────────────────────────────────────────────────────────────────┘   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <h3>🎮 AI游戏/视频生成原理</h3>
+
+            <div class="cards-grid card-grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎮</div>
+                        <div>
+                            <div class="card-title">游戏AI原理</div>
+                            <div class="card-subtitle">NPC/对话系统</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="diagram-box" style="margin: 0.5rem 0;">
+                            <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│  游戏AI 技术架构                          │
+├─────────────────────────────────────────┤
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │        游戏状态编码              │   │
+│  └────────────────┬────────────────┘   │
+│                   │                       │
+│         ┌─────────┴─────────┐           │
+│         ▼                   ▼           │
+│  ┌─────────────┐    ┌─────────────┐     │
+│  │ 状态理解    │    │ 动作生成    │     │
+│  │ (LLM)       │    │ (规则/RL)   │     │
+│  └─────────────┘    └─────────────┘     │
+│         │                   │           │
+│         └─────────┬─────────┘           │
+│                   ▼                       │
+│          ┌──────────────────┐            │
+│          │  动作执行        │            │
+│          └──────────────────┘            │
+│                                         │
+└─────────────────────────────────────────┘
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.85rem; padding-left: 1rem;">
+                            <li>游戏状态 → 文本描述</li>
+                            <li>LLM理解上下文</li>
+                            <li>生成符合角色设定的回复</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎬</div>
+                        <div>
+                            <div class="card-title">视频生成原理</div>
+                            <div class="card-subtitle">Sora/Runway</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="diagram-box" style="margin: 0.5rem 0;">
+                            <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│  视频生成 技术架构                        │
+├─────────────────────────────────────────┤
+│                                         │
+│  空间压缩: 视频 → 潜在空间 (VAE)         │
+│       ↓                                  │
+│  时空建模: 3D U-Net / Transformer        │
+│       ↓                                  │
+│  文本条件: CLIP文本编码                  │
+│       ↓                                  │
+│  生成过程: 迭代去噪                      │
+│       ↓                                  │
+│  视频解码: 潜在 → 视频帧                 │
+│                                         │
+└─────────────────────────────────────────┘
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.85rem; padding-left: 1rem;">
+                            <li>时空patch建模</li>
+                            <li>时序一致性保证</li>
+                            <li>物理世界模拟能力</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3>🛡️ AI安全与对齐原理</h3>
+
+            <div class="card">
+                <div class="card-header">RLHF - 人类反馈强化学习</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      RLHF 训练流程                                        │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────────────────────────────────────────────────────────┐   │
+│   │                                                                 │   │
+│   │   Step 1: 监督微调 (SFT)                                        │   │
+│   │   ┌─────────────────────────────────────────────────────────┐  │   │
+│   │   │  高质量对话数据 → 微调LLM → 有监督策略模型              │  │   │
+│   │   └─────────────────────────────────────────────────────────┘  │   │
+│   │                          ↓                                      │   │
+│   │   Step 2: 奖励模型训练 (RM)                                    │   │
+│   │   ┌─────────────────────────────────────────────────────────┐  │   │
+│   │   │  人类标注偏好 → 训练奖励模型 → 输出奖励分数             │  │   │
+│   │   │            ↑                                              │  │   │
+│   │   │      成对比较标注                                         │  │   │
+│   │   └─────────────────────────────────────────────────────────┘  │   │
+│   │                          ↓                                      │   │
+│   │   Step 3: PPO强化学习                                          │   │
+│   │   ┌─────────────────────────────────────────────────────────┐  │   │
+│   │   │  SFT模型 → 生成回答 → RM评分 → PPO更新 → 新模型        │  │   │
+│   │   │            ↑                                             │  │   │
+│   │   │      KL散度惩罚 (防止偏离SFT太远)                       │  │   │
+│   │   └─────────────────────────────────────────────────────────┘  │   │
+│   │                                                                 │   │
+│   └─────────────────────────────────────────────────────────────────┘   │
+│                                                                         │
+│   核心思想：用人类偏好指导模型行为，使其更有帮助、更安全            │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card">
+                    <h4>🚫 内容安全</h4>
+                    <ul style="font-size:0.85rem; padding-left:1rem;">
+                        <li>RLHF减少有害输出</li>
+                        <li>Guardrails护栏过滤</li>
+                        <li>输入输出审核</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>🎯 提示注入防御</h4>
+                    <ul style="font-size:0.85rem; padding-left:1rem;">
+                        <li>指令分层</li>
+                        <li>敏感词过滤</li>
+                        <li>上下文隔离</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>🔒 数据隐私</h4>
+                    <ul style="font-size:0.85rem; padding-left:1rem;">
+                        <li>差分隐私训练</li>
+                        <li>数据脱敏</li>
+                        <li>本地部署选项</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🧠 Agent/RAG 原理</h3>
+
+            <div class="cards-grid card-grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🤖</div>
+                        <div>
+                            <div class="card-title">Agent 执行原理</div>
+                        </div>
+                    </div>
+                    <div class="diagram-box" style="margin: 0.5rem 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│  Agent 执行循环                          │
+├─────────────────────────────────────────┤
+│                                         │
+│  1. 接收用户输入                         │
+│         ↓                                │
+│  2. 理解意图 (LLM)                      │
+│         ↓                                │
+│  3. 规划步骤 (ReAct/CoT)                │
+│         ↓                                │
+│  4. 选择工具并执行                       │
+│         ↓                                │
+│  5. 观察结果                             │
+│         ↓                                │
+│  6. 决定下一步或结束                     │
+│                                         │
+└─────────────────────────────────────────┘
+                        </div>
+                    </div>
+                    <ul style="font-size: 0.85rem; padding-left: 1rem;">
+                        <li>ReAct: 推理+行动交替</li>
+                        <li>工具调用: Function Calling</li>
+                        <li>自我反思: 评估结果改进</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📚</div>
+                        <div>
+                            <div class="card-title">RAG 工作原理</div>
+                        </div>
+                    </div>
+                    <div class="diagram-box" style="margin: 0.5rem 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│  RAG 检索增强生成                        │
+├─────────────────────────────────────────┤
+│                                         │
+│  检索阶段:                              │
+│  用户问题 → 向量化 → 向量检索 → 文档   │
+│                 ↓                        │
+│           Embedding模型                  │
+│                                         │
+│  生成阶段:                              │
+│  问题 + 检索文档 → LLM → 答案          │
+│                                         │
+└─────────────────────────────────────────┘
+                        </div>
+                    </div>
+                    <ul style="font-size: 0.85rem; padding-left: 1rem;">
+                        <li>解决知识时效性问题</li>
+                        <li>减少幻觉（基于事实）</li>
+                        <li>支持私有知识库</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>📊 核心技术速查</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>技术</th>
+                            <th>应用场景</th>
+                            <th>核心原理</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Transformer</strong></td>
+                            <td>NLP、CV、多模态</td>
+                            <td>自注意力机制、并行计算</td>
+                        </tr>
+                        <tr>
+                            <td><strong>扩散模型</strong></td>
+                            <td>图像/音频生成</td>
+                            <td>逐步去噪、生成建模</td>
+                        </tr>
+                        <tr>
+                            <td><strong>RLHF</strong></td>
+                            <td>模型对齐、安全</td>
+                            <td>人类反馈强化学习</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Embedding</strong></td>
+                            <td>语义检索、RAG</td>
+                            <td>向量表示、相似度计算</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CLIP</strong></td>
+                            <td>多模态理解、生成</td>
+                            <td>图文对比学习</td>
+                        </tr>
+                        <tr>
+                            <td><strong>强化学习</strong></td>
+                            <td>游戏AI、Agent</td>
+                            <td>奖励最大化、策略优化</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>💡 关键洞察</h3>
+
+            <div class="cards-grid card-grid-2">
+                <div class="card">
+                    <h4>🔑 核心规律</h4>
+                    <ul style="font-size:0.9rem; padding-left:1.2rem;">
+                        <li><strong>规模定律</strong>: 参数、数据、计算量增加 → 能力涌现</li>
+                        <li><strong>涌现能力</strong>: 大到一定程度出现小模型没有的能力</li>
+                        <li><strong>对齐税</strong>: 安全对齐可能降低部分能力</li>
+                        <li><strong>多模态融合</strong>: 统一表示空间是趋势</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>⚠️ 当前局限</h4>
+                    <ul style="font-size:0.9rem; padding-left:1.2rem;">
+                        <li>长程依赖仍有挑战</li>
+                        <li>推理成本高</li>
+                        <li>事实一致性不足</li>
+                        <li>可解释性差</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

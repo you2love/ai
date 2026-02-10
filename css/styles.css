@@ -14,8 +14,17 @@
     --border-color: #e5e7eb;
     --sidebar-width: 280px;
     --sidebar-bg: #ffffff;
-    --code-bg: #1e293b;
-    --code-text: #e2e8f0;
+    --code-bg: #1e1e1e;
+    --code-text: #d4d4d4;
+    --code-keyword: #569cd6;
+    --code-string: #ce9178;
+    --code-number: #b5cea8;
+    --code-comment: #6a9955;
+    --code-function: #dcdcaa;
+    --code-class: #4ec9b0;
+    --code-variable: #9cdcfe;
+    --code-operator: #d4d4d4;
+    --code-builtin: #4ec9b0;
     --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
     --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
     --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
@@ -103,9 +112,20 @@ html, body {
 }
 
 .nav-link.active {
-    background: var(--primary-light);
+    background: linear-gradient(90deg, var(--primary-light) 0%, #ffffff 100%);
     color: var(--primary-color);
-    border-left: 3px solid var(--primary-color);
+    font-weight: 700;
+    border-left: 4px solid var(--primary-color);
+    box-shadow: inset 2px 0 8px rgba(0, 102, 204, 0.15);
+    position: relative;
+}
+
+.nav-link.active::before {
+    content: '▶';
+    position: absolute;
+    left: 8px;
+    font-size: 0.6rem;
+    color: var(--primary-color);
 }
 
 .nav-icon {
@@ -538,24 +558,39 @@ tr:last-child td {
     padding: 1.25rem;
     background: var(--code-bg);
     overflow-x: auto;
-    font-family: 'Fira Code', 'Monaco', 'Courier New', monospace;
-    font-size: 0.85rem;
-    line-height: 1.7;
+    font-family: 'Fira Code', 'Monaco', 'Consolas', 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.8;
     color: var(--code-text);
     position: relative;
     white-space: pre;
     word-wrap: normal;
+    border-radius: var(--radius-sm);
 }
 
 .code-block code {
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
-    color: inherit;
     display: block;
     white-space: pre;
     overflow-x: auto;
 }
+
+/* Python Syntax Highlighting */
+.code-block code .keyword { color: var(--code-keyword); font-weight: 500; }
+.code-block code .string { color: var(--code-string); }
+.code-block code .number { color: var(--code-number); }
+.code-block code .comment { color: var(--code-comment); font-style: italic; }
+.code-block code .function { color: var(--code-function); }
+.code-block code .class { color: var(--code-class); }
+.code-block code .variable { color: var(--code-variable); }
+.code-block code .operator { color: var(--code-operator); }
+.code-block code .builtin { color: var(--code-builtin); }
+.code-block code .def { color: var(--code-function); font-weight: 500; }
+.code-block code .param { color: var(--code-variable); }
+.code-block code .decorator { color: var(--code-keyword); }
+.code-block code .annotation { color: var(--code-keyword); }
 
 /* Concept Cards */
 .concept-card {

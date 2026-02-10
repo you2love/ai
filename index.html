@@ -15,7 +15,7 @@
             <nav class="sidebar-nav">
                 <ul class="nav-tree">
                     <li class="nav-item">
-                        <a href="getting-started.html" target="content-frame" class="nav-link active">
+                        <a href="getting-started.html" target="content-frame" class="nav-link">
                             <span class="nav-icon">🚀</span>
                             <span class="nav-text">入门阶段</span>
                         </a>
@@ -24,12 +24,6 @@
                         <a href="ai-basics.html" target="content-frame" class="nav-link">
                             <span class="nav-icon">📖</span>
                             <span class="nav-text">AI基础</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="python-basics.html" target="content-frame" class="nav-link">
-                            <span class="nav-icon">🐍</span>
-                            <span class="nav-text">Python入门</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -80,6 +74,24 @@
                             <span class="nav-text">A2A协议</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="vibe-coding.html" target="content-frame" class="nav-link">
+                            <span class="nav-icon">🎵</span>
+                            <span class="nav-text">Vibe Coding</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="agentic-engineering.html" target="content-frame" class="nav-link">
+                            <span class="nav-icon">🏗️</span>
+                            <span class="nav-text">Agentic Engineering</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="ai-principles.html" target="content-frame" class="nav-link">
+                            <span class="nav-icon">🔬</span>
+                            <span class="nav-text">AI工具原理</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </aside>
@@ -90,5 +102,33 @@
     </div>
 
     <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const iframe = document.querySelector('.content-frame');
+            
+            // 设置高亮状态
+            function setActive(href) {
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href') === href) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            }
+            
+            // 初始化高亮入门阶段
+            setActive('getting-started.html');
+            
+            // 导航点击事件
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    setActive(href);
+                });
+            });
+        });
+    </script>
 </body>
 </html>

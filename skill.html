@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Skill详解 - AI技术学习平台</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">AI Skill详解</h2>
+            <p class="section-subtitle">从入门到精通，掌握AI助手的技能系统</p>
+
+            <div class="code-sections">
+                <!-- 什么是Skill -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>1. 什么是AI Skill？</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># AI Skill（技能）详解
+#
+# Skill是AI助手执行特定任务的能力单元
+# 每个Skill封装了特定领域的知识和操作能力
+#
+# Skill的核心特性：
+# 1. 独立性 - Skill可以独立存在和测试
+# 2. 可组合性 - 多个Skill可以组合成复杂工作流
+# 3. 可扩展性 - 容易添加新的Skill
+# 4. 可复用性 - Skill可以在多个AI助手中复用
+#
+# Skill vs Tool vs Agent：
+# - Tool（工具）：底层的操作函数
+# - Skill（技能）：面向任务的工具组合
+# - Agent（代理）：使用Skill完成复杂任务的AI
+
+# Skill的通用结构
+SKILL_STRUCTURE = """
+一个典型的Skill包含：
+1. Skill元信息 - 名称、描述、版本、作者
+2. 输入参数定义 - 参数类型、验证规则
+3. 输出格式定义 - 返回值结构、错误格式
+4. 核心逻辑 - 实现具体功能的代码
+5. 依赖声明 - 需要的其他工具或服务
+6. 测试用例 - 验证Skill正确性
+"""
+
+print("AI Skill的核心设计理念：")
+print("1. 让AI模型能够执行特定领域的任务")
+print("2. 提供标准化的技能调用接口")
+print("3. 支持技能的动态发现和组合")
+print("4. 实现技能的可插拔架构")</code></pre>
+                </div>
+
+                <!-- Skill基础结构 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>2. Skill基础结构</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># Skill的Python实现基础结构
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional, Union
+from dataclasses import dataclass, field
+from enum import Enum
+import json
+import logging
+
+# 日志配置
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# 技能状态枚举
+class SkillStatus(Enum):
+    UNKNOWN = "unknown"
+    LOADING = "loading"
+    READY = "ready"
+    RUNNING = "running"
+    ERROR = "error"
+
+# 技能参数定义
+@dataclass
+class SkillParameter:
+    """技能参数定义"""
+    name: str
+    type: type
+    description: str
+    required: bool = True
+    default: Any = None
+    enum_values: List[Any] = field(default_factory=list)
+    min_value: Optional[float] = None
+    max_value: Optional[float] = None
+
+# 技能输出定义
+@dataclass
+class SkillOutput:
+    """技能输出定义"""
+    name: str
+    type: type
+    description: str
+
+# 技能元信息
+@dataclass
+class SkillMetadata:
+    """技能元信息"""
+    name: str
+    version: str
+    description: str
+    author: str = "Anonymous"
+    tags: List[str] = field(default_factory=list)
+    examples: List[str] = field(default_factory=list)
+
+# 技能基类
+class BaseSkill(ABC):
+    """所有Skill的基类"""
+    
+    def __init__(self):
+        self.metadata = self._get_metadata()
+        self.parameters = self._define_parameters()
+        self.outputs = self._define_outputs()
+        self.status = SkillStatus.UNKNOWN
+        self._initialized = False
+    
+    @abstractmethod
+    def _get_metadata(self) -> SkillMetadata:
+        """获取技能元信息"""
+        pass
+    
+    @abstractmethod
+    def _define_parameters(self) -> List[SkillParameter]:
+        """定义输入参数"""
+        pass
+    
+    @abstractmethod
+    def _define_outputs(self) -> List[SkillOutput]:
+        """定义输出"""
+        pass
+    
+    @abstractmethod
+    async def execute(self, **kwargs) -> Dict[str, Any]:
+        """执行技能"""
+        pass
+    
+    async def initialize(self) -> bool:
+        """初始化技能"""
+        try:
+            self.status = SkillStatus.LOADING
+            # 执行初始化逻辑，如加载模型、连接服务等
+            await self._init_resources()
+            self._initialized = True
+            self.status = SkillStatus.READY
+            logger.info(f"Skill {self.metadata.name} initialized successfully")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to initialize skill {self.metadata.name}: {e}")
+            self.status = SkillStatus.ERROR
+            return False
+    
+    async def _init_resources(self):
+        """初始化资源（可重写）"""
+        pass
+    
+    def validate_input(self, **kwargs) -> tuple[bool, str]:
+        """验证输入参数"""
+        for param in self.parameters:
+            if param.required and param.name not in kwargs:
+                return False, f"缺少必需参数: {param.name}"
+            
+            value = kwargs.get(param.name)
+            if value is not None:
+                # 类型检查
+                if not isinstance(value, param.type):
+                    return False, f"参数 {param.name} 类型错误，期望 {param.type}"
+                
+                # 枚举检查
+                if param.enum_values and value not in param.enum_values:
+                    return False, f"参数 {param.name} 值无效，有效值: {param.enum_values}"
+                
+                # 数值范围检查
+                if param.min_value is not None and value < param.min_value:
+                    return False, f"参数 {param.name} 不能小于 {param.min_value}"
+                if param.max_value is not None and value > param.max_value:
+                    return False, f"参数 {param.name} 不能大于 {param.max_value}"
+        
+        return True, ""
+    
+    def get_info(self) -> Dict[str, Any]:
+        """获取技能信息"""
+        return {
+            "metadata": {
+                "name": self.metadata.name,
+                "version": self.metadata.version,
+                "description": self.metadata.description,
+                "author": self.metadata.author,
+                "tags": self.metadata.tags
+            },
+            "parameters": [
+                {
+                    "name": p.name,
+                    "type": p.type.__name__,
+                    "description": p.description,
+                    "required": p.required,
+                    "default": p.default
+                }
+                for p in self.parameters
+            ],
+            "outputs": [
+                {"name": o.name, "type": o.type.__name__, "description": o.description}
+                for o in self.outputs
+            ],
+            "status": self.status.value,
+            "initialized": self._initialized
+        }
+
+# 使用示例
+class CalculatorSkill(BaseSkill):
+    """计算器技能示例"""
+    
+    def _get_metadata(self) -> SkillMetadata:
+        return SkillMetadata(
+            name="calculator",
+            version="1.0.0",
+            description="执行基本数学运算",
+            author="AI Learning",
+            tags=["math", "calculation", "utility"],
+            examples=["计算 10 + 5", "求平方根 16", "计算幂 2^8"]
+        )
+    
+    def _define_parameters(self) -> List[SkillParameter]:
+        return [
+            SkillParameter(name="a", type=float, description="第一个数字", required=True),
+            SkillParameter(name="b", type=float, description="第二个数字", required=False, default=None),
+            SkillParameter(name="operation", type=str, description="运算操作", required=True,
+                          enum_values=["add", "subtract", "multiply", "divide", "power", "sqrt"])
+        ]
+    
+    def _define_outputs(self) -> List[SkillOutput]:
+        return [
+            SkillOutput(name="result", type=float, description="计算结果"),
+            SkillOutput(name="expression", type=str, description="运算表达式")
+        ]
+    
+    async def execute(self, **kwargs) -> Dict[str, Any]:
+        # 验证输入
+        valid, error = self.validate_input(**kwargs)
+        if not valid:
+            return {"error": error}
+        
+        a = kwargs["a"]
+        b = kwargs.get("b")
+        operation = kwargs["operation"]
+        
+        operations = {
+            "add": lambda x, y: (x + y, f"{x} + {y}"),
+            "subtract": lambda x, y: (x - y, f"{x} - {y}"),
+            "multiply": lambda x, y: (x * y, f"{x} × {y}"),
+            "divide": lambda x, y: (x / y, f"{x} ÷ {y}") if y != 0 else (None, "除数不能为零"),
+            "power": lambda x, y: (x ** y, f"{x}^{y}"),
+            "sqrt": lambda x, y: (x ** 0.5, f"√{x}")
+        }
+        
+        if operation in ["sqrt"]:
+            result, expr = operations[operation](a, b or 1)
+        elif b is not None:
+            result, expr = operations[operation](a, b)
+        else:
+            return {"error": f"操作 {operation} 需要两个操作数"}
+        
+        return {"result": result, "expression": expr}
+
+# 使用计算器技能
+async def main():
+    calc = CalculatorSkill()
+    await calc.initialize()
+    
+    print("技能信息：")
+    print(json.dumps(calc.get_info(), ensure_ascii=False, indent=2))
+    
+    # 执行计算
+    result = await calc.execute(a=10, b=5, operation="multiply")
+    print(f"\n计算结果：{result}")</code></pre>
+                </div>
+
+                <!-- 复杂Skill设计 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>3. 复杂Skill设计</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 复杂Skill设计：数据分析和可视化技能
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Union
+from abc import ABC, abstractmethod
+import json
+import asyncio
+
+@dataclass
+class AnalysisResult:
+    """分析结果"""
+    summary: str
+    statistics: Dict[str, float]
+    charts: List[Dict[str, str]] = None
+    recommendations: List[str] = None
+
+class DataAnalysisSkill(BaseSkill):
+    """数据分析技能"""
+    
+    def _get_metadata(self) -> SkillMetadata:
+        return SkillMetadata(
+            name="data_analysis",
+            version="2.0.0",
+            description="数据分析与可视化，支持统计分析、趋势分析、异常检测",
+            author="AI Learning",
+            tags=["data", "analysis", "visualization", "statistics"]
+        )
+    
+    def _define_parameters(self) -> List[SkillParameter]:
+        return [
+            SkillParameter(name="data", type=list, description="输入数据列表", required=True),
+            SkillParameter(name="analysis_type", type=str, description="分析类型",
+                          enum_values=["basic", "statistical", "trend", "anomaly"]),
+            SkillParameter(name="chart_type", type=str, description="图表类型",
+                          enum_values=["line", "bar", "scatter", "histogram", "boxplot"],
+                          required=False, default="line"),
+            SkillParameter(name="options", type=dict, description="分析选项", required=False, default=None)
+        ]
+    
+    def _define_outputs(self) -> List[SkillOutput]:
+        return [
+            SkillOutput(name="result", type=AnalysisResult, description="分析结果"),
+            SkillOutput(name="chart_data", type=dict, description="图表数据")
+        ]
+    
+    async def execute(self, **kwargs) -> Dict[str, Any]:
+        valid, error = self.validate_input(**kwargs)
+        if not valid:
+            return {"error": error}
+        
+        data = kwargs["data"]
+        analysis_type = kwargs["analysis_type"]
+        chart_type = kwargs.get("chart_type", "line")
+        options = kwargs.get("options", {})
+        
+        # 根据分析类型执行不同的分析
+        if analysis_type == "basic":
+            return await self._basic_analysis(data, chart_type)
+        elif analysis_type == "statistical":
+            return await self._statistical_analysis(data, chart_type, options)
+        elif analysis_type == "trend":
+            return await self._trend_analysis(data, chart_type)
+        elif analysis_type == "anomaly":
+            return await self._anomaly_detection(data, chart_type)
+        
+        return {"error": f"未知的分析类型: {analysis_type}"}
+    
+    async def _basic_analysis(self, data: List, chart_type: str) -> Dict[str, Any]:
+        """基础分析"""
+        if not data:
+            return {"error": "数据为空"}
+        
+        stats = {
+            "count": len(data),
+            "sum": sum(data),
+            "mean": sum(data) / len(data),
+            "min": min(data),
+            "max": max(data)
+        }
+        
+        # 计算中位数
+        sorted_data = sorted(data)
+        n = len(sorted_data)
+        median = (sorted_data[n//2] if n % 2 else 
+                 (sorted_data[n//2 - 1] + sorted_data[n//2]) / 2)
+        stats["median"] = median
+        
+        summary = f"数据包含 {len(data)} 个值，范围从 {min(data)} 到 {max(data)}，平均值 {stats['mean']:.2f}"
+        
+        return {
+            "result": AnalysisResult(
+                summary=summary,
+                statistics=stats,
+                charts=[{"type": chart_type, "data": str(data)}],
+                recommendations=["数据分布较为均匀"]
+            ),
+            "chart_data": {"type": chart_type, "values": data}
+        }
+    
+    async def _statistical_analysis(self, data: List, chart_type: str, 
+                                     options: dict) -> Dict[str, Any]:
+        """统计分析"""
+        import math
+        
+        n = len(data)
+        mean = sum(data) / n
+        
+        # 计算标准差
+        variance = sum((x - mean) ** 2 for x in data) / n
+        std_dev = math.sqrt(variance)
+        
+        # 计算偏度和峰度（简化版）
+        skewness = sum((x - mean) ** 3 for x in data) / (n * std_dev ** 3) if std_dev > 0 else 0
+        
+        stats = {
+            "count": n,
+            "mean": mean,
+            "variance": variance,
+            "std_dev": std_dev,
+            "skewness": skewness,
+            "range": max(data) - min(data)
+        }
+        
+        summary = f"数据均值 {mean:.2f}，标准差 {std_dev:.2f}，偏度 {skewness:.2f}"
+        
+        return {
+            "result": AnalysisResult(
+                summary=summary,
+                statistics=stats,
+                charts=[{"type": chart_type, "data": str(data)}],
+                recommendations=["数据分布接近正态分布" if abs(skewness) < 0.5 else "数据存在一定偏斜"]
+            ),
+            "chart_data": {"type": chart_type, "values": data}
+        }
+    
+    async def _trend_analysis(self, data: List, chart_type: str) -> Dict[str, Any]:
+        """趋势分析"""
+        if len(data) < 2:
+            return {"error": "趋势分析需要至少2个数据点"}
+        
+        # 简单线性回归
+        n = len(data)
+        x = list(range(n))
+        sum_x = sum(x)
+        sum_y = sum(data)
+        sum_xy = sum(xi * yi for xi, yi in zip(x, data))
+        sum_xx = sum(xi * xi for xi in x)
+        
+        slope = (n * sum_xy - sum_x * sum_y) / (n * sum_xx - sum_x ** 2)
+        intercept = (sum_y - slope * sum_x) / n
+        
+        trend = "上升" if slope > 0 else "下降"
+        
+        stats = {
+            "slope": slope,
+            "intercept": intercept,
+            "trend": trend,
+            "change_rate": slope / (sum(data) / n) * 100 if sum(data) != 0 else 0
+        }
+        
+        summary = f"数据呈现{trend}趋势，斜率 {slope:.4f}，变化率 {stats['change_rate']:.2f}%"
+        
+        return {
+            "result": AnalysisResult(
+                summary=summary,
+                statistics=stats,
+                charts=[{"type": chart_type, "data": str(data)}],
+                recommendations=[f"建议关注{trend}趋势的持续性"]
+            ),
+            "chart_data": {"type": chart_type, "values": data, "trend_line": [intercept + slope * i for i in range(n)]}
+        }
+    
+    async def _anomaly_detection(self, data: List, chart_type: str) -> Dict[str, Any]:
+        """异常检测（使用IQR方法）"""
+        if len(data) < 4:
+            return {"error": "异常检测需要至少4个数据点"}
+        
+        sorted_data = sorted(data)
+        n = len(sorted_data)
+        
+        # 计算四分位数
+        q1 = sorted_data[n // 4]
+        q3 = sorted_data[3 * n // 4]
+        iqr = q3 - q1
+        
+        # 异常值边界
+        lower_bound = q1 - 1.5 * iqr
+        upper_bound = q3 + 1.5 * iqr
+        
+        # 检测异常值
+        anomalies = [x for x in data if x < lower_bound or x > upper_bound]
+        normal_data = [x for x in data if lower_bound <= x <= upper_bound]
+        
+        stats = {
+            "q1": q1,
+            "q3": q3,
+            "iqr": iqr,
+            "lower_bound": lower_bound,
+            "upper_bound": upper_bound,
+            "anomaly_count": len(anomalies),
+            "anomaly_rate": len(anomalies) / len(data) * 100
+        }
+        
+        summary = f"检测到 {len(anomalies)} 个异常值 ({stats['anomaly_rate']:.1f}%)，正常范围 [{lower_bound:.2f}, {upper_bound:.2f}]"
+        
+        return {
+            "result": AnalysisResult(
+                summary=summary,
+                statistics=stats,
+                charts=[{"type": chart_type, "data": str(data), "anomalies": str(anomalies)}],
+                recommendations=["建议检查异常值的产生原因", "考虑使用更稳健的统计方法"]
+            ),
+            "chart_data": {"type": chart_type, "values": normal_data, "anomalies": anomalies}
+        }
+
+# 使用数据分析技能
+async def demo_data_analysis():
+    skill = DataAnalysisSkill()
+    await skill.initialize()
+    
+    # 示例数据
+    data = [10, 12, 15, 14, 18, 22, 25, 24, 30, 28, 35, 100]  # 100是异常值
+    
+    print("=== 基础分析 ===")
+    result = await skill.execute(data=data, analysis_type="basic", chart_type="line")
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    
+    print("\n=== 趋势分析 ===")
+    result = await skill.execute(data=data, analysis_type="trend", chart_type="line")
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    
+    print("\n=== 异常检测 ===")
+    result = await skill.execute(data=data, analysis_type="anomaly", chart_type="scatter")
+    print(json.dumps(result, ensure_ascii=False, indent=2))</code></pre>
+                </div>
+
+                <!-- Skill编排和组合 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>4. Skill编排和组合</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># Skill编排器：组合多个Skill完成复杂任务
+from typing import Any, Dict, List, Optional, Callable
+from dataclasses import dataclass, field
+from enum import Enum
+import json
+
+class WorkflowStatus(Enum):
+    PENDING = "pending"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+
+@dataclass
+class WorkflowStep:
+    """工作流步骤"""
+    name: str
+    skill_name: str
+    parameters: Dict[str, Any] = field(default_factory=dict)
+    condition: Optional[Callable] = None
+    on_success: Optional[str] = None
+    on_failure: Optional[str] = None
+
+@dataclass
+class WorkflowResult:
+    """工作流结果"""
+    status: WorkflowStatus
+    steps_executed: List[Dict[str, Any]] = field(default_factory=list)
+    final_output: Any = None
+    error: Optional[str] = None
+    execution_time: float = 0
+
+class SkillOrchestrator:
+    """技能编排器"""
+    
+    def __init__(self):
+        self.skills: Dict[str, BaseSkill] = {}
+        self.workflows: Dict[str, List[WorkflowStep]] = {}
+        self.history = []
+    
+    def register_skill(self, skill: BaseSkill):
+        """注册技能"""
+        self.skills[skill.metadata.name] = skill
+        print(f"已注册技能: {skill.metadata.name}")
+    
+    def create_workflow(self, name: str, steps: List[Dict]) -> List[WorkflowStep]:
+        """创建工作流"""
+        workflow_steps = []
+        for step in steps:
+            workflow_steps.append(WorkflowStep(
+                name=step["name"],
+                skill_name=step["skill"],
+                parameters=step.get("parameters", {}),
+                condition=step.get("condition"),
+                on_success=step.get("on_success"),
+                on_failure=step.get("on_failure")
+            ))
+        self.workflows[name] = workflow_steps
+        return workflow_steps
+    
+    async def execute_workflow(
+        self,
+        name: str,
+        context: Dict[str, Any] = None,
+        max_steps: int = 100
+    ) -> WorkflowResult:
+        """执行工作流"""
+        if name not in self.workflows:
+            return WorkflowResult(
+                status=WorkflowStatus.FAILED,
+                error=f"工作流 '{name}' 不存在"
+            )
+        
+        steps = self.workflows[name]
+        context = context or {}
+        steps_executed = []
+        start_time = __import__("time").time()
+        
+        for i, step in enumerate(steps):
+            if i >= max_steps:
+                break
+            
+            try:
+                skill = self.skills.get(step.skill_name)
+                if not skill:
+                    return WorkflowResult(
+                        status=WorkflowStatus.FAILED,
+                        error=f"技能 '{step.skill_name}' 未注册",
+                        steps_executed=steps_executed
+                    )
+                
+                # 解析参数（支持上下文引用）
+                params = self._resolve_parameters(step.parameters, context)
+                
+                # 检查条件
+                if step.condition and not step.condition(context):
+                    steps_executed.append({
+                        "step": step.name,
+                        "status": "skipped",
+                        "reason": "条件不满足"
+                    })
+                    continue
+                
+                # 执行技能
+                result = await skill.execute(**params)
+                
+                # 处理结果
+                if "error" in result:
+                    if step.on_failure:
+                        context["error"] = result["error"]
+                        # 跳转到失败处理步骤
+                        continue
+                    else:
+                        return WorkflowResult(
+                            status=WorkflowStatus.FAILED,
+                            error=result["error"],
+                            steps_executed=steps_executed + [{
+                                "step": step.name,
+                                "status": "failed",
+                                "error": result["error"]
+                            }],
+                            execution_time=__import__("time").time() - start_time
+                        )
+                
+                # 更新上下文
+                context[f"{step.name}_result"] = result
+                steps_executed.append({
+                    "step": step.name,
+                    "skill": step.skill_name,
+                    "status": "completed",
+                    "result": result
+                })
+                
+                # 成功时跳转到指定步骤
+                if step.on_success and step.on_success in [s.name for s in steps]:
+                    pass  # 继续执行（实际实现可跳转）
+                
+            except Exception as e:
+                return WorkflowResult(
+                    status=WorkflowStatus.FAILED,
+                    error=str(e),
+                    steps_executed=steps_executed + [{
+                        "step": step.name,
+                        "status": "failed",
+                        "error": str(e)
+                    }],
+                    execution_time=__import__("time").time() - start_time
+                )
+        
+        execution_time = __import__("time").time() - start_time
+        self.history.append({
+            "workflow": name,
+            "status": "completed",
+            "steps": len(steps_executed),
+            "time": execution_time
+        })
+        
+        return WorkflowResult(
+            status=WorkflowStatus.COMPLETED,
+            steps_executed=steps_executed,
+            final_output=context,
+            execution_time=execution_time
+        )
+    
+    def _resolve_parameters(self, params: Dict, context: Dict) -> Dict:
+        """解析参数，支持上下文引用"""
+        resolved = {}
+        for key, value in params.items():
+            if isinstance(value, str) and value.startswith("${"):
+                # 引用上下文变量
+                var_name = value[2:-1]
+                resolved[key] = context.get(var_name, value)
+            else:
+                resolved[key] = value
+        return resolved
+
+# 数据处理工作流示例
+async def data_processing_workflow_demo():
+    """完整的数据处理工作流"""
+    
+    orchestrator = SkillOrchestrator()
+    
+    # 注册技能
+    data_skill = DataAnalysisSkill()
+    await data_skill.initialize()
+    orchestrator.register_skill(data_skill)
+    
+    orchestrator.register_skill(CalculatorSkill())
+    
+    # 创建工作流
+    workflow_steps = [
+        {
+            "name": "加载数据",
+            "skill": "data_analysis",
+            "parameters": {
+                "data": [10, 12, 15, 14, 18, 22, 25, 24, 30, 28, 35],
+                "analysis_type": "statistical",
+                "chart_type": "line"
+            }
+        },
+        {
+            "name": "趋势分析",
+            "skill": "data_analysis",
+            "parameters": {
+                "analysis_type": "trend"
+            }
+        },
+        {
+            "name": "计算增长",
+            "skill": "calculator",
+            "parameters": {
+                "a": "${trend_analysis_result.result.statistics.slope}",
+                "b": 12,
+                "operation": "multiply"
+            }
+        }
+    ]
+    
+    orchestrator.create_workflow("data_pipeline", workflow_steps)
+    
+    # 执行工作流
+    result = await orchestrator.execute_workflow("data_pipeline")
+    
+    print("工作流执行结果：")
+    print(f"状态: {result.status.value}")
+    print(f"执行步骤数: {len(result.steps_executed)}")
+    print(f"执行时间: {result.execution_time:.3f}秒")
+    
+    for step in result.steps_executed:
+        print(f"\n步骤: {step['step']}")
+        print(f"状态: {step['status']}")
+        if 'result' in step:
+            print(f"结果类型: type(step['result']).__name__")</code></pre>
+                </div>
+
+                <!-- Skill与AI模型集成 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>5. Skill与AI模型集成</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># Skill与AI模型的集成：让AI自动选择和使用Skill
+from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from enum import Enum
+import json
+
+class MessageRole(Enum):
+    USER = "user"
+    ASSISTANT = "assistant"
+    SYSTEM = "system"
+
+@dataclass
+class Message:
+    """对话消息"""
+    role: MessageRole
+    content: str
+    tool_calls: List[Dict] = None
+
+class AISkillAssistant:
+    """集成Skill的AI助手"""
+    
+    def __init__(self, api_key: str, model: str = "claude-sonnet-4-20250514"):
+        from anthropic import Anthropic
+        self.client = Anthropic(api_key=api_key)
+        self.model = model
+        self.skills: Dict[str, BaseSkill] = {}
+        self.tools_description = ""
+        self.conversation_history: List[Message] = []
+    
+    def register_skill(self, skill: BaseSkill):
+        """注册技能"""
+        self.skills[skill.metadata.name] = skill
+        self._update_tools_description()
+        print(f"已注册技能: {skill.metadata.name}")
+    
+    def _update_tools_description(self):
+        """更新工具描述"""
+        descriptions = []
+        for name, skill in self.skills.items():
+            params = []
+            for param in skill.parameters:
+                param_desc = f"{param.name}: {param.description} ({param.type.__name__})"
+                if param.required:
+                    param_desc += " [必需]"
+                params.append(param_desc)
+            
+            descriptions.append(
+                f"- {name}: {skill.metadata.description}\n"
+                f"  参数: {', '.join(params)}"
+            )
+        
+        self.tools_description = "\n".join(descriptions)
+    
+    def _get_system_prompt(self) -> str:
+        """获取系统提示"""
+        return f"""你是一个智能助手，可以通过技能来帮助用户完成任务。
+
+可用技能：
+{self.tools_description}
+
+使用规则：
+1. 分析用户需求，选择合适的技能
+2. 按照技能要求提供正确的参数
+3. 技能调用格式：{{"tool": "技能名称", "arguments": {{参数键: 参数值}}}}
+4. 先分析再决定是否需要调用技能
+5. 如果不需要调用技能，直接回答用户问题"""
+    
+    async def chat(self, user_message: str) -> str:
+        """对话"""
+        # 添加用户消息
+        self.conversation_history.append(
+            Message(role=MessageRole.USER, content=user_message)
+        )
+        
+        # 构建消息
+        messages = [
+            {"role": "system", "content": self._get_system_prompt()}
+        ]
+        
+        # 添加历史消息
+        for msg in self.conversation_history[-10:]:  # 保留最近10轮
+            messages.append({
+                "role": msg.role.value,
+                "content": msg.content
+            })
+        
+        # 调用AI
+        response = self.client.messages.create(
+            model=self.model,
+            max_tokens=2000,
+            messages=messages
+        )
+        
+        response_text = response.content[0].text
+        
+        # 检查是否需要调用技能
+        import re
+        tool_call = self._parse_tool_call(response_text)
+        
+        if tool_call:
+            # 调用技能
+            skill_name = tool_call["tool"]
+            args = tool_call["arguments"]
+            
+            skill = self.skills.get(skill_name)
+            if skill:
+                # 验证并执行技能
+                valid, error = skill.validate_input(**args)
+                if valid:
+                    result = await skill.execute(**args)
+                    
+                    # 将技能结果加入对话
+                    result_message = f"技能调用结果：{json.dumps(result, ensure_ascii=False)}"
+                    self.conversation_history.append(
+                        Message(role=MessageRole.ASSISTANT, content=response_text)
+                    )
+                    self.conversation_history.append(
+                        Message(role=MessageRole.USER, content=result_message)
+                    )
+                    
+                    # 再次调用AI生成最终回复
+                    messages.append({"role": "assistant", "content": response_text})
+                    messages.append({"role": "user", "content": result_message})
+                    
+                    final_response = self.client.messages.create(
+                        model=self.model,
+                        max_tokens=2000,
+                        messages=messages[-12:]  # 保留更多上下文
+                    )
+                    
+                    response_text = final_response.content[0].text
+        
+        # 添加助手消息
+        self.conversation_history.append(
+            Message(role=MessageRole.ASSISTANT, content=response_text)
+        )
+        
+        return response_text
+    
+    def _parse_tool_call(self, text: str) -> Optional[Dict]:
+        """解析技能调用"""
+        import re
+        pattern = r'{"tool":\s*"(\w+)",\s*"arguments":\s*({.*?})}'
+        match = re.search(pattern, text, re.DOTALL)
+        
+        if match:
+            try:
+                return {
+                    "tool": match.group(1),
+                    "arguments": json.loads(match.group(2))
+                }
+            except json.JSONDecodeError:
+                return None
+        return None
+
+# 使用示例
+async def ai_assistant_demo():
+    assistant = AISkillAssistant(api_key="your-api-key")
+    
+    # 注册技能
+    calc = CalculatorSkill()
+    await calc.initialize()
+    assistant.register_skill(calc)
+    
+    data_skill = DataAnalysisSkill()
+    await data_skill.initialize()
+    assistant.register_skill(data_skill)
+    
+    # 对话
+    print("=== AI助手对话示例 ===")
+    
+    response = await assistant.chat("计算 25 乘以 4 加 10")
+    print(f"\n用户：计算 25 乘以 4 加 10")
+    print(f"助手：{response}")
+    
+    response = await assistant.chat("分析这组数据 [10, 15, 20, 25, 30, 35, 40, 100] 的统计特征")
+    print(f"\n用户：分析数据 [10, 15, 20, 25, 30, 35, 40, 100]")
+    print(f"助手：{response}")</code></pre>
+                </div>
+
+                <!-- Skill注册中心 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>6. Skill注册中心</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># Skill注册中心：管理、发现和版本控制
+from typing import Any, Dict, List, Optional
+from dataclasses import dataclass, field
+from enum import Enum
+from datetime import datetime
+import json
+import hashlib
+
+class SkillCategory(Enum):
+    DATA_ANALYSIS = "data_analysis"
+    TEXT_PROCESSING = "text_processing"
+    WEB_SERVICE = "web_service"
+    FILE_OPERATIONS = "file_operations"
+    SYSTEM_OPERATIONS = "system_operations"
+    CUSTOM = "custom"
+
+@dataclass
+class SkillVersion:
+    """技能版本信息"""
+    version: str
+    created_at: datetime
+    changelog: str
+    is_compatible: bool = True
+
+@dataclass
+class SkillEntry:
+    """技能注册条目"""
+    skill_id: str
+    name: str
+    category: SkillCategory
+    description: str
+    metadata: SkillMetadata
+    versions: List[SkillVersion] = field(default_factory=list)
+    rating: float = 0.0
+    download_count: int = 0
+    tags: List[str] = field(default_factory=list)
+    author: str = ""
+    repository_url: str = ""
+    documentation_url: str = ""
+
+class SkillRegistry:
+    """技能注册中心"""
+    
+    def __init__(self):
+        self.skills: Dict[str, SkillEntry] = {}
+        self.skill_instances: Dict[str, BaseSkill] = {}
+        self.category_index: Dict[SkillCategory, List[str]] = {}
+        self.tag_index: Dict[str, List[str]] = {}
+    
+    def register(
+        self,
+        skill_id: str,
+        skill: BaseSkill,
+        category: SkillCategory,
+        description: str,
+        tags: List[str] = None,
+        author: str = "",
+        repository_url: str = ""
+    ):
+        """注册技能"""
+        if skill_id in self.skills:
+            raise ValueError(f"技能ID '{skill_id}' 已存在")
+        
+        # 创建注册条目
+        entry = SkillEntry(
+            skill_id=skill_id,
+            name=skill.metadata.name,
+            category=category,
+            description=description,
+            metadata=skill.metadata,
+            tags=tags or [],
+            author=author,
+            repository_url=repository_url
+        )
+        
+        # 添加初始版本
+        entry.versions.append(SkillVersion(
+            version=skill.metadata.version,
+            created_at=datetime.now(),
+            changelog="Initial release"
+        ))
+        
+        # 索引
+        self.skills[skill_id] = entry
+        self.skill_instances[skill_id] = skill
+        
+        # 分类索引
+        if category not in self.category_index:
+            self.category_index[category] = []
+        self.category_index[category].append(skill_id)
+        
+        # 标签索引
+        for tag in entry.tags:
+            if tag not in self.tag_index:
+                self.tag_index[tag] = []
+            self.tag_index[tag].append(skill_id)
+        
+        print(f"技能已注册: {skill_id} v{skill.metadata.version}")
+        return skill_id
+    
+    def get_skill(self, skill_id: str) -> Optional[BaseSkill]:
+        """获取技能实例"""
+        return self.skill_instances.get(skill_id)
+    
+    def get_info(self, skill_id: str) -> Optional[Dict]:
+        """获取技能信息"""
+        entry = self.skills.get(skill_id)
+        if not entry:
+            return None
+        
+        skill = self.skill_instances.get(skill_id)
+        return {
+            "id": entry.skill_id,
+            "name": entry.name,
+            "category": entry.category.value,
+            "description": entry.description,
+            "version": entry.metadata.version,
+            "versions": [
+                {"version": v.version, "date": v.created_at.isoformat()}
+                for v in entry.versions
+            ],
+            "tags": entry.tags,
+            "author": entry.author,
+            "rating": entry.rating,
+            "downloads": entry.download_count,
+            "info": skill.get_info() if skill else None
+        }
+    
+    def search(
+        self,
+        query: str = None,
+        category: SkillCategory = None,
+        tags: List[str] = None,
+        min_rating: float = 0.0,
+        sort_by: str = "downloads"
+    ) -> List[Dict]:
+        """搜索技能"""
+        results = []
+        
+        for skill_id, entry in self.skills.items():
+            # 文本搜索
+            if query:
+                query_lower = query.lower()
+                if (query_lower not in entry.name.lower() and
+                    query_lower not in entry.description.lower()):
+                    continue
+            
+            # 分类过滤
+            if category and entry.category != category:
+                continue
+            
+            # 标签过滤
+            if tags:
+                if not any(tag in entry.tags for tag in tags):
+                    continue
+            
+            # 评分过滤
+            if entry.rating < min_rating:
+                continue
+            
+            results.append(self.get_info(skill_id))
+        
+        # 排序
+        if sort_by == "downloads":
+            results.sort(key=lambda x: x["downloads"], reverse=True)
+        elif sort_by == "rating":
+            results.sort(key=lambda x: x["rating"], reverse=True)
+        
+        return results
+    
+    def add_version(self, skill_id: str, version: str, changelog: str):
+        """添加新版本"""
+        entry = self.skills.get(skill_id)
+        if not entry:
+            raise ValueError(f"技能 '{skill_id}' 不存在")
+        
+        # 检查版本兼容性
+        is_compatible = self._check_compatibility(
+            entry.metadata.version,
+            version
+        )
+        
+        entry.versions.append(SkillVersion(
+            version=version,
+            created_at=datetime.now(),
+            changelog=changelog,
+            is_compatible=is_compatible
+        ))
+        
+        print(f"新版本已添加: {skill_id} v{version}")
+    
+    def _check_compatibility(self, old_version: str, new_version: str) -> bool:
+        """检查版本兼容性"""
+        # 简化版本检查
+        old_parts = [int(x) for x in old_version.split(".")]
+        new_parts = [int(x) for x in new_version.split(".")]
+        
+        # 主版本号相同则兼容
+        return old_parts[0] == new_parts[0]
+    
+    def list_categories(self) -> List[Dict]:
+        """列出所有分类"""
+        return [
+            {"category": cat.value, "count": len(skills)}
+            for cat, skills in self.category_index.items()
+        ]
+    
+    def export_registry(self) -> Dict:
+        """导出注册中心"""
+        return {
+            "skills": [
+                {
+                    "id": skill_id,
+                    **self.get_info(skill_id)
+                }
+                for skill_id in self.skills
+            ],
+            "categories": self.list_categories()
+        }
+
+# 使用注册中心
+async def registry_demo():
+    registry = SkillRegistry()
+    
+    # 注册技能
+    calc = CalculatorSkill()
+    await calc.initialize()
+    registry.register(
+        skill_id="com.ailearning.calculator",
+        skill=calc,
+        category=SkillCategory.DATA_ANALYSIS,
+        description="基础计算器技能",
+        tags=["数学", "计算", "基础"],
+        author="AI Learning"
+    )
+    
+    data_skill = DataAnalysisSkill()
+    await data_skill.initialize()
+    registry.register(
+        skill_id="com.ailearning.data_analysis",
+        skill=data_skill,
+        category=SkillCategory.DATA_ANALYSIS,
+        description="数据分析与可视化",
+        tags=["数据", "分析", "可视化", "统计"],
+        author="AI Learning"
+    )
+    
+    # 搜索技能
+    print("\n=== 搜索结果 ===")
+    results = registry.search(query="数据")
+    print(json.dumps(results, ensure_ascii=False, indent=2))
+    
+    # 列出分类
+    print("\n=== 分类列表 ===")
+    categories = registry.list_categories()
+    print(json.dumps(categories, ensure_ascii=False, indent=2))
+    
+    # 导出注册中心
+    print("\n=== 导出注册中心 ===")
+    exported = registry.export_registry()
+    print(f"共注册 {len(exported['skills'])} 个技能")</code></pre>
+                </div>
+
+                <!-- Skill测试和验证 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>7. Skill测试和验证</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># Skill测试框架：单元测试、集成测试、性能测试
+from typing import Any, Callable, Dict, List
+from dataclasses import dataclass
+from enum import Enum
+import time
+import json
+
+class TestStatus(Enum):
+    PASSED = "passed"
+    FAILED = "failed"
+    SKIPPED = "skipped"
+    ERROR = "error"
+
+@dataclass
+class TestCase:
+    """测试用例"""
+    name: str
+    skill_name: str
+    parameters: Dict[str, Any]
+    expected_output: Dict[str, Any]
+    validate_fn: Callable = None
+
+@dataclass
+class TestResult:
+    """测试结果"""
+    test_case: str
+    status: TestStatus
+    execution_time: float
+    output: Any
+    expected: Any
+    error: str = None
+
+class SkillTestFramework:
+    """技能测试框架"""
+    
+    def __init__(self):
+        self.test_cases: List[TestCase] = []
+        self.results: List[TestResult] = []
+        self.skill_registry = SkillRegistry()
+    
+    def add_test_case(
+        self,
+        name: str,
+        skill_name: str,
+        parameters: Dict[str, Any],
+        expected_output: Dict[str, Any] = None,
+        validate_fn: Callable = None
+    ):
+        """添加测试用例"""
+        self.test_cases.append(TestCase(
+            name=name,
+            skill_name=skill_name,
+            parameters=parameters,
+            expected_output=expected_output,
+            validate_fn=validate_fn
+        ))
+    
+    async def run_tests(
+        self,
+        skills: Dict[str, BaseSkill] = None,
+        parallel: bool = False
+    ) -> Dict[str, Any]:
+        """运行所有测试"""
+        skills = skills or {}
+        self.results = []
+        
+        total = len(self.test_cases)
+        passed = failed = skipped = 0
+        
+        for test in self.test_cases:
+            skill = skills.get(test.skill_name)
+            
+            if not skill:
+                self.results.append(TestResult(
+                    test_case=test.name,
+                    status=TestStatus.SKIPPED,
+                    execution_time=0,
+                    output=None,
+                    expected=test.expected_output,
+                    error=f"技能 '{test.skill_name}' 未加载"
+                ))
+                skipped += 1
+                continue
+            
+            start_time = time.time()
+            try:
+                # 执行技能
+                output = await skill.execute(**test.parameters)
+                execution_time = time.time() - start_time
+                
+                # 验证结果
+                status = TestStatus.PASSED
+                if test.validate_fn:
+                    if not test.validate_fn(output):
+                        status = TestStatus.FAILED
+                elif test.expected_output:
+                    if output != test.expected_output:
+                        status = TestStatus.FAILED
+                
+                self.results.append(TestResult(
+                    test_case=test.name,
+                    status=status,
+                    execution_time=execution_time,
+                    output=output,
+                    expected=test.expected_output
+                ))
+                
+                if status == TestStatus.PASSED:
+                    passed += 1
+                else:
+                    failed += 1
+                    
+            except Exception as e:
+                self.results.append(TestResult(
+                    test_case=test.name,
+                    status=TestStatus.ERROR,
+                    execution_time=time.time() - start_time,
+                    output=None,
+                    expected=test.expected_output,
+                    error=str(e)
+                ))
+                failed += 1
+        
+        return {
+            "total": total,
+            "passed": passed,
+            "failed": failed,
+            "skipped": skipped,
+            "success_rate": (passed / total * 100) if total > 0 else 0,
+            "results": [
+                {
+                    "test": r.test_case,
+                    "status": r.status.value,
+                    "time": f"{r.execution_time:.4f}s",
+                    "error": r.error
+                }
+                for r in self.results
+            ]
+        }
+    
+    def generate_report(self, output_format: str = "text") -> str:
+        """生成测试报告"""
+        if output_format == "json":
+            return json.dumps(self.run_tests(), ensure_ascii=False, indent=2)
+        
+        # 文本格式
+        report = []
+        report.append("=" * 60)
+        report.append("Skill 测试报告")
+        report.append("=" * 60)
+        
+        summary = self._get_summary()
+        report.append(f"\n总计: {summary['total']} 个测试")
+        report.append(f"通过: {summary['passed']}")
+        report.append(f"失败: {summary['failed']}")
+        report.append(f"跳过: {summary['skipped']}")
+        report.append(f"成功率: {summary['success_rate']:.1f}%")
+        
+        report.append("\n" + "-" * 60)
+        report.append("详细结果：")
+        report.append("-" * 60)
+        
+        for result in self.results:
+            status_icon = "✓" if result.status == TestStatus.PASSED else \
+                         "✗" if result.status == TestStatus.FAILED else \
+                         "○" if result.status == TestStatus.SKIPPED else "!"
+            report.append(f"{status_icon} {result.test_case}")
+            if result.error:
+                report.append(f"   错误: {result.error}")
+        
+        return "\n".join(report)
+    
+    def _get_summary(self) -> Dict:
+        """获取测试摘要"""
+        total = len(self.results)
+        passed = sum(1 for r in self.results if r.status == TestStatus.PASSED)
+        failed = sum(1 for r in self.results if r.status in [
+            TestStatus.FAILED, TestStatus.ERROR
+        ])
+        skipped = sum(1 for r in self.results if r.status == TestStatus.SKIPPED)
+        
+        return {
+            "total": total,
+            "passed": passed,
+            "failed": failed,
+            "skipped": skipped,
+            "success_rate": (passed / total * 100) if total > 0 else 0
+        }
+
+# 性能测试
+class PerformanceTester:
+    """性能测试器"""
+    
+    async def test_latency(
+        self,
+        skill: BaseSkill,
+        parameters: Dict[str, Any],
+        iterations: int = 100
+    ) -> Dict[str, Any]:
+        """测试延迟"""
+        latencies = []
+        
+        for _ in range(iterations):
+            start = time.time()
+            await skill.execute(**parameters)
+            latencies.append(time.time() - start)
+        
+        return {
+            "iterations": iterations,
+            "avg_latency": sum(latencies) / len(latencies),
+            "min_latency": min(latencies),
+            "max_latency": max(latencies),
+            "p95_latency": sorted(latencies)[int(iterations * 0.95)],
+            "p99_latency": sorted(latencies)[int(iterations * 0.99)]
+        }
+    
+    async def test_throughput(
+        self,
+        skill: BaseSkill,
+        parameters: Dict[str, Any],
+        duration: float = 10.0
+    ) -> Dict[str, Any]:
+        """测试吞吐量"""
+        count = 0
+        start = time.time()
+        
+        while time.time() - start < duration:
+            await skill.execute(**parameters)
+            count += 1
+        
+        return {
+            "duration": duration,
+            "total_executions": count,
+            "throughput": count / duration
+        }
+
+# 使用测试框架
+async def test_skill_demo():
+    framework = SkillTestFramework()
+    performance = PerformanceTester()
+    
+    # 注册技能
+    calc = CalculatorSkill()
+    await calc.initialize()
+    
+    # 添加测试用例
+    print("=== 添加测试用例 ===")
+    
+    framework.add_test_case(
+        name="加法测试",
+        skill_name="calculator",
+        parameters={"a": 10, "b": 5, "operation": "add"},
+        expected_output={"result": 15, "expression": "10 + 5"}
+    )
+    
+    framework.add_test_case(
+        name="乘法测试",
+        skill_name="calculator",
+        parameters={"a": 8, "b": 8, "operation": "multiply"},
+        validate_fn=lambda r: r.get("result") == 64
+    )
+    
+    framework.add_test_case(
+        name="除法测试",
+        skill_name="calculator",
+        parameters={"a": 100, "b": 0, "operation": "divide"}
+    )
+    
+    # 运行测试
+    skills = {"calculator": calc}
+    results = await framework.run_tests(skills)
+    
+    print("\n=== 测试结果 ===")
+    print(json.dumps(results, ensure_ascii=False, indent=2))
+    
+    print("\n=== 测试报告 ===")
+    print(framework.generate_report("text"))
+    
+    # 性能测试
+    print("\n=== 性能测试 ===")
+    perf_result = await performance.test_latency(
+        calc,
+        {"a": 100, "b": 50, "operation": "add"},
+        iterations=1000
+    )
+    print(json.dumps(perf_result, ensure_ascii=False, indent=2))</code></pre>
+                </div>
+
+                <!-- Skill最佳实践 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>8. Skill最佳实践总结</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># Skill最佳实践总结
+
+SKILL_BEST_PRACTICES = """
+【设计原则】
+1. 单一职责 - 每个Skill只做一件事，做好一件事
+2. 清晰的接口 - 参数和返回值有明确的定义和文档
+3. 错误处理 - 优雅地处理各种错误情况
+4. 可测试性 - Skill应该容易进行单元测试
+
+【命名规范】
+1. 使用小写字母和下划线：calculate_total_price
+2. 避免缩写，保持可读性
+3. 版本号使用语义化版本：major.minor.patch
+
+【参数设计】
+1. 必需参数放在前面，可选参数放在后面
+2. 提供合理的默认值
+3. 添加参数验证和类型检查
+4. 文档说明每个参数的含义和有效范围
+
+【错误处理】
+1. 使用有意义的错误消息
+2. 区分可恢复错误和不可恢复错误
+3. 提供错误恢复建议
+4. 记录错误日志
+
+【性能优化】
+1. 避免阻塞操作，使用异步
+2. 实现结果缓存
+3. 控制资源使用
+4. 提供性能监控接口
+
+【文档规范】
+1. 提供清晰的使用示例
+2. 说明参数和返回值
+3. 列出已知限制
+4. 提供常见问题解答
+
+【测试策略】
+1. 为每个功能编写单元测试
+2. 测试边界条件和异常情况
+3. 进行性能基准测试
+4. 编写集成测试验证组合功能
+
+【版本管理】
+1. 保持向后兼容性
+2. 重大变更时增加主版本号
+3. 提供迁移指南
+4. 标记弃用功能
+"""
+
+print(SKILL_BEST_PRACTICES)
+
+# Skill学习路线图
+SKILL_LEARNING_ROADMAP = """
+【阶段1 - 入门（1-2周）】
+□ 理解Skill的基本概念和架构
+□ 学习BaseSkill基类的使用
+□ 创建第一个简单的Skill
+□ 掌握参数定义和验证
+
+【阶段2 - 基础（2-3周）】
+□ 实现复杂的数据处理Skill
+□ 学习异步编程模式
+□ 掌握错误处理机制
+□ 实现多个相关的Skill
+
+【阶段3 - 中级（3-4周）】
+□ 学习Skill编排和组合
+□ 实现工作流自动化
+□ 掌握Skill注册和管理
+□ 学习测试框架的使用
+
+【阶段4 - 高级（4周+）】
+□ Skill与AI模型深度集成
+□ 自定义Skill传输协议
+□ 大规模Skill系统设计
+□ 贡献开源Skill库
+"""
+
+print(SKILL_LEARNING_ROADMAP)
+
+# 推荐资源
+RECOMMENDED_RESOURCES = """
+【官方资源】
+- Skill SDK文档
+- 示例代码仓库
+- 最佳实践指南
+
+【社区资源】
+- GitHub Awesome Skill Collections
+- 技术博客和教程
+- 开源Skill库
+
+【进阶主题】
+- 分布式Skill系统
+- Skill安全与权限
+- Skill性能优化
+- 多模态Skill设计
+"""
+
+print(RECOMMENDED_RESOURCES)
+
+# 完整的Skill开发清单
+SKILL_DEVELOPMENT_CHECKLIST = """
+□ 定义清晰的Skill目标
+□ 设计参数和返回值结构
+□ 实现BaseSkill子类
+□ 添加完整的文档字符串
+□ 实现输入验证逻辑
+□ 添加错误处理
+□ 编写单元测试
+□ 进行性能测试
+□ 编写使用示例
+□ 注册到Skill注册中心
+□ 编写用户文档
+□ 创建迁移脚本（如需要）
+"""
+
+print("\n" + SKILL_DEVELOPMENT_CHECKLIST)</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

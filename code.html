@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代码示例 - AI技术学习平台</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Python代码示例 -->
+    <section class="section python-code">
+        <div class="container">
+            <h2 class="section-title">Python代码示例</h2>
+            <p class="section-subtitle">从基础到实战，全面掌握Python编程技能</p>
+
+            <div class="code-sections">
+                <!-- Python基础 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>Python基础语法</h3>
+                        <button class="copy-btn" onclick="copyCode(this)">复制代码</button>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># Python基础语法示例
+# 变量定义和数据类型
+name = "Python"
+age = 25
+price = 19.99
+is_active = True
+data_list = [1, 2, 3, 4, 5]
+data_dict = {"name": "Python", "version": "3.9"}
+
+# 条件语句
+if age >= 18:
+    print("成年人")
+else:
+    print("未成年人")
+
+# 循环语句
+# for循环
+for i in range(5):
+    print(f"当前数字: {i}")
+
+# while循环
+count = 0
+while count < 3:
+    print(f"计数: {count}")
+    count += 1
+
+# 函数定义
+def greet(name, message="Hello"):
+    """
+    问候函数
+    参数: name - 姓名, message - 问候语
+    返回: 问候字符串
+    """
+    return f"{message}, {name}!"
+
+# 列表推导式
+squares = [x**2 for x in range(10)]
+print(f"平方列表: {squares}")
+
+# 字典推导式
+square_dict = {x: x**2 for x in range(5)}
+print(f"平方字典: {square_dict}")
+
+# 类定义
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def introduce(self):
+        return f"我是{self.name}，今年{self.age}岁"
+
+# 异常处理
+try:
+    result = 10 / 0
+except ZeroDivisionError:
+    print("不能除以零")
+finally:
+    print("程序继续执行")
+
+# 文件操作
+with open('example.txt', 'w', encoding='utf-8') as f:
+    f.write("Hello, Python!")
+
+with open('example.txt', 'r', encoding='utf-8') as f:
+    content = f.read()
+    print(f"文件内容: {content}")</code></pre>
+                </div>
+
+                <!-- 数据处理 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>数据处理（Pandas）</h3>
+                        <button class="copy-btn" onclick="copyCode(this)">复制代码</button>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 数据处理示例 - 使用Pandas库
+import pandas as pd
+import numpy as np
+
+# 创建DataFrame
+data = {
+    '姓名': ['张三', '李四', '王五', '赵六'],
+    '年龄': [25, 30, 35, 28],
+    '城市': ['北京', '上海', '广州', '深圳'],
+    '工资': [15000, 20000, 18000, 22000]
+}
+df = pd.DataFrame(data)
+print(f"数据表:\n{df}")
+
+# 数据查看
+print(f"\n前3行数据:\n{df.head(3)}")
+print(f"\n数据基本信息:\n{df.info()}")
+print(f"\n数据统计描述:\n{df.describe()}")
+
+# 数据选择
+print(f"\n选择'姓名'列:\n{df['姓名']}")
+print(f"\n选择前2行:\n{df.iloc[:2]}")
+print(f"\n选择年龄大于28的行:\n{df[df['年龄'] > 28]}")
+
+# 数据筛选和排序
+high_salary = df[df['工资'] > 18000]
+print(f"\n工资大于18000的员工:\n{high_salary}")
+
+sorted_df = df.sort_values('工资', ascending=False)
+print(f"\n按工资降序排列:\n{sorted_df}")
+
+# 数据分组
+city_stats = df.groupby('城市').agg({
+    '工资': ['mean', 'count'],
+    '年龄': 'mean'
+})
+print(f"\n按城市分组统计:\n{city_stats}")
+
+# 数据处理
+df['奖金'] = df['工资'] * 0.1
+df['工资等级'] = pd.cut(df['工资'],
+                        bins=[0, 18000, 20000, float('inf')],
+                        labels=['普通', '良好', '优秀'])
+print(f"\n处理后的数据:\n{df}")</code></pre>
+                </div>
+
+                <!-- 科学计算 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>科学计算（NumPy）</h3>
+                        <button class="copy-btn" onclick="copyCode(this)">复制代码</button>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 科学计算示例 - 使用NumPy库
+import numpy as np
+
+# 创建数组
+arr1 = np.array([1, 2, 3, 4, 5])
+arr2 = np.array([6, 7, 8, 9, 10])
+
+print(f"数组1: {arr1}")
+print(f"数组2: {arr2}")
+
+# 数组运算
+print(f"\n加法: {arr1 + arr2}")
+print(f"减法: {arr1 - arr2}")
+print(f"乘法: {arr1 * arr2}")
+print(f"除法: {arr1 / arr2}")
+
+# 数组操作
+print(f"\n数组1的平方: {arr1 ** 2}")
+print(f"数组1的平方根: {np.sqrt(arr1)}")
+print(f"数组1的和: {np.sum(arr1)}")
+print(f"数组1的平均值: {np.mean(arr1)}")
+print(f"数组1的标准差: {np.std(arr1)}")
+
+# 创建特殊数组
+zeros_arr = np.zeros((3, 3))
+ones_arr = np.ones((2, 4))
+random_arr = np.random.random(5)
+identity_mat = np.eye(3)
+
+print(f"\n全零数组:\n{zeros_arr}")
+print(f"全一数组:\n{ones_arr}")
+print(f"随机数组: {random_arr}")
+print(f"单位矩阵:\n{identity_mat}")</code></pre>
+                </div>
+
+                <!-- 数据可视化 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>数据可视化（Matplotlib）</h3>
+                        <button class="copy-btn" onclick="copyCode(this)">复制代码</button>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 数据可视化示例 - 使用Matplotlib库
+import matplotlib.pyplot as plt
+import numpy as np
+
+# 设置中文字体支持
+plt.rcParams['font.sans-serif'] = ['SimHei', 'Arial Unicode MS']
+plt.rcParams['axes.unicode_minus'] = False
+
+# 1. 基础折线图
+x = np.linspace(0, 10, 100)
+y = np.sin(x)
+
+plt.figure(figsize=(10, 6))
+plt.plot(x, y, label='sin(x)', color='blue', linewidth=2)
+plt.plot(x, np.cos(x), label='cos(x)', color='red', linewidth=2)
+plt.title('三角函数图像', fontsize=16)
+plt.xlabel('x', fontsize=12)
+plt.ylabel('y', fontsize=12)
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+# 2. 散点图
+np.random.seed(42)
+x = np.random.randn(100)
+y = x + np.random.randn(100) * 0.5
+
+plt.figure(figsize=(10, 6))
+plt.scatter(x, y, alpha=0.6, c='blue')
+plt.title('散点图示例', fontsize=16)
+plt.xlabel('X轴')
+plt.ylabel('Y轴')
+plt.show()
+
+# 3. 柱状图
+categories = ['Python', 'Java', 'C++', 'JavaScript', 'Go']
+values = [85, 75, 70, 80, 65]
+
+plt.figure(figsize=(10, 6))
+bars = plt.bar(categories, values, color='skyblue', edgecolor='black')
+plt.title('编程语言流行度', fontsize=16)
+plt.xlabel('编程语言')
+plt.ylabel('流行度分数')
+plt.show()</code></pre>
+                </div>
+
+                <!-- 机器学习基础 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>机器学习基础（Scikit-learn）</h3>
+                        <button class="copy-btn" onclick="copyCode(this)">复制代码</button>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 机器学习基础示例 - 使用Scikit-learn库
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np
+import pandas as pd
+
+# 1. 线性回归示例
+np.random.seed(42)
+X = np.random.randn(100, 1) * 2
+y = 3 * X + 2 + np.random.randn(100, 1) * 0.5
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+model = LinearRegression()
+model.fit(X_train_scaled, y_train)
+
+y_pred = model.predict(X_test_scaled)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"模型系数: {model.coef_}")
+print(f"截距: {model.intercept_}")
+print(f"均方误差: {mse:.4f}")
+print(f"R²得分: {r2:.4f}")</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

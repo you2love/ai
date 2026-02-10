@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深度学习 - AI技术学习平台</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">🕸️ 深度学习</h2>
+            <p class="section-subtitle">基于神经网络的机器学习方法</p>
+
+            <!-- 什么是深度学习 -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <div class="card-icon">🧠</div>
+                    <div>
+                        <div class="card-title">什么是深度学习？</div>
+                        <div class="card-subtitle">深度学习 vs 机器学习</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p><strong>深度学习</strong>是机器学习的一个子领域，使用多层神经网络来学习数据的复杂模式。</p>
+
+                    <div class="comparison-row" style="margin-top: 1rem;">
+                        <div class="comparison-cell" style="font-weight: 600;">对比</div>
+                        <div class="comparison-cell" style="background: #fef2f2;">传统机器学习</div>
+                        <div class="comparison-cell" style="background: #ecfdf5;">深度学习</div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">特征提取</div>
+                        <div class="comparison-cell">人工设计</div>
+                        <div class="comparison-cell">自动学习</div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">数据需求</div>
+                        <div class="comparison-cell">中小规模</div>
+                        <div class="comparison-cell">大规模</div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">计算需求</div>
+                        <div class="comparison-cell">CPU即可</div>
+                        <div class="comparison-cell">需要GPU</div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">可解释性</div>
+                        <div class="comparison-cell">较好</div>
+                        <div class="comparison-cell">较差</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 神经网络基础 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🧠 神经网络基础</h3>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🔬</div>
+                    <div>
+                        <div class="card-title">神经元结构</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="diagram-box">
+                        <div class="diagram-title">单个神经元的工作原理</div>
+                        <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│     输入 x₁ ──权重 w₁──┐                                        │
+│                       │                                        │
+│     输入 x₂ ──权重 w₂──┼──▶ 求和 Σ(w·x + b) ──▶ 激活函数 ──▶ 输出 │
+│                       │                                        │
+│     输入 x₃ ──权重 w₃──┘                                        │
+│                                                                 │
+│  偏置 b: 调整神经元激活的阈值                                    │
+│  激活函数: 引入非线性（ReLU、Sigmoid、Tanh）                     │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+                        </div>
+                    </div>
+
+                    <div class="diagram-box">
+                        <div class="diagram-title">多层神经网络</div>
+                        <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│   输入层          隐藏层1          隐藏层2          输出层      │
+│                                                                 │
+│     ○─┐        ┌───┐            ┌───┐            ┌─┐          │
+│     ○─┼──────▶│ ○ │──────────▶│ ○ │──────────▶│○│          │
+│     ○─┤        └───┘            └───┘            └─┘          │
+│     ○─┤        ┌───┐            ┌───┐                         │
+│     ○─┼──────▶│ ○ │──────────▶│ ○ │                         │
+│     ○─┘        └───┘            └───┘                         │
+│                                                                 │
+│   [x₁,x₂,    →  特征提取    →  特征组合   →  最终预测         │
+│    x₃,x₄]                                                      │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 常见网络架构 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🏗️ 常见网络架构</h3>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🖼️</div>
+                        <div>
+                            <div class="card-title">CNN</div>
+                            <div class="card-subtitle">卷积神经网络</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem;">擅长处理图像</p>
+                        <div style="margin: 1rem 0;">
+                            <div class="tags">
+                                <span class="tag">图像分类</span>
+                                <span class="tag">目标检测</span>
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>卷积层：提取特征</li>
+                            <li>池化层：压缩信息</li>
+                            <li>经典模型：ResNet、VGG</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📝</div>
+                        <div>
+                            <div class="card-title">RNN/LSTM</div>
+                            <div class="card-subtitle">循环神经网络</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem;">擅长处理序列</p>
+                        <div style="margin: 1rem 0;">
+                            <div class="tags">
+                                <span class="tag">文本</span>
+                                <span class="tag">时序</span>
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>记忆之前的信息</li>
+                            <li>LSTM解决长依赖</li>
+                            <li>应用：机器翻译、语音</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">⚡</div>
+                        <div>
+                            <div class="card-title">Transformer</div>
+                            <div class="card-subtitle">自注意力网络</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem;">当前最主流架构</p>
+                        <div style="margin: 1rem 0;">
+                            <div class="tags">
+                                <span class="tag red">GPT/BERT</span>
+                            </div>
+                        </div>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>自注意力机制</li>
+                            <li>并行计算高效</li>
+                            <li>大语言模型基础</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 核心概念 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">📚 核心概念</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>概念</th>
+                            <th>说明</th>
+                            <th>简单理解</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>前向传播</strong></td>
+                            <td>数据从输入层传到输出层</td>
+                            <td>做计算题</td>
+                        </tr>
+                        <tr>
+                            <td><strong>反向传播</strong></td>
+                            <td>从后往前调整参数</td>
+                            <td>对答案改错</td>
+                        </tr>
+                        <tr>
+                            <td><strong>损失函数</strong></td>
+                            <td>衡量预测和真实的差距</td>
+                            <td>离正确答案有多远</td>
+                        </tr>
+                        <tr>
+                            <td><strong>优化器</strong></td>
+                            <td>调整参数减少损失</td>
+                            <td>找到更好的方法</td>
+                        </tr>
+                        <tr>
+                            <td><strong>学习率</strong></td>
+                            <td>每次调整的步长</td>
+                            <td>改多大程度的错</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Batch</strong></td>
+                            <td>每次训练的数据量</td>
+                            <td>一次看多少题</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Epoch</strong></td>
+                            <td>完整遍历一次数据集</td>
+                            <td>完整复习一遍</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 训练技巧 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">⚙️ 训练技巧</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <h4 style="margin-bottom: 1rem;">⚠️ 过拟合</h4>
+                    <p style="font-size: 0.9rem; color: #666;">模型记住训练数据，不会泛化</p>
+                    <div class="info-box warning" style="margin-top: 1rem;">
+                        <p><strong>表现：</strong>训练集准确率很高，测试集准确率很低</p>
+                        <p><strong>解决方法：</strong></p>
+                        <ul style="margin-left: 1rem; font-size: 0.85rem;">
+                            <li>增加训练数据</li>
+                            <li>正则化（L1/L2）</li>
+                            <li>Dropout随机丢弃</li>
+                            <li>减少模型复杂度</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4 style="margin-bottom: 1rem;">⚠️ 欠拟合</h4>
+                    <p style="font-size: 0.9rem; color: #666;">模型太简单，学不会</p>
+                    <div class="info-box warning" style="margin-top: 1rem;">
+                        <p><strong>表现：</strong>训练集和测试集准确率都很低</p>
+                        <p><strong>解决方法：</strong></p>
+                        <ul style="margin-left: 1rem; font-size: 0.85rem;">
+                            <li>增加模型复杂度</li>
+                            <li>增加训练时间</li>
+                            <li>减少正则化</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 主流框架 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🛠️ 主流深度学习框架</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>框架</th>
+                            <th>特点</th>
+                            <th>适用场景</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>PyTorch</strong></td>
+                            <td>Python风格，动态图，研究首选</td>
+                            <td>学术研究、快速原型</td>
+                        </tr>
+                        <tr>
+                            <td><strong>TensorFlow</strong></td>
+                            <td>工业成熟，部署方便</td>
+                            <td>生产部署、大规模训练</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Keras</strong></td>
+                            <td>简单易用，上手快</td>
+                            <td>入门学习、快速实验</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 学习建议 -->
+            <div class="info-box tip">
+                <div class="info-box-title">💡 学习建议</div>
+                <ol style="margin-left: 1.5rem;">
+                    <li>先学习PyTorch，语法简洁易上手</li>
+                    <li>理解反向传播原理，这是核心</li>
+                    <li>跑通经典模型代码（LeNet、ResNet）</li>
+                    <li>使用预训练模型做迁移学习</li>
+                </ol>
+            </div>
+
+        </div>
+    </section>
+</body>
+</html>

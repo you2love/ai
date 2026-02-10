@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机器学习 - AI技术学习平台</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">🧠 机器学习</h2>
+            <p class="section-subtitle">让计算机从数据中自动学习规律</p>
+
+            <!-- 什么是机器学习 -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header">
+                    <div class="card-icon">🤔</div>
+                    <div>
+                        <div class="card-title">什么是机器学习？</div>
+                        <div class="card-subtitle">核心概念</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="diagram-box">
+                        <div class="diagram-title">机器学习 vs 传统编程</div>
+                        <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  传统编程：                                                  │
+│  ┌─────────┐     ┌─────────────┐     ┌─────────┐          │
+│  │  输入   │ ──▶  │  人工规则   │ ──▶  │  输出   │          │
+│  └─────────┘     └─────────────┘     └─────────┘          │
+│                                                             │
+│  机器学习：                                                  │
+│  ┌─────────┐     ┌─────────────┐     ┌─────────┐          │
+│  │ 输入+答案│ ──▶  │   学习算法  │ ──▶  │  规则   │          │
+│  └─────────┘     └─────────────┘     └─────────┘          │
+│                                         │                  │
+│                                         ▼                  │
+│                                   ┌─────────┐             │
+│                                   │ 预测新数据│             │
+│                                   └─────────┘             │
+└─────────────────────────────────────────────────────────────┘
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 三大学习类型 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">📊 机器学习三大类型</h3>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card level-card level-1">
+                    <div class="level-badge">🎯 监督学习</div>
+                    <h4 style="margin-bottom: 0.5rem;">有标签数据</h4>
+                    <p style="font-size: 0.9rem; color: #666;">给机器"标准答案"学习</p>
+                    <div style="margin: 1rem 0;">
+                        <div class="tags">
+                            <span class="tag">分类</span>
+                            <span class="tag">回归</span>
+                        </div>
+                    </div>
+                    <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                        <li>垃圾邮件识别</li>
+                        <li>房价预测</li>
+                        <li>图像分类</li>
+                    </ul>
+                </div>
+
+                <div class="card level-card level-2">
+                    <div class="level-badge">🔍 无监督学习</div>
+                    <h4 style="margin-bottom: 0.5rem;">无标签数据</h4>
+                    <p style="font-size: 0.9rem; color: #666;">让机器自己发现规律</p>
+                    <div style="margin: 1rem 0;">
+                        <div class="tags">
+                            <span class="tag">聚类</span>
+                            <span class="tag">降维</span>
+                        </div>
+                    </div>
+                    <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                        <li>用户分群</li>
+                        <li>异常检测</li>
+                        <li>数据压缩</li>
+                    </ul>
+                </div>
+
+                <div class="card level-card level-3">
+                    <div class="level-badge">🎮 强化学习</div>
+                    <h4 style="margin-bottom: 0.5rem;">试错学习</h4>
+                    <p style="font-size: 0.9rem; color: #666;">通过奖励和惩罚学习</p>
+                    <div style="margin: 1rem 0;">
+                        <div class="tags">
+                            <span class="tag">决策</span>
+                            <span class="tag">控制</span>
+                        </div>
+                    </div>
+                    <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                        <li>游戏AI</li>
+                        <li>机器人控制</li>
+                        <li>自动驾驶</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 回归 vs 分类 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">📈 回归 vs 分类</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>对比项</th>
+                            <th>回归问题</th>
+                            <th>分类问题</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>输出类型</strong></td>
+                            <td>连续数值</td>
+                            <td>离散类别</td>
+                        </tr>
+                        <tr>
+                            <td><strong>例子</strong></td>
+                            <td>预测房价（150万、200万...）</td>
+                            <td>识别猫狗（猫、狗）</td>
+                        </tr>
+                        <tr>
+                            <td><strong>输出示例</strong></td>
+                            <td>99.5、150.2</td>
+                            <td>0、1、2 或 猫、狗、鸟</td>
+                        </tr>
+                        <tr>
+                            <td><strong>评估指标</strong></td>
+                            <td>MSE、RMSE、MAE</td>
+                            <td>准确率、精确率、召回率</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 常见算法 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🔧 常见算法</h3>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📉</div>
+                        <div>
+                            <div class="card-title">线性回归</div>
+                            <div class="card-subtitle">Regression</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 1rem;">找一条直线拟合数据</p>
+                        <div class="diagram-box" style="margin: 0; padding: 0.75rem;">
+                            <div style="font-size: 0.8rem;">
+输入：面积 → 输出：价格
+  50㎡ → 100万
+  80㎡ → 160万
+  100㎡ → 200万
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🚦</div>
+                        <div>
+                            <div class="card-title">逻辑回归</div>
+                            <div class="card-subtitle">Classification</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 1rem;">二分类问题的经典算法</p>
+                        <div class="diagram-box" style="margin: 0; padding: 0.75rem;">
+                            <div style="font-size: 0.8rem;">
+输入：邮件内容 → 输出：是否垃圾
+  "中奖通知" → 垃圾邮件 ✓
+  "会议安排" → 正常邮件 ✓
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🌳</div>
+                        <div>
+                            <div class="card-title">决策树</div>
+                            <div class="card-subtitle">Tree</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 1rem;">像树一样不断分支判断</p>
+                        <div class="diagram-box" style="margin: 0; padding: 0.75rem;">
+                            <div style="font-size: 0.8rem;">
+              天气如何？
+            /     |     \
+         晴天  阴天   下雨
+          ✓     ?     取消
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🌲</div>
+                        <div>
+                            <div class="card-title">随机森林</div>
+                            <div class="card-subtitle">Ensemble</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 1rem;">多棵树一起投票，精度更高</p>
+                        <div class="diagram-box" style="margin: 0; padding: 0.75rem;">
+                            <div style="font-size: 0.8rem;">
+树1预测：猫
+树2预测：狗
+树3预测：猫
+→ 最终结果：猫（2:1）
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">👥</div>
+                        <div>
+                            <div class="card-title">K近邻</div>
+                            <div class="card-subtitle">KNN</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 1rem;">看邻居是什么，你就是什么</p>
+                        <div class="diagram-box" style="margin: 0; padding: 0.75rem;">
+                            <div style="font-size: 0.8rem;">
+新样本周围3个邻居：
+2个是A类，1个是B类
+→ 分类为A类
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📊</div>
+                        <div>
+                            <div class="card-title">K均值</div>
+                            <div class="card-subtitle">K-Means</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.9rem; margin-bottom: 1rem;">自动把相似数据分在一起</p>
+                        <div class="diagram-box" style="margin: 0; padding: 0.75rem;">
+                            <div style="font-size: 0.8rem;">
+用户数据 → 自动分组
+年轻+高消费 → 高价值用户
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 机器学习流程 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🔄 机器学习工作流程</h3>
+
+            <div class="flow-chart">
+                <div class="flow-item start">收集数据</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item">数据清洗</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item">特征工程</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item">模型训练</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item">模型评估</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item end">预测应用</div>
+            </div>
+
+            <!-- 评估指标 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">📏 模型评估指标</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>指标</th>
+                            <th>说明</th>
+                            <th>适用场景</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>准确率</strong></td>
+                            <td>预测正确的比例</td>
+                            <td>分类问题通用</td>
+                        </tr>
+                        <tr>
+                            <td><strong>精确率</strong></td>
+                            <td>预测为正类中真正正类的比例</td>
+                            <td>关注误报</td>
+                        </tr>
+                        <tr>
+                            <td><strong>召回率</strong></td>
+                            <td>正类中被正确预测的比例</td>
+                            <td>关注漏报</td>
+                        </tr>
+                        <tr>
+                            <td><strong>F1分数</strong></td>
+                            <td>精确率和召回率的调和平均</td>
+                            <td>综合评价</td>
+                        </tr>
+                        <tr>
+                            <td><strong>MSE</strong></td>
+                            <td>预测值与真实值差异的平方平均</td>
+                            <td>回归问题</td>
+                        </tr>
+                        <tr>
+                            <td><strong>R²</strong></td>
+                            <td>模型解释数据的能力（0-1）</td>
+                            <td>回归问题</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 学习建议 -->
+            <div class="info-box tip">
+                <div class="info-box-title">💡 学习建议</div>
+                <ol style="margin-left: 1.5rem;">
+                    <li>先理解每种算法的"直觉"，不要死记公式</li>
+                    <li>使用Scikit-learn库快速实践各种算法</li>
+                    <li>完成Kaggle入门竞赛，如Titanic生存预测</li>
+                    <li>学会使用交叉验证评估模型</li>
+                </ol>
+            </div>
+
+        </div>
+    </section>
+</body>
+</html>

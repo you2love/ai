@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP协议详解 - AI技术学习平台</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">MCP协议详解</h2>
+            <p class="section-subtitle">从入门到精通，掌握Model Context Protocol</p>
+
+            <div class="code-sections">
+                <!-- 什么是MCP -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>1. 什么是MCP协议？</h3>
+                    </div>
+                    <div class="code-block"><code class="language-python"># MCP (Model Context Protocol) 简介
+#
+# MCP是Anthropic于2024年11月发布的开放协议
+# 它为AI应用提供了一个标准化的方式来连接外部数据源和工具
+#
+# MCP的核心优势：
+# 1. 统一接口 - 不同的工具和数据源使用相同的协议
+# 2. 可扩展性 - 轻松添加新的工具和数据源
+# 3. 安全性 - 明确的权限控制和沙箱机制
+# 4. 互操作性 - 不同AI框架可以共用工具
+
+# MCP架构包含三个核心组件：
+# 1. MCP Client - 运行在AI应用中，负责与服务器通信
+# 2. MCP Server - 提供工具和数据源
+# 3. Transport Layer - 负责数据传输（支持stdio、HTTP、WebSocket等）
+
+print("MCP协议的核心设计理念：")
+print("1. 让AI模型能够动态发现和使用工具")
+print("2. 提供标准化的工具调用接口")
+print("3. 支持上下文管理和资源访问")</code></pre>
+                </div>
+
+                <!-- MCP服务器基础 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>2. 创建MCP服务器</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 使用Python创建简单的MCP服务器
+# 需要安装: pip install mcp
+
+from mcp.server import Server
+from mcp.server.stdio import stdio_server
+from mcp.types import Tool, TextContent
+import json
+
+# 创建MCP服务器实例
+app = Server("simple-mcp-server")
+
+# 定义工具函数
+def calculate(a: int, b: int, operation: str = "add") -> str:
+    """执行基本数学运算"""
+    if operation == "add":
+        return str(a + b)
+    elif operation == "subtract":
+        return str(a - b)
+    elif operation == "multiply":
+        return str(a * b)
+    elif operation == "divide":
+        if b == 0:
+            return "错误：除数不能为零"
+        return str(a / b)
+    else:
+        return f"未知操作：{operation}"
+
+# 注册工具
+@app.list_tools()
+async def list_tools():
+    """列出可用的工具"""
+    return [
+        Tool(
+            name="calculate",
+            description="执行基本数学运算（加、减、乘、除）",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "a": {"type": "integer", "description": "第一个数字"},
+                    "b": {"type": "integer", "description": "第二个数字"},
+                    "operation": {
+                        "type": "string",
+                        "enum": ["add", "subtract", "multiply", "divide"],
+                        "description": "运算操作"
+                    }
+                },
+                "required": ["a", "b"]
+            }
+        )
+    ]
+
+@app.call_tool()
+async def call_tool(name: str, arguments: dict):
+    """调用工具"""
+    if name == "calculate":
+        a = arguments.get("a", 0)
+        b = arguments.get("b", 0)
+        operation = arguments.get("operation", "add")
+        result = calculate(a, b, operation)
+        return [TextContent(type="text", text=f"{a} {operation} {b} = {result}")]
+    else:
+        return [TextContent(type="text", text=f"未知工具：{name}")]
+
+# 启动服务器
+async def main():
+    async with stdio_server() as (read_stream, write_stream):
+        await app.run(read_stream, write_stream, app.create_initialization_options())
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())</code></pre>
+                </div>
+
+                <!-- MCP客户端基础 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>3. 创建MCP客户端</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 创建MCP客户端连接到服务器
+import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+# 服务器连接参数
+server_params = StdioServerParameters(
+    command="python",  # 服务器启动命令
+    args=["simple_mcp_server.py"],  # 服务器脚本路径
+    env=None
+)
+
+async def use_mcp_client():
+    """使用MCP客户端调用工具"""
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            # 初始化会话
+            await session.initialize()
+            
+            # 列出可用工具
+            tools = await session.list_tools()
+            print("可用工具：")
+            for tool in tools.tools:
+                print(f"  - {tool.name}: {tool.description}")
+            
+            # 调用计算工具
+            result = await session.call_tool(
+                "calculate",
+                {"a": 10, "b": 5, "operation": "multiply"}
+            )
+            print(f"\n计算结果：{result.content[0].text}")
+            
+            # 批量调用
+            results = await session.call_tools_batch([
+                {"name": "calculate", "arguments": {"a": 100, "b": 20, "operation": "add"}},
+                {"name": "calculate", "arguments": {"a": 100, "b": 20, "operation": "subtract"}},
+                {"name": "calculate", "arguments": {"a": 100, "b": 20, "operation": "multiply"}},
+            ])
+            for res in results:
+                print(f"  {res.content[0].text}")
+
+if __name__ == "__main__":
+    asyncio.run(use_mcp_client())</code></pre>
+                </div>
+
+                <!-- MCP资源管理 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>4. MCP资源管理</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># MCP资源管理 - 让AI模型访问外部数据
+from mcp.server import Server
+from mcp.server.stdio import stdio_server
+from mcp.types import Resource, TextResourceContents
+
+app = Server("resource-server")
+
+# 模拟数据库
+database = {
+    "users": [
+        {"id": 1, "name": "张三", "email": "zhangsan@example.com"},
+        {"id": 2, "name": "李四", "email": "lisi@example.com"},
+        {"id": 3, "name": "王五", "email": "wangwu@example.com"}
+    ],
+    "products": [
+        {"id": 101, "name": "AI课程", "price": 299},
+        {"id": 102, "name": "数据分析课程", "price": 199},
+        {"id": 103, "name": "机器学习课程", "price": 399}
+    ]
+}
+
+@app.list_resources()
+async def list_resources():
+    """列出可用的资源"""
+    return [
+        Resource(
+            uri="db://users",
+            name="用户列表",
+            description="获取所有用户信息",
+            mimeType="application/json"
+        ),
+        Resource(
+            uri="db://products",
+            name="产品列表",
+            description="获取所有产品信息",
+            mimeType="application/json"
+        )
+    ]
+
+@app.read_resource()
+async def read_resource(uri: str):
+    """读取资源内容"""
+    if uri == "db://users":
+        return TextResourceContents(
+            uri=uri,
+            mimeType="application/json",
+            text=json.dumps(database["users"], ensure_ascii=False, indent=2)
+        )
+    elif uri == "db://products":
+        return TextResourceContents(
+            uri=uri,
+            mimeType="application/json",
+            text=json.dumps(database["products"], ensure_ascii=False, indent=2)
+        )
+    else:
+        raise ValueError(f"未知资源：{uri}")
+
+# 客户端使用资源
+async def use_resources():
+    """客户端访问资源的示例"""
+    # 读取用户资源
+    users = await session.read_resource("db://users")
+    print("用户列表：")
+    print(users.contents[0].text)
+    
+    # 读取产品资源
+    products = await session.read_resource("db://products")
+    print("\n产品列表：")
+    print(products.contents[0].text)</code></pre>
+                </div>
+
+                <!-- MCP提示模板 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>5. MCP提示模板</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># MCP提示模板 - 预定义的AI交互模板
+from mcp.server import Server
+from mcp.server.stdio import stdio_server
+from mcp.types import Prompt, PromptArgument
+
+app = Server("prompt-server")
+
+@app.list_prompts()
+async def list_prompts():
+    """列出可用的提示模板"""
+    return [
+        Prompt(
+            name="analyze-data",
+            description="数据分析助手模板",
+            arguments=[
+                PromptArgument(
+                    name="data",
+                    description="要分析的数据",
+                    required=True
+                ),
+                PromptArgument(
+                    name="analysis-type",
+                    description="分析类型（统计、趋势、异常）",
+                    required=False
+                )
+            ]
+        ),
+        Prompt(
+            name="code-review",
+            description="代码审查助手模板",
+            arguments=[
+                PromptArgument(
+                    name="language",
+                    description="编程语言",
+                    required=True
+                )
+            ]
+        )
+    ]
+
+@app.get_prompt()
+async def get_prompt(name: str, arguments: dict):
+    """获取提示模板"""
+    if name == "analyze-data":
+        data = arguments.get("data", "")
+        analysis_type = arguments.get("analysis-type", "统计")
+        return f"""你是一个数据分析专家。请对以下数据进行{analysis_type}分析：
+
+数据：{data}
+
+请提供：
+1. 基本统计信息（均值、中位数、标准差）
+2. 关键发现和洞察
+3. 可视化建议
+4. 后续分析建议"""
+
+    elif name == "code-review":
+        language = arguments.get("language", "Python")
+        return f"""你是一个专业的{language}代码审查专家。请审查以下代码：
+
+1. 检查代码质量和最佳实践
+2. 识别潜在的bug和性能问题
+3. 提供改进建议
+4. 评估代码安全性
+
+请逐行分析并给出详细反馈。"""
+
+# 客户端使用提示模板
+async def use_prompts():
+    """使用提示模板"""
+    # 获取数据分析提示
+    prompt = await session.get_prompt(
+        "analyze-data",
+        {
+            "data": "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]",
+            "analysis-type": "统计"
+        }
+    )
+    print("数据分析提示：")
+    print(prompt.description)
+    print(prompt.messages[0].content.text)</code></pre>
+                </div>
+
+                <!-- MCP采样机制 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>6. MCP采样机制（高级）</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># MCP采样机制 - 服务器端的AI响应生成
+from mcp.server import Server
+from mcp.types import SamplingMessage, TextContent
+from anthropic import Anthropic
+
+app = Server("sampling-server")
+
+# 配置采样API
+anthropic = Anthropic(api_key="your-api-key")
+
+@app.list_sampling_handlers()
+async def list_sampling_handlers():
+    """列出采样处理器"""
+    return [SamplingHandler()]
+
+class SamplingHandler:
+    """自定义采样处理器"""
+    
+    async def create_message(
+        self,
+        messages: list[SamplingMessage],
+        max_tokens: int = 1000,
+        system_prompt: str = None
+    ) -> SamplingResponse:
+        """创建AI响应"""
+        # 构建消息格式
+        api_messages = []
+        for msg in messages:
+            api_messages.append({
+                "role": "user" if msg.role == "user" else "assistant",
+                "content": msg.content[0].text if msg.content else ""
+            })
+        
+        # 调用AI API
+        response = anthropic.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=max_tokens,
+            messages=api_messages,
+            system=system_prompt
+        )
+        
+        # 返回采样响应
+        return SamplingResponse(
+            role="assistant",
+            content=[TextContent(type="text", text=response.content[0].text)]
+        )
+
+# 使用采样机制的客户端
+async def use_sampling():
+    """使用采样机制进行AI推理"""
+    # 服务器可以代表用户调用AI模型
+    # 支持复杂的对话流程控制
+    
+    # 采样消息示例
+    messages = [
+        SamplingMessage(
+            role="user",
+            content=[TextContent(type="text", text="请帮我分析这段代码的性能问题")]
+        )
+    ]
+    
+    response = await session.create_sampling_message(
+        messages=messages,
+        max_tokens=2000
+    )
+    
+    print("AI分析结果：")
+    print(response.content[0].text)</code></pre>
+                </div>
+
+                <!-- MCP工具组合使用 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>7. 高级：多工具组合使用</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># MCP高级用法：多工具组合、链式调用、错误处理
+import asyncio
+from typing import List, Dict, Any
+from mcp import ClientSession
+
+class MCPWorkflow:
+    """MCP工作流管理器"""
+    
+    def __init__(self, session: ClientSession):
+        self.session = session
+        self.history = []
+    
+    async def execute_workflow(self, steps: List[Dict[str, Any]]):
+        """执行多步骤工作流"""
+        results = []
+        
+        for i, step in enumerate(steps):
+            tool_name = step["tool"]
+            args = step.get("args", {})
+            condition = step.get("condition")
+            transform = step.get("transform")
+            
+            # 检查条件
+            if condition and not self._evaluate_condition(condition, results):
+                continue
+            
+            # 调用工具
+            try:
+                result = await self.session.call_tool(tool_name, args)
+                result_text = result.content[0].text
+                
+                # 转换结果
+                if transform:
+                    result_text = transform(result_text)
+                
+                results.append({
+                    "step": i + 1,
+                    "tool": tool_name,
+                    "result": result_text
+                })
+                
+                self.history.append(result_text)
+                
+            except Exception as e:
+                results.append({
+                    "step": i + 1,
+                    "tool": tool_name,
+                    "error": str(e)
+                })
+        
+        return results
+    
+    def _evaluate_condition(self, condition: Dict, results: List) -> bool:
+        """评估条件表达式"""
+        # 简化的条件评估
+        last_result = results[-1]["result"] if results else ""
+        return condition.get("contains", "") in last_result
+
+# 使用示例：数据处理工作流
+async def data_processing_workflow():
+    """复杂的数据处理工作流示例"""
+    
+    workflow = MCPWorkflow(session)
+    
+    steps = [
+        {
+            "tool": "fetch-data",
+            "args": {"url": "https://api.example.com/data"}
+        },
+        {
+            "tool": "validate-data",
+            "args": {"schema": "data_schema.json"},
+            "condition": {"contains": "valid"}
+        },
+        {
+            "tool": "transform-data",
+            "args": {"format": "csv"},
+            "transform": lambda x: x.upper()
+        },
+        {
+            "tool": "save-data",
+            "args": {"path": "output.csv"}
+        }
+    ]
+    
+    results = await workflow.execute_workflow(steps)
+    
+    for result in results:
+        if "error" in result:
+            print(f"步骤 {result['step']} 错误: {result['error']}")
+        else:
+            print(f"步骤 {result['step']} 完成: {result['tool']}")
+
+# MCP错误处理和重试机制
+class MCPErrorHandler:
+    """MCP错误处理器"""
+    
+    def __init__(self, max_retries: int = 3, delay: float = 1.0):
+        self.max_retries = max_retries
+        self.delay = delay
+    
+    async def execute_with_retry(
+        self,
+        tool_name: str,
+        args: dict,
+        error_types: list = None
+    ):
+        """带重试的工具执行"""
+        error_types = error_types or [Exception]
+        
+        for attempt in range(self.max_retries):
+            try:
+                result = await session.call_tool(tool_name, args)
+                return result
+            
+            except tuple(error_types) as e:
+                if attempt == self.max_retries - 1:
+                    raise
+                
+                await asyncio.sleep(self.delay * (attempt + 1))
+                print(f"重试 {attempt + 1}/{self.max_retries}: {e}")</code></pre>
+                </div>
+
+                <!-- MCP安全最佳实践 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>8. MCP安全最佳实践</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># MCP安全实践：权限控制、输入验证、沙箱隔离
+from mcp.server import Server
+from mcp.types import Tool, TextContent
+from typing import Optional
+import re
+
+class SecureMCPServer:
+    """安全的MCP服务器"""
+    
+    def __init__(self, allowed_tools: list = None, rate_limit: int = 100):
+        self.allowed_tools = set(allowed_tools or [])
+        self.rate_limit = rate_limit
+        self.request_count = {}
+        self.permission_db = {}
+    
+    def validate_input(self, tool_name: str, args: dict) -> tuple[bool, str]:
+        """输入验证"""
+        # 检查工具是否允许
+        if tool_name not in self.allowed_tools:
+            return False, f"工具 {tool_name} 未授权"
+        
+        # 检查参数类型
+        for key, value in args.items():
+            if not isinstance(value, (str, int, float, bool, list, dict)):
+                return False, f"参数 {key} 类型无效"
+        
+        # 防止SQL注入
+        for key, value in args.items():
+            if isinstance(value, str):
+                if re.search(r"['\";]|--|/\*", value):
+                    return False, f"参数 {key} 包含敏感字符"
+        
+        return True, ""
+    
+    def check_rate_limit(self, client_id: str) -> tuple[bool, int]:
+        """速率限制检查"""
+        current = self.request_count.get(client_id, 0)
+        if current >= self.rate_limit:
+            return False, current
+        
+        self.request_count[client_id] = current + 1
+        return True, current + 1
+    
+    def sandbox_execution(self, tool_name: str, args: dict) -> dict:
+        """沙箱执行环境"""
+        # 创建受限的执行环境
+        import subprocess
+        
+        allowed_commands = {
+            "read_file": ["cat", "head", "tail"],
+            "list_dir": ["ls", "find"],
+            "search": ["grep", "find"]
+        }
+        
+        if tool_name not in allowed_commands:
+            raise PermissionError(f"工具 {tool_name} 不允许在沙箱中执行")
+        
+        return {"status": "executed", "sandbox": True}
+
+# 客户端安全实践
+class SecureMCPClient:
+    """安全的MCP客户端"""
+    
+    def __init__(self, session: ClientSession):
+        self.session = session
+        self.trusted_servers = set()
+    
+    async def verify_server(self, server_id: str) -> bool:
+        """验证服务器身份"""
+        # 实现服务器证书验证
+        return server_id in self.trusted_servers
+    
+    def sanitize_output(self, text: str) -> str:
+        """清理输出内容"""
+        # 移除敏感信息
+        import re
+        text = re.sub(r'\b\d{16}\b', '[银行卡号已隐藏]', text)
+        text = re.sub(r'\b[\w\.-]+@[\w\.-]+\.\w{2,4}\b', '[邮箱已隐藏]', text)
+        return text
+    
+    async def secure_tool_call(
+        self,
+        tool_name: str,
+        args: dict,
+        timeout: float = 30.0
+    ) -> str:
+        """安全的工具调用"""
+        # 1. 验证服务器
+        # 2. 验证输入
+        # 3. 设置超时
+        # 4. 清理输出
+        
+        import asyncio
+        
+        try:
+            result = await asyncio.wait_for(
+                self.session.call_tool(tool_name, args),
+                timeout=timeout
+            )
+            return self.sanitize_output(result.content[0].text)
+        
+        except asyncio.TimeoutError:
+            return f"工具调用超时（{timeout}秒）"
+        
+        except Exception as e:
+            return f"工具调用失败：{str(e)}"</code></pre>
+                </div>
+
+                <!-- MCP在AI应用中的实际应用 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>9. 实际应用：AI助手集成MCP</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 完整的AI助手集成MCP示例
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+from anthropic import Anthropic
+import json
+
+class AIBotWithMCP:
+    """集成MCP的AI助手"""
+    
+    def __init__(self, anthropic_api_key: str):
+        self.client = Anthropic(api_key=anthropic_api_key)
+        self.sessions = {}
+    
+    async def connect_to_server(
+        self,
+        server_id: str,
+        server_command: list,
+        env: dict = None
+    ):
+        """连接到MCP服务器"""
+        server_params = StdioServerParameters(
+            command=server_command[0],
+            args=server_command[1:],
+            env=env
+        )
+        
+        self.sessions[server_id] = {
+            "params": server_params,
+            "session": None,
+            "tools": []
+        }
+        
+        # 获取工具列表
+        await self._refresh_tools(server_id)
+    
+    async def _refresh_tools(self, server_id: str):
+        """刷新工具列表"""
+        server = self.sessions[server_id]
+        
+        async with stdio_client(server["params"]) as (read, write):
+            async with ClientSession(read, write) as session:
+                tools = await session.list_tools()
+                server["tools"] = [
+                    {
+                        "name": t.name,
+                        "description": t.description,
+                        "input_schema": t.inputSchema
+                    }
+                    for t in tools.tools
+                ]
+    
+    async def chat(self, message: str) -> str:
+        """AI对话"""
+        # 1. 获取所有可用工具
+        all_tools = []
+        for server_id, server in self.sessions.items():
+            all_tools.extend(server["tools"])
+        
+        # 2. 构建系统提示
+        system_prompt = f"""你是一个智能AI助手，可以通过工具来帮助用户解决问题。
+
+可用工具：
+{json.dumps(all_tools, ensure_ascii=False, indent=2)}
+
+请根据用户需求选择合适的工具来完成任务。"""
+        
+        # 3. 调用AI
+        response = self.client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=2000,
+            system=system_prompt,
+            messages=[{"role": "user", "content": message}]
+        )
+        
+        ai_response = response.content[0].text
+        
+        # 4. 检测是否需要调用工具
+        # 这里简化处理，实际需要解析AI的tool_use请求
+        
+        return ai_response
+    
+    async def chat_with_tools(self, message: str) -> str:
+        """支持工具调用的AI对话"""
+        
+        # 获取所有工具描述
+        all_tools = []
+        for server_id, server in self.sessions.items():
+            all_tools.extend(server["tools"])
+        
+        system_prompt = """你是一个智能助手。当你需要执行具体操作时，请使用工具。
+你可以通过JSON格式的工具调用来完成任务。
+
+工具调用格式：
+{"tool": "工具名称", "arguments": {"参数": "值"}}
+
+请在回复中明确说明你需要使用的工具及其参数。"""
+        
+        # 第一轮：AI决定是否调用工具
+        response = self.client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=2000,
+            system=system_prompt,
+            messages=[{"role": "user", "content": message}]
+        )
+        
+        content = response.content[0].text
+        
+        # 解析工具调用
+        import re
+        tool_match = re.search(r'{"tool": "(\w+)", "arguments": ({.*?})}', content)
+        
+        if tool_match:
+            tool_name = tool_match.group(1)
+            args = json.loads(tool_match.group(2).replace("'", '"'))
+            
+            # 调用工具
+            results = await self._call_all_servers_tool(tool_name, args)
+            
+            # 将结果返回给AI
+            tool_result_prompt = f"""工具调用结果：
+{json.dumps(results, ensure_ascii=False, indent=2)}
+
+请根据工具结果继续回答用户问题。"""
+            
+            final_response = self.client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=2000,
+                messages=[
+                    {"role": "user", "content": message},
+                    {"role": "assistant", "content": content},
+                    {"role": "user", "content": tool_result_prompt}
+                ]
+            )
+            
+            return final_response.content[0].text
+        
+        return content
+    
+    async def _call_all_servers_tool(
+        self,
+        tool_name: str,
+        args: dict
+    ) -> dict:
+        """在所有服务器中查找并调用工具"""
+        results = {}
+        
+        for server_id, server in self.sessions.items():
+            # 检查工具是否存在
+            tool_exists = any(
+                t["name"] == tool_name
+                for t in server["tools"]
+            )
+            
+            if tool_exists:
+                async with stdio_client(server["params"]) as (read, write):
+                    async with ClientSession(read, write) as session:
+                        await session.initialize()
+                        result = await session.call_tool(tool_name, args)
+                        results[server_id] = result.content[0].text
+        
+        return results
+
+# 使用示例
+async def main():
+    bot = AIBotWithMCP("your-api-key")
+    
+    # 连接到MCP服务器
+    await bot.connect_to_server(
+        "calculator",
+        ["python", "calculator_server.py"]
+    )
+    
+    # 对话
+    response = await bot.chat_with_tools("计算 25 * 4 + 10")
+    print(response)
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())</code></pre>
+                </div>
+
+                <!-- MCP最佳实践总结 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>10. MCP最佳实践总结</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># MCP协议最佳实践总结
+
+MCP_BEST_PRACTICES = """
+1. 服务器设计最佳实践：
+   - 保持工具职责单一
+   - 提供清晰的工具描述
+   - 实现完善的错误处理
+   - 添加输入验证和清理
+
+2. 客户端设计最佳实践：
+   - 实现工具缓存机制
+   - 添加请求超时控制
+   - 实现重试和熔断机制
+   - 记录工具调用日志
+
+3. 安全最佳实践：
+   - 限制可用工具范围
+   - 实现权限控制系统
+   - 沙箱执行敏感操作
+   - 验证服务器身份
+
+4. 性能优化：
+   - 批量调用工具
+   - 连接池管理
+   - 结果缓存策略
+   - 异步调用优化
+
+5. 部署建议：
+   - 使用Docker容器化
+   - 配置资源限制
+   - 监控工具调用
+   - 优雅降级策略
+"""
+
+print(MCP_BEST_PRACTICES)
+
+# MCP学习路线图
+MCP_LEARNING_ROADMAP = """
+MCP学习路线图：
+
+阶段1 - 入门（1-2周）：
+  □ 理解MCP协议架构
+  □ 搭建开发环境
+  □ 创建第一个MCP服务器
+  □ 创建MCP客户端连接
+
+阶段2 - 基础（2-3周）：
+  □ 掌握工具定义和注册
+  □ 实现资源管理
+  □ 使用提示模板
+  □ 错误处理和调试
+
+阶段3 - 中级（3-4周）：
+  □ 多工具组合使用
+  □ 采样机制深入理解
+  □ 性能优化实践
+  □ 安全实践实现
+
+阶段4 - 高级（4周+）：
+  □ 自定义传输层
+  □ 复杂工作流设计
+  □ 大规模部署
+  □ 贡献MCP生态系统
+"""
+
+print(MCP_LEARNING_ROADMAP)
+
+# 常用MCP服务器资源
+MCP_RESOURCES = """
+官方资源：
+- MCP文档：https://modelcontextprotocol.io/
+- Python SDK：pip install mcp
+- JavaScript SDK：npm install @modelcontextprotocol/sdk
+
+社区资源：
+- MCP Servers：https://github.com/anthropics/mcp-servers
+- Awesome MCP：https://github.com/punkpeye/awesome-mcp-servers
+
+推荐学习顺序：
+1. 官方快速开始指南
+2. 示例服务器代码
+3. 实际项目实践
+4. 参与社区讨论
+"""
+
+print(MCP_RESOURCES)</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

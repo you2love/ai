@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangChain开发指南 - AI技术学习平台</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">LangChain开发指南</h2>
+            <p class="section-subtitle">从入门到精通，掌握LLM应用开发框架</p>
+
+            <div class="code-sections">
+                <!-- LangChain简介 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>1. LangChain简介</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># LangChain开发指南
+#
+# LangChain是一个用于构建LLM应用的框架
+# 核心设计理念：组件化 + 链式调用 + 代理机制
+#
+# 核心组件：
+# 1. Models - 封装各种LLM接口
+# 2. Prompts - 提示词模板管理
+# 3. Chains - 链式调用组合
+# 4. Agents - 智能代理执行任务
+# 5. Memory - 对话状态持久化
+# 6. RAG - 检索增强生成
+# 7. Callbacks - 事件回调机制
+
+# 版本信息
+LANGCHAIN_VERSION = "0.2.x"
+
+# 核心优势
+LANGCHAIN_FEATURES = """
+1. 模型无关性 - 支持OpenAI, Anthropic, HuggingFace等
+2. 高度模块化 - 各组件可独立使用
+3. 丰富生态 - 大量预置组件和集成
+4. 生产就绪 - 企业级应用支持
+"""
+
+print(f"LangChain版本: {LANGCHAIN_VERSION}")
+print(f"核心特性:\n{LANGCHAIN_FEATURES}")</code></pre>
+                </div>
+
+                <!-- 环境配置 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>2. 环境配置与安装</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 安装LangChain及其集成包
+# pip install langchain langchain-openai langchain-anthropic
+
+# 基础导入
+from langchain_openai import ChatOpenAI
+from langchain_anthropic import ChatAnthropic
+from langchain_community.llms import HuggingFaceHub
+from langchain.schema import HumanMessage, SystemMessage, AIMessage
+from langchain.prompts import ChatPromptTemplate, PromptTemplate
+from langchain.chains import LLMChain, SequentialChain, ConversationChain
+from langchain.agents import AgentType, initialize_agent, load_tools
+from langchain.memory import ConversationBufferMemory, VectorStoreMemory
+from langchain_community.vectorstores import FAISS
+from langchain_openai import OpenAIEmbeddings
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import TextLoader, PDFLoader
+
+# 配置API密钥
+import os
+os.environ["OPENAI_API_KEY"] = "your-api-key"
+os.environ["ANTHROPIC_API_KEY"] = "your-api-key"
+os.environ["HUGGINGFACEHUB_API_TOKEN"] = "your-token"
+
+print("LangChain环境配置完成！")</code></pre>
+                </div>
+
+                <!-- 模型调用 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>3. 模型调用与封装</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 模型调用基础
+from langchain_openai import ChatOpenAI
+from langchain_anthropic import ChatAnthropic
+from langchain.schema import HumanMessage
+
+# OpenAI GPT-4
+gpt4 = ChatOpenAI(
+    model="gpt-4",
+    temperature=0.7,
+    max_tokens=2000,
+    streaming=True  # 启用流式输出
+)
+
+# OpenAI GPT-3.5-Turbo
+gpt35 = ChatOpenAI(
+    model="gpt-3.5-turbo",
+    temperature=0.3
+)
+
+# Anthropic Claude
+claude = ChatAnthropic(
+    model="claude-3-5-sonnet-20241022",
+    temperature=0.7,
+    max_tokens=4000
+)
+
+# 同步调用
+messages = [
+    HumanMessage(content="请用一句话介绍你自己")
+]
+response = gpt4.invoke(messages)
+print(f"GPT-4: {response.content}")
+
+# 流式调用
+print("\n流式输出: ", end="")
+for chunk in gpt4.stream(messages):
+    print(chunk.content, end="", flush=True)
+print()
+
+# 批量调用
+batch_messages = [
+    [HumanMessage(content="什么是AI？")],
+    [HumanMessage(content="什么是机器学习？")]
+]
+responses = gpt35.batch(batch_messages)
+for i, response in enumerate(responses):
+    print(f"响应{i+1}: {response.content[:100]}...")</code></pre>
+                </div>
+
+                <!-- 提示词模板 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>4. 提示词模板系统</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 提示词模板
+from langchain.prompts import ChatPromptTemplate, PromptTemplate
+from langchain.prompts.chat import SystemMessagePromptTemplate, HumanMessagePromptTemplate
+
+# 1. 简单提示词模板
+simple_template = PromptTemplate(
+    input_variables=["topic"],
+    template="请用100字介绍{topic}，使用通俗易懂的语言。"
+)
+
+topic = "区块链"
+prompt = simple_template.format(topic=topic)
+print(f"简单模板: {prompt}")
+
+# 2. 聊天提示词模板
+chat_template = ChatPromptTemplate.from_messages([
+    ("system", "你是一个专业的{role}，擅长解答关于{domain}的问题。"),
+    ("human", "{question}")
+])
+
+messages = chat_template.format_messages(
+    role="技术顾问",
+    domain="人工智能",
+    question="什么是Transformer架构？"
+)
+
+# 3. 带Few-shot的模板
+few_shot_template = ChatPromptTemplate.from_messages([
+    ("system", "你是一个情感分析助手。"),
+    ("human", "今天天气真好！"),
+    ("ai", "正面"),
+    ("human", "这电影太无聊了"),
+    ("ai", "负面"),
+    ("human", "{input_text}"),
+])
+
+# 4. 部分填充模板
+partial_template = PromptTemplate(
+    template="请为{product}写一段{type}的文案，目标是{goal}。",
+    input_variables=["product", "type"]
+)
+filled_template = partial_template.partial(product="智能手表", goal="提高销量")
+prompt = filled_template.format(type="广告语")
+print(f"部分填充: {prompt}")
+
+# 5. 提示词组合
+from langchain.prompts import PipelinePromptTemplate
+
+full_template = """{intro}
+主要部分: {body}
+结论: {conclusion}"""
+
+intro = PromptTemplate.from_template("你是{role}。")
+body = PromptTemplate.from_template("请详细解释{topic}。")
+conclusion = PromptTemplate.from_template("总结一下关键点。")
+
+pipeline_prompt = PipelinePromptTemplate(
+    final_prompt=full_template,
+    pipeline_prompts={
+        "intro": intro,
+        "body": body,
+        "conclusion": conclusion
+    }
+)
+
+print(pipeline_prompt.format(role="编程导师", topic="递归"))</code></pre>
+                </div>
+
+                <!-- 链式调用 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>5. 链式调用与组合</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 链式调用
+from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.chains import LLMChain, SequentialChain, TransformChain
+
+llm = ChatOpenAI(model="gpt-4", temperature=0.7)
+
+# 1. 简单链 - LLMChain
+prompt = ChatPromptTemplate.from_template(
+    "请为以下产品起三个有创意的名字：{product}"
+)
+chain = LLMChain(llm=llm, prompt=prompt)
+
+result = chain.invoke({"product": "智能水杯"})
+print(f"产品名称建议: {result['text']}")
+
+# 2. 顺序链 - SequentialChain
+first_prompt = ChatPromptTemplate.from_template(
+    "请用一句话总结以下文章：{article}"
+)
+first_chain = LLMChain(llm=llm, prompt=first_prompt, output_key="summary")
+
+second_prompt = ChatPromptTemplate.from_template(
+    "基于以下摘要写一段详细介绍：{summary}"
+)
+second_chain = LLMChain(llm=llm, prompt=second_prompt, output_key="detailed")
+
+sequential_chain = SequentialChain(
+    chains=[first_chain, second_chain],
+    input_variables=["article"],
+    output_variables=["summary", "detailed"]
+)
+
+article = "人工智能正在改变世界..."
+result = sequential_chain.invoke({"article": article})
+print(f"摘要: {result['summary']}")
+print(f"详细介绍: {result['detailed'][:200]}...")
+
+# 3. 转换链 - TransformChain
+def transform_func(inputs):
+    return {"output": inputs["text"].upper()}
+
+transform_chain = TransformChain(
+    input_variables=["text"],
+    output_variables=["output"],
+    transform=transform_func
+)
+
+# 4. 自定义链
+from langchain.chains import Chain
+
+class CustomChain(Chain):
+    def __init__(self, llm, **kwargs):
+        super().__init__(**kwargs)
+        self.llm = llm
+
+    @property
+    def input_keys(self):
+        return ["question"]
+
+    @property
+    def output_keys(self):
+        return ["answer", "confidence"]
+
+    def _call(self, inputs, **kwargs):
+        question = inputs["question"]
+        response = self.llm.invoke([HumanMessage(content=question)])
+        return {"answer": response.content, "confidence": 0.9}
+
+custom_chain = CustomChain(llm=llm)
+result = custom_chain.invoke({"question": "什么是机器学习？"})
+print(f"回答: {result['answer'][:100]}...")
+print(f"置信度: {result['confidence']}")</code></pre>
+                </div>
+
+                <!-- 记忆系统 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>6. 记忆与状态管理</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 记忆系统
+from langchain.memory import (
+    ConversationBufferMemory,
+    ConversationBufferWindowMemory,
+    ConversationSummaryMemory,
+    VectorStoreMemory,
+    EntityMemory
+)
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
+
+llm = ChatOpenAI(model="gpt-4")
+
+# 1. 简单缓冲记忆
+memory = ConversationBufferMemory()
+
+memory.save_context(
+    {"input": "我叫张三"},
+    {"output": "你好张三，很高兴认识你！"}
+)
+memory.save_context(
+    {"input": "我喜欢编程"},
+    {"output": "编程是一项很有价值的技能！"}
+)
+
+# 加载历史
+print("对话历史:")
+print(memory.load_memory_variables({}))
+
+# 2. 窗口记忆 - 保留最近N轮对话
+window_memory = ConversationBufferWindowMemory(k=3)
+
+# 3. 摘要记忆 - 自动生成对话摘要
+summary_memory = ConversationSummaryMemory(llm=llm)
+
+# 4. 向量存储记忆 - 支持语义搜索
+embeddings = OpenAIEmbeddings()
+vectorstore = FAISS.from_texts(["初始记忆"], embeddings)
+vectorstore_memory = VectorStoreMemory.from_existing_index(
+    vectorstore,
+    memory_key="history"
+)
+
+# 5. 实体记忆 - 跟踪实体信息
+entity_memory = EntityMemory(llm=llm)
+
+# 6. 带记忆的对话链
+from langchain.chains import ConversationChain
+
+conversation = ConversationChain(
+    llm=llm,
+    memory=ConversationBufferMemory(),
+    verbose=True
+)
+
+response = conversation.invoke({"input": "你好！"})
+print(response["response"])
+
+response = conversation.invoke({"input": "我昨天学完了Python基础"})
+print(response["response"])
+
+# 查看记忆内容
+print("\n记忆内容:")
+print(memory.load_memory_variables({})["history"])</code></pre>
+                </div>
+
+                <!-- RAG检索增强 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>7. RAG检索增强生成</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># RAG检索增强生成
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS, Chroma
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.chains import RetrievalQA, ConversationalRetrievalChain
+from langchain.document_loaders import TextLoader, PDFLoader, DirectoryLoader
+from langchain.schema import Document
+
+llm = ChatOpenAI(model="gpt-4")
+embeddings = OpenAIEmbeddings()
+
+# 1. 文档加载
+loader = TextLoader("docs/article.txt")
+documents = loader.load()
+
+# 2. 文档分割
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=1000,
+    chunk_overlap=200,
+    separators=["\n\n", "\n", "。", "！", "？", "；", " "]
+)
+split_docs = text_splitter.split_documents(documents)
+print(f"分割后文档数量: {len(split_docs)}")
+
+# 3. 创建向量索引
+vectorstore = FAISS.from_documents(split_docs, embeddings)
+
+# 4. 检索器配置
+retriever = vectorstore.as_retriever(
+    search_type="similarity",  # similarity, mmr, similarity_score_threshold
+    search_kwargs={
+        "k": 4,  # 返回结果数量
+        "score_threshold": 0.8  # 相似度阈值
+    }
+)
+
+# 5. 基础RAG链
+qa_chain = RetrievalQA.from_chain_type(
+    llm=llm,
+    chain_type="stuff",  # stuff, map_reduce, refine, map_rerank
+    retriever=retriever,
+    return_source_documents=True
+)
+
+# 执行问答
+question = "文章主要讲了什么？"
+result = qa_chain.invoke({"query": question})
+print(f"答案: {result['result']}")
+print(f"来源文档数: {len(result['source_documents'])}")
+
+# 6. 对话式RAG
+conversational_chain = ConversationalRetrievalChain.from_llm(
+    llm=llm,
+    retriever=retriever,
+    memory=ConversationBufferMemory(),
+    return_source_documents=True
+)
+
+# 7. 不同chain_type对比
+# Stuff: 将所有文档拼接到一起（适用于少量文档）
+# Map-Reduce: 对每个文档单独总结，再合并
+# Refine: 逐个文档迭代优化答案
+# Map-Rerank: 对每个文档打分，选择最佳答案
+
+map_reduce_chain = RetrievalQA.from_chain_type(
+    llm=llm,
+    chain_type="map_reduce",
+    retriever=retriever
+)
+
+# 8. 自定义RAG链
+from langchain.chains import LLMChain
+from langchain.prompts import ChatPromptTemplate
+
+template = """根据以下上下文回答问题。如果无法从上下文中找到答案，请说"根据提供的信息，我无法回答这个问题"。
+
+上下文：
+{context}
+
+问题：{question}
+"""
+
+prompt = ChatPromptTemplate.from_template(template)
+
+def format_docs(docs):
+    return "\n\n".join([d.page_content for d in docs])
+
+custom_rag_chain = (
+    {"context": retriever | format_docs, "question": lambda x: x["question"]}
+    | prompt
+    | llm
+    | (lambda x: {"answer": x.content})
+)
+
+result = custom_rag_chain.invoke({"question": "详细说明一下..."})</code></pre>
+                </div>
+
+                <!-- 代理系统 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>8. 代理与工具集成</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 代理系统
+from langchain.agents import AgentType, initialize_agent, create_react_agent
+from langchain_openai import ChatOpenAI, OpenAI
+from langchain.tools import Tool, StructuredTool
+from langchain_community.utilities import SerpAPIWrapper, WikipediaAPIWrapper
+from langchain_experimental.utilities import PythonREPL
+
+llm = ChatOpenAI(model="gpt-4-turbo", temperature=0)
+
+# 1. 内置工具
+tools = load_tools(["serpapi", "wikipedia", "llm-math"], llm=llm)
+
+# 2. 自定义工具
+def calculate_circle_area(radius: float) -> str:
+    """计算圆的面积。输入半径，返回面积。"""
+    import math
+    area = math.pi * radius ** 2
+    return f"半径为{radius}的圆面积是{area:.2f}"
+
+def get_weather(city: str) -> str:
+    """获取城市天气信息"""
+    weather_data = {
+        "北京": "晴，25°C",
+        "上海": "多云，22°C",
+        "广州": "雨，28°C"
+    }
+    return weather_data.get(city, "未知城市")
+
+def search_web(query: str) -> str:
+    """网络搜索工具"""
+    return f"搜索'{query}'的结果..."
+
+# 注册工具
+custom_tools = [
+    StructuredTool.from_function(
+        fn=calculate_circle_area,
+        name="calculate_area",
+        description="计算几何图形面积"
+    ),
+    StructuredTool.from_function(
+        fn=get_weather,
+        name="get_weather",
+        description="获取城市天气"
+    ),
+    Tool(
+        name="search",
+        func=search_web,
+        description="用于搜索网络信息"
+    )
+]
+
+# 3. 初始化代理
+agent = initialize_agent(
+    tools=custom_tools,
+    llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,  # 零样本推理
+    verbose=True,
+    max_iterations=5,
+    early_stopping_method="generate"
+)
+
+# 执行任务
+response = agent.invoke("北京的天气怎么样？")
+print(f"回答: {response['output']}")
+
+response = agent.invoke("计算半径为5的圆的面积")
+print(f"回答: {response['output']}")
+
+# 4. ReAct代理
+from langchain import hub
+
+prompt = hub.pull("hwchase17/react")
+tools = [calculate_circle_area, get_weather]
+
+react_agent = create_react_agent(llm, tools, prompt)
+react_chain = AgentExecutor(agent=react_agent, tools=tools, verbose=True)
+
+# 5. 计划-执行代理
+from langchain_experimental.plan_and_execute import PlanAndExecuteAgentExecutor, load_chat_planner
+
+planner = load_chat_planner(llm)
+executor = AgentExecutor(agent=react_agent, tools=tools)
+
+plan_execute_agent = PlanAndExecuteAgentExecutor(
+    planner=planner,
+    executor=executor,
+    verbose=True
+)
+
+# 6. 自定义工具类
+from langchain.tools import BaseTool
+from pydantic import BaseModel, Field
+
+class CalculateInput(BaseModel):
+    operation: str = Field(..., description="运算操作: add, subtract, multiply, divide")
+    a: float = Field(..., description="第一个数")
+    b: float = Field(..., description="第二个数")
+
+class CalculatorTool(BaseTool):
+    name = "calculator"
+    description = "执行基本数学运算"
+    args_schema = CalculateInput
+
+    def _run(self, operation: str, a: float, b: float):
+        operations = {
+            "add": lambda x, y: x + y,
+            "subtract": lambda x, y: x - y,
+            "multiply": lambda x, y: x * y,
+            "divide": lambda x, y: x / y if y != 0 else "Error"
+        }
+        return operations.get(operation, lambda x, y: "Unknown operation")(a, b)
+
+calculator = CalculatorTool()</code></pre>
+                </div>
+
+                <!-- 回调与监控 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>9. 回调与事件处理</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 回调系统
+from langchain.callbacks.base import BaseCallbackHandler
+from langchain.callbacks.tracers import LangChainTracer
+from langchain.callbacks.manager import CallbackManager
+from langchain_openai import ChatOpenAI
+
+# 1. 自定义回调处理器
+class LoggingCallback(BaseCallbackHandler):
+    def on_llm_start(self, serialized, prompts, **kwargs):
+        print(f"LLM开始处理...")
+        print(f"提示词: {prompts[-1][:100]}...")
+
+    def on_llm_end(self, response, **kwargs):
+        print(f"LLM处理完成")
+        print(f"响应长度: {len(response.content) if hasattr(response, 'content') else 'N/A'}")
+
+    def on_llm_error(self, error, **kwargs):
+        print(f"LLM错误: {error}")
+
+    def on_chain_start(self, serialized, inputs, **kwargs):
+        print(f"链开始执行: {serialized.get('name', 'Unknown')}")
+
+    def on_chain_end(self, outputs, **kwargs):
+        print(f"链执行完成")
+
+    def on_tool_start(self, serialized, inputs, **kwargs):
+        print(f"工具开始: {serialized.get('name', 'Unknown')}")
+
+    def on_tool_end(self, output, **kwargs):
+        print(f"工具完成: {output[:100] if isinstance(output, str) else output}...")
+
+# 使用回调
+callback_handler = LoggingCallback()
+callback_manager = CallbackManager([callback_handler])
+
+llm = ChatOpenAI(
+    model="gpt-4",
+    callback_manager=callback_manager,
+    verbose=True
+)
+
+# 2. 追踪器 - LangSmith集成
+from langchain.callbacks.tracers import LangChainTracer
+from langchain import hub
+
+# 设置LangSmith
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_API_KEY"] = "your-langsmith-key"
+os.environ["LANGCHAIN_PROJECT"] = "my-project"
+
+tracer = LangChainTracer(project_name="my-project")
+
+# 在链中使用追踪器
+prompt = hub.pull("hwchase17/react")
+llm_with_tracer = ChatOpenAI(callback_manager=CallbackManager([tracer]))
+
+# 3. 上下文回调
+from langchain.callbacks.manager import enter_new_context, exit_all_context
+
+callback_manager = CallbackManager([])
+llm = ChatOpenAI()
+
+# 进入新上下文
+with enter_new_context(callback_manager):
+    response = llm.invoke("Hello!")
+
+# 4. 流式回调
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+
+streaming_handler = StreamingStdOutCallbackHandler()
+llm = ChatOpenAI(streaming=True, callbacks=[streaming_handler])
+
+for chunk in llm.stream("写一首诗"):
+    print(chunk.content, end="", flush=True)
+print()
+
+# 5. 进度回调
+class ProgressCallback(BaseCallbackHandler):
+    def __init__(self):
+        self.progress = 0
+
+    def on_llm_new_token(self, token, **kwargs):
+        self.progress += 1
+        if self.progress % 10 == 0:
+            print(f"已生成 {self.progress} 个token...", end="\r")
+
+progress_cb = ProgressCallback()
+llm = ChatOpenAI(callbacks=[progress_cb])</code></pre>
+                </div>
+
+                <!-- 生产实践 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>10. 生产环境最佳实践</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 生产环境配置
+from langchain_openai import ChatOpenAI
+from langchain_community.chat_models import BedrockChat
+from langchain_anthropic import ChatAnthropic
+from langchain.callbacks.base import BaseCallbackHandler
+from langchain.globals import set_verbose, set_debug
+from tenacity import retry, stop_after_attempt, wait_exponential
+
+# 1. 多模型负载均衡
+class ModelRouter:
+    def __init__(self):
+        self.models = {
+            "fast": ChatOpenAI(model="gpt-3.5-turbo"),
+            "smart": ChatOpenAI(model="gpt-4"),
+            "claude": ChatAnthropic(model="claude-3-5-sonnet")
+        }
+
+    def route(self, task_complexity: str) -> ChatOpenAI:
+        if task_complexity == "simple":
+            return self.models["fast"]
+        elif task_complexity == "complex":
+            return self.models["smart"]
+        return self.models["claude"]
+
+router = ModelRouter()
+
+# 2. 重试机制
+class RetryCallback(BaseCallbackHandler):
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1))
+    def call_with_retry(self, chain, inputs):
+        return chain.invoke(inputs)
+
+# 3. 速率限制
+import asyncio
+from typing import AsyncIterator
+
+class RateLimiter:
+    def __init__(self, rate: int, per: float):
+        self.rate = rate
+        self.per = per
+        self.tokens = rate
+        self.last_update = asyncio.get_event_loop().time()
+
+    async def acquire(self):
+        now = asyncio.get_event_loop().time()
+        time_passed = now - self.last_update
+        self.tokens = min(self.rate, self.tokens + time_passed * self.rate / self.per)
+        if self.tokens >= 1:
+            self.tokens -= 1
+            self.last_update = now
+            return
+        await asyncio.sleep((1 - self.tokens) * self.per / self.rate)
+
+# 4. 配置管理
+from langchain_core.runnables import ConfigurableField
+
+llm = ChatOpenAI(
+    model="gpt-4",
+    temperature=0.7
+).configurable_alternatives(
+    ConfigurableField(id="model"),
+    default_key="gpt4",
+    gpt35=ChatOpenAI(model="gpt-3.5-turbo"),
+    claude=ChatAnthropic(model="claude-3-5-sonnet")
+)
+
+# 5. 部署配置
+# 使用LangServe部署为API服务
+"""
+# server.py
+from fastapi import FastAPI
+from langserve import add_routes
+
+app = FastAPI()
+
+add_routes(app, qa_chain, path="/qa")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+"""
+
+# 6. 监控指标
+class MetricsCallback(BaseCallbackHandler):
+    def __init__(self):
+        self.metrics = {
+            "total_requests": 0,
+            "total_tokens": 0,
+            "total_latency": 0,
+            "errors": 0
+        }
+
+    def on_llm_end(self, response, **kwargs):
+        if hasattr(response, 'response_metadata'):
+            usage = response.response_metadata.get('token_usage', {})
+            self.metrics["total_tokens"] += usage.get('total_tokens', 0)
+        self.metrics["total_requests"] += 1
+
+# 7. 环境配置
+ENV_CONFIG = {
+    "development": {
+        "model": "gpt-3.5-turbo",
+        "temperature": 0.7,
+        "verbose": True
+    },
+    "production": {
+        "model": "gpt-4",
+        "temperature": 0.3,
+        "verbose": False
+    }
+}
+
+# 8. 安全性考虑
+# - API密钥管理：使用环境变量或密钥管理服务
+# - 输入验证：防止提示词注入
+# - 输出过滤：防止敏感信息泄露
+# - 速率限制：防止滥用
+# - 日志审计：记录所有请求
+
+print("LangChain生产环境配置完成！")</code></pre>
+                </div>
+
+                <!-- 完整应用示例 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>11. 完整应用：AI助手系统</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 完整AI助手系统实现
+from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.chains import ConversationChain, LLMChain
+from langchain.memory import ConversationBufferMemory, VectorStoreMemory
+from langchain.agents import AgentType, initialize_agent
+from langchain_community.vectorstores import FAISS
+from langchain_openai import OpenAIEmbeddings
+
+class AIAssistant:
+    def __init__(self, api_key: str):
+        os.environ["OPENAI_API_KEY"] = api_key
+
+        # 初始化LLM
+        self.llm = ChatOpenAI(
+            model="gpt-4",
+            temperature=0.7,
+            streaming=True
+        )
+
+        # 初始化记忆
+        self.memory = ConversationBufferMemory()
+
+        # 初始化工具
+        self.tools = self._load_tools()
+
+        # 初始化代理
+        self.agent = initialize_agent(
+            self.tools,
+            self.llm,
+            agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
+            memory=self.memory,
+            verbose=False
+        )
+
+        # 系统提示词
+        self.system_prompt = """你是一个智能AI助手，名字叫小助手。
+
+你的职责：
+1. 回答用户的问题
+2. 帮助用户解决问题
+3. 提供有用的建议
+
+请始终保持友好、专业、有帮助的态度。"""
+
+    def _load_tools(self):
+        """加载工具"""
+        return [
+            {
+                "name": "search",
+                "description": "搜索网络信息",
+                "func": lambda x: f"搜索结果: {x}"
+            },
+            {
+                "name": "calculator",
+                "description": "计算数学表达式",
+                "func": lambda x: eval(x) if x.replace(" ", "").replace("+", "").replace("-", "").replace("*", "").replace("/", "").isdigit() else "Invalid expression"
+            }
+        ]
+
+    def chat(self, message: str) -> str:
+        """对话接口"""
+        response = self.agent.invoke({"input": message})
+        return response["output"]
+
+    def get_history(self) -> list:
+        """获取对话历史"""
+        return self.memory.load_memory_variables({})["history"]
+
+    def clear_history(self):
+        """清空对话历史"""
+        self.memory.clear()
+
+# 使用示例
+if __name__ == "__main__":
+    assistant = AIAssistant(api_key="your-api-key")
+
+    # 对话
+    print("Assistant: 你好！我是小助手，有什么可以帮你的？")
+
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() in ["quit", "exit", "bye"]:
+            print("Assistant: 再见！")
+            break
+
+        response = assistant.chat(user_input)
+        print(f"Assistant: {response}")</code></pre>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</body>
+</html>

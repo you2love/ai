@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A2A协议详解 - AI技术学习平台</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">A2A协议详解</h2>
+            <p class="section-subtitle">从入门到精通，掌握Agent-to-Agent通信协议</p>
+
+            <div class="code-sections">
+                <!-- 什么是A2A -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>1. 什么是A2A协议？</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># A2A (Agent-to-Agent) 协议详解
+#
+# A2A是Anthropic于2025年发布的开放协议
+# 它为AI智能体之间的通信和协作提供了标准化框架
+#
+# A2A的核心目标：
+# 1. 智能体发现 - 动态发现可用的智能体服务
+# 2. 任务委托 - 智能体之间可以互相委托任务
+# 3. 结果传递 - 任务结果可以在智能体间传递
+# 4. 协作编排 - 支持复杂的多智能体工作流
+#
+# A2A vs MCP：
+# - MCP：智能体与工具/资源的通信
+# - A2A：智能体与智能体之间的通信
+
+# A2A协议架构
+A2A_ARCHITECTURE = """
+┌─────────────────────────────────────────────────────────┐
+│                   A2A Protocol Layer                    │
+├─────────────────────────────────────────────────────────┤
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐│
+│  │ Agent A  │◄─►│ Agent B  │◄─►│ Agent C  │◄─►│ Agent D  ││
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘│
+│       │              │              │              │        │
+│       └──────────────┴──────────────┴──────────────┘        │
+│                         │                                      │
+│              ┌─────────┴─────────┐                            │
+│              │   Agent Registry  │                            │
+│              │   (服务发现)       │                            │
+│              └───────────────────┘                            │
+└─────────────────────────────────────────────────────────┘
+"""
+
+print("A2A协议的核心设计理念：")
+print("1. 让AI智能体能够互相发现和通信")
+print("2. 支持任务委托和结果共享")
+print("3. 实现复杂的多智能体协作")
+print("4. 提供安全可控的智能体网络")</code></pre>
+                </div>
+
+                <!-- A2A基础架构 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>2. A2A协议基础架构</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># A2A协议基础架构实现
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+import uuid
+import json
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class AgentState(Enum):
+    IDLE = "idle"
+    BUSY = "busy"
+    OFFLINE = "offline"
+    ERROR = "error"
+
+class TaskStatus(Enum):
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+
+@dataclass
+class AgentInfo:
+    """智能体信息"""
+    agent_id: str
+    name: str
+    description: str
+    capabilities: List[str]
+    endpoint: str
+    state: AgentState = AgentState.IDLE
+    metadata: Dict = field(default_factory=dict)
+
+@dataclass
+class Task:
+    """任务"""
+    task_id: str
+    task_type: str
+    description: str
+    parameters: Dict[str, Any]
+    source_agent: str
+    target_agent: str
+    status: TaskStatus = TaskStatus.PENDING
+    created_at: datetime = field(default_factory=datetime.now)
+    completed_at: datetime = None
+    result: Any = None
+    error: str = None
+
+@dataclass
+class Message:
+    """A2A消息"""
+    message_id: str
+    message_type: str  # task_request, task_response, task_update, etc.
+    sender: str
+    receiver: str
+    content: Dict
+    timestamp: datetime = field(default_factory=datetime.now)
+    correlation_id: str = None
+
+class BaseA2AAgent(ABC):
+    """A2A智能体基类"""
+
+    def __init__(self, name: str, capabilities: List[str]):
+        self.agent_id = str(uuid.uuid4())[:8]
+        self.name = name
+        self.capabilities = capabilities
+        self.state = AgentState.IDLE
+        self.incoming_queue: List[Message] = []
+        self.outgoing_queue: List[Message] = []
+        self.task_history: Dict[str, Task] = {}
+        self.neighbors: Dict[str, 'BaseA2AAgent'] = {}
+        self.registry = None
+
+    def get_agent_info(self) -> AgentInfo:
+        """获取智能体信息"""
+        return AgentInfo(
+            agent_id=self.agent_id,
+            name=self.name,
+            description=self._get_description(),
+            capabilities=self.capabilities,
+            endpoint=self._get_endpoint(),
+            state=self.state,
+            metadata=self._get_metadata()
+        )
+
+    @abstractmethod
+    def _get_description(self) -> str:
+        pass
+
+    @abstractmethod
+    def _get_endpoint(self) -> str:
+        pass
+
+    def _get_metadata(self) -> Dict:
+        return {}
+
+    def register_to_registry(self, registry: 'AgentRegistry'):
+        """注册到智能体注册中心"""
+        self.registry = registry
+        registry.register(self)
+        logger.info(f"Agent {self.name} registered to registry")
+
+    def discover_neighbors(self, registry: 'AgentRegistry', capabilities: List[str] = None):
+        """发现邻居智能体"""
+        agents = registry.list_agents(capabilities=capabilities)
+        for agent in agents:
+            if agent.agent_id != self.agent_id:
+                self.neighbors[agent.agent_id] = agent
+        logger.info(f"Discovered {len(self.neighbors)} neighbor agents")
+
+    async def send_message(self, receiver_id: str, message_type: str, content: Dict, correlation_id: str = None):
+        """发送消息"""
+        message = Message(
+            message_id=str(uuid.uuid4()),
+            message_type=message_type,
+            sender=self.agent_id,
+            receiver=receiver_id,
+            content=content,
+            correlation_id=correlation_id
+        )
+        self.outgoing_queue.append(message)
+        logger.info(f"Message sent to {receiver_id}: {message_type}")
+
+    async def receive_message(self, message: Message):
+        """接收消息"""
+        self.incoming_queue.append(message)
+        logger.info(f"Message received from {message.sender}: {message.message_type}")
+        await self._process_message(message)
+
+    async def _process_message(self, message: Message):
+        """处理消息"""
+        if message.message_type == "task_request":
+            await self._handle_task_request(message)
+        elif message.message_type == "task_update":
+            await self._handle_task_update(message)
+        elif message.message_type == "task_cancel":
+            await self._handle_task_cancel(message)
+        elif message.message_type == "capability_query":
+            await self._handle_capability_query(message)
+
+    @abstractmethod
+    async def _handle_task_request(self, message: Message):
+        pass
+
+    async def _handle_task_update(self, message: Message):
+        """处理任务更新"""
+        task_id = message.content.get("task_id")
+        status = message.content.get("status")
+        logger.info(f"Task {task_id} status updated: {status}")
+
+    async def _handle_task_cancel(self, message: Message):
+        """处理任务取消"""
+        task_id = message.content.get("task_id")
+        task = self.task_history.get(task_id)
+        if task:
+            task.status = TaskStatus.CANCELLED
+            logger.info(f"Task {task_id} cancelled")
+
+    async def _handle_capability_query(self, message: Message):
+        """处理能力查询"""
+        await self.send_message(
+            receiver_id=message.sender,
+            message_type="capability_response",
+            content={"agent_id": self.agent_id, "capabilities": self.capabilities}
+        )
+
+    async def delegate_task(self, target_agent_id: str, task_type: str, description: str, parameters: Dict) -> str:
+        """委托任务给其他智能体"""
+        task = Task(
+            task_id=str(uuid.uuid4()),
+            task_type=task_type,
+            description=description,
+            parameters=parameters,
+            source_agent=self.agent_id,
+            target_agent=target_agent_id,
+            status=TaskStatus.PENDING
+        )
+        self.task_history[task.task_id] = task
+
+        await self.send_message(
+            receiver_id=target_agent_id,
+            message_type="task_request",
+            content={
+                "task_id": task.task_id,
+                "task_type": task_type,
+                "description": description,
+                "parameters": parameters
+            },
+            correlation_id=task.task_id
+        )
+
+        return task.task_id
+
+    def get_status(self) -> Dict:
+        """获取状态"""
+        return {
+            "agent_id": self.agent_id,
+            "name": self.name,
+            "state": self.state.value,
+            "capabilities": self.capabilities,
+            "neighbors_count": len(self.neighbors),
+            "tasks_completed": sum(1 for t in self.task_history.values() if t.status == TaskStatus.COMPLETED)
+        }
+
+# 使用示例
+class AssistantAgent(BaseA2AAgent):
+    """助手智能体"""
+
+    def __init__(self, name: str):
+        super().__init__(name, capabilities=["chat", "task_planning", "coordination"])
+        self.role = "assistant"
+
+    def _get_description(self) -> str:
+        return "通用助手智能体，支持对话、任务规划和协调"
+
+    def _get_endpoint(self) -> str:
+        return f"agent://{self.name.lower().replace(' ', '_')}"
+
+    async def _handle_task_request(self, message: Message):
+        """处理任务请求"""
+        content = message.content
+        task_id = content.get("task_id")
+        task_type = content.get("task_type")
+
+        self.state = AgentState.BUSY
+
+        task = self.task_history.get(task_id)
+        if task:
+            task.status = TaskStatus.IN_PROGRESS
+
+            # 根据任务类型处理
+            if task_type == "chat":
+                result = await self._handle_chat_task(content.get("parameters", {}))
+            elif task_type == "coordination":
+                result = await self._handle_coordination_task(content.get("parameters", {}))
+            else:
+                result = {"status": "unknown_task_type", "task_type": task_type}
+
+            task.result = result
+            task.status = TaskStatus.COMPLETED
+            task.completed_at = datetime.now()
+
+            # 发送结果
+            await self.send_message(
+                receiver_id=message.sender,
+                message_type="task_response",
+                content={
+                    "task_id": task_id,
+                    "status": "completed",
+                    "result": result
+                },
+                correlation_id=task_id
+            )
+
+        self.state = AgentState.IDLE
+
+    async def _handle_chat_task(self, params: Dict) -> Dict:
+        return {"response": f"助手回复: {params.get('message', '')}"}
+
+    async def _handle_coordination_task(self, params: Dict) -> Dict:
+        return {"status": "coordinated", "details": params}</code></pre>
+                </div>
+
+                <!-- A2A智能体注册中心 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>3. A2A智能体注册中心</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># A2A智能体注册中心 - 智能体发现和服务注册
+from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime
+import json
+
+@dataclass
+class RegistryEntry:
+    """注册表条目"""
+    agent: BaseA2AAgent
+    registered_at: datetime
+    last_heartbeat: datetime
+    health_score: float = 1.0
+
+class AgentRegistry:
+    """智能体注册中心"""
+
+    def __init__(self, name: str = "A2A Registry"):
+        self.name = name
+        self.agents: Dict[str, RegistryEntry] = {}
+        self.service_index: Dict[str, List[str]] = {}  # capability -> agent_ids
+
+    def register(self, agent: BaseA2AAgent) -> bool:
+        """注册智能体"""
+        if agent.agent_id in self.agents:
+            logger.warning(f"Agent {agent.agent_id} already registered")
+            return False
+
+        entry = RegistryEntry(
+            agent=agent,
+            registered_at=datetime.now(),
+            last_heartbeat=datetime.now()
+        )
+        self.agents[agent.agent_id] = entry
+
+        # 更新服务索引
+        for capability in agent.capabilities:
+            if capability not in self.service_index:
+                self.service_index[capability] = []
+            self.service_index[capability].append(agent.agent_id)
+
+        logger.info(f"Agent {agent.name} registered successfully")
+        return True
+
+    def unregister(self, agent_id: str) -> bool:
+        """取消注册"""
+        if agent_id not in self.agents:
+            return False
+
+        agent = self.agents[agent_id].agent
+
+        # 从服务索引中移除
+        for capability in agent.capabilities:
+            if capability in self.service_index and agent_id in self.service_index[capability]:
+                self.service_index[capability].remove(agent_id)
+
+        del self.agents[agent_id]
+        logger.info(f"Agent {agent_id} unregistered")
+        return True
+
+    def list_agents(self, capabilities: List[str] = None, state: str = None) -> List[AgentInfo]:
+        """列出智能体"""
+        results = []
+
+        for agent_id, entry in self.agents.items():
+            # 过滤：能力
+            if capabilities:
+                if not all(cap in entry.agent.capabilities for cap in capabilities):
+                    continue
+
+            # 过滤：状态
+            if state and entry.agent.state.value != state:
+                continue
+
+            results.append(entry.agent.get_agent_info())
+
+        return results
+
+    def find_agent(self, agent_id: str) -> Optional[AgentInfo]:
+        """查找智能体"""
+        entry = self.agents.get(agent_id)
+        return entry.agent.get_agent_info() if entry else None
+
+    def find_by_capability(self, capability: str) -> List[AgentInfo]:
+        """根据能力查找"""
+        agent_ids = self.service_index.get(capability, [])
+        return [self.agents[aid].agent.get_agent_info() for aid in agent_ids if aid in self.agents]
+
+    def get_best_agent(self, capabilities: List[str], strategy: str = "random") -> Optional[AgentInfo]:
+        """获取最佳智能体"""
+        candidates = self.list_agents(capabilities=capabilities, state="idle")
+
+        if not candidates:
+            return None
+
+        if strategy == "random":
+            import random
+            return random.choice(candidates)
+        elif strategy == "least_busy":
+            return min(candidates, key=lambda a: self.agents[a.agent_id].health_score)
+        elif strategy == "round_robin":
+            # 简化的轮询实现
+            return candidates[0]
+
+        return candidates[0]
+
+    def heartbeat(self, agent_id: str) -> bool:
+        """心跳"""
+        if agent_id not in self.agents:
+            return False
+
+        self.agents[agent_id].last_heartbeat = datetime.now()
+        return True
+
+    def cleanup_stale_agents(self, max_age_seconds: float = 300) -> int:
+        """清理不活跃的智能体"""
+        from datetime import timedelta
+        cutoff = datetime.now() - timedelta(seconds=max_age_seconds)
+
+        stale = [
+            aid for aid, entry in self.agents.items()
+            if entry.last_heartbeat < cutoff
+        ]
+
+        for aid in stale:
+            self.unregister(aid)
+
+        return len(stale)
+
+    def export_registry(self) -> Dict:
+        """导出注册表"""
+        return {
+            "name": self.name,
+            "total_agents": len(self.agents),
+            "agents": [
+                {
+                    "id": info.agent_id,
+                    "name": info.name,
+                    "capabilities": info.capabilities,
+                    "state": info.state.value
+                }
+                for info in self.list_agents()
+            ]
+        }
+
+# 使用示例
+async def registry_demo():
+    registry = AgentRegistry("主注册中心")
+
+    # 创建智能体
+    agents = [
+        AssistantAgent("助手A"),
+        AssistantAgent("助手B"),
+        AssistantAgent("助手C")
+    ]
+
+    # 注册智能体
+    for agent in agents:
+        agent.register_to_registry(registry)
+
+    print("=== A2A注册中心示例 ===")
+    print(f"已注册 {len(registry.list_agents())} 个智能体")
+
+    # 查找能力
+    results = registry.find_by_capability("chat")
+    print(f"\n支持'chat'能力的智能体: {len(results)} 个")
+    for r in results:
+        print(f"  - {r.name} ({r.agent_id})")
+
+    # 导出注册表
+    export = registry.export_registry()
+    print(f"\n注册表信息:")
+    print(json.dumps(export, ensure_ascii=False, indent=2))</code></pre>
+                </div>
+
+                <!-- A2A任务委托 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>4. A2A任务委托机制</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># A2A任务委托和执行
+from typing import Any, Dict, List, Optional, Callable
+from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
+import asyncio
+import uuid
+
+class TaskPriority(Enum):
+    LOW = 1
+    NORMAL = 2
+    HIGH = 3
+    URGENT = 4
+
+@dataclass
+class TaskRequest:
+    """任务请求"""
+    task_id: str
+    task_type: str
+    description: str
+    parameters: Dict[str, Any]
+    source_agent: str
+    priority: TaskPriority = TaskPriority.NORMAL
+    deadline: datetime = None
+    dependencies: List[str] = None
+    callbacks: Dict[str, Callable] = None
+    context: Dict = None
+
+@dataclass
+class TaskResult:
+    """任务结果"""
+    task_id: str
+    success: bool
+    data: Any = None
+    error: str = None
+    execution_time: float = 0
+    metadata: Dict = None
+
+class TaskManager:
+    """任务管理器"""
+
+    def __init__(self, agent: BaseA2AAgent):
+        self.agent = agent
+        self.pending_tasks: Dict[str, TaskRequest] = {}
+        self.running_tasks: Dict[str, TaskRequest] = {}
+        self.completed_tasks: Dict[str, TaskResult] = {}
+        self.task_queue: asyncio.Queue = asyncio.Queue()
+        self.workers: List[asyncio.Task] = []
+        self.max_concurrent = 3
+        self._running = False
+
+    async def start(self, num_workers: int = 3):
+        """启动任务管理器"""
+        self._running = True
+        self.max_concurrent = num_workers
+
+        # 启动工作协程
+        for i in range(num_workers):
+            worker = asyncio.create_task(self._worker(f"Worker-{i}"))
+            self.workers.append(worker)
+
+        logger.info(f"Task manager started with {num_workers} workers")
+
+    async def stop(self):
+        """停止任务管理器"""
+        self._running = False
+        for worker in self.workers:
+            worker.cancel()
+        await asyncio.gather(*self.workers, return_exceptions=True)
+        logger.info("Task manager stopped")
+
+    async def submit_task(self, request: TaskRequest) -> str:
+        """提交任务"""
+        self.pending_tasks[request.task_id] = request
+        await self.task_queue.put(request)
+        logger.info(f"Task submitted: {request.task_id}")
+        return request.task_id
+
+    async def _worker(self, name: str):
+        """工作协程"""
+        while self._running:
+            try:
+                request = await asyncio.wait_for(
+                    self.task_queue.get(),
+                    timeout=1.0
+                )
+
+                # 检查并发限制
+                while len(self.running_tasks) >= self.max_concurrent:
+                    await asyncio.sleep(0.1)
+
+                await self._execute_task(name, request)
+
+            except asyncio.TimeoutError:
+                continue
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Worker {name} error: {e}")
+
+    async def _execute_task(self, worker_name: str, request: TaskRequest):
+        """执行任务"""
+        request.status = "running"
+        self.running_tasks[request.task_id] = request
+        del self.pending_tasks[request.task_id]
+
+        start_time = datetime.now()
+
+        try:
+            # 执行任务
+            if self.agent.neighbors:
+                # 可以委托给其他智能体
+                result_data = await self._delegate_or_execute(request)
+            else:
+                # 本地执行
+                result_data = await self._execute_locally(request)
+
+            execution_time = (datetime.now() - start_time).total_seconds()
+
+            result = TaskResult(
+                task_id=request.task_id,
+                success=True,
+                data=result_data,
+                execution_time=execution_time
+            )
+
+            # 执行回调
+            if request.callbacks and "on_success" in request.callbacks:
+                await request.callbacks["on_success"](result)
+
+        except Exception as e:
+            execution_time = (datetime.now() - start_time).total_seconds()
+
+            result = TaskResult(
+                task_id=request.task_id,
+                success=False,
+                error=str(e),
+                execution_time=execution_time
+            )
+
+            if request.callbacks and "on_failure" in request.callbacks:
+                await request.callbacks["on_failure"](result)
+
+        self.completed_tasks[request.task_id] = result
+        del self.running_tasks[request.task_id]
+
+        logger.info(f"Task {request.task_id} completed: {result.success}")
+
+    async def _delegate_or_execute(self, request: TaskRequest) -> Dict:
+        """委托或本地执行"""
+        # 检查是否可以委托给邻居
+        for neighbor_id, neighbor in self.agent.neighbors.items():
+            if any(cap in neighbor.capabilities for cap in self.agent.capabilities):
+                # 委托给邻居
+                delegated_task_id = await self.agent.delegate_task(
+                    target_agent_id=neighbor_id,
+                    task_type=request.task_type,
+                    description=request.description,
+                    parameters=request.parameters
+                )
+                return {"delegated_to": neighbor_id, "delegated_task_id": delegated_task_id}
+
+        # 本地执行
+        return await self._execute_locally(request)
+
+    async def _execute_locally(self, request: TaskRequest) -> Dict:
+        """本地执行任务"""
+        # 模拟任务执行
+        await asyncio.sleep(0.1)  # 模拟处理时间
+
+        return {
+            "status": "completed",
+            "task_type": request.task_type,
+            "processed_by": self.agent.name,
+            "parameters": request.parameters
+        }
+
+    async def get_task_status(self, task_id: str) -> Optional[Dict]:
+        """获取任务状态"""
+        if task_id in self.pending_tasks:
+            return {"status": "pending", "task_id": task_id}
+        elif task_id in self.running_tasks:
+            return {"status": "running", "task_id": task_id}
+        elif task_id in self.completed_tasks:
+            result = self.completed_tasks[task_id]
+            return {
+                "status": "completed",
+                "task_id": task_id,
+                "success": result.success,
+                "execution_time": result.execution_time
+            }
+        return None
+
+    def get_statistics(self) -> Dict:
+        """获取统计信息"""
+        return {
+            "pending": len(self.pending_tasks),
+            "running": len(self.running_tasks),
+            "completed": len(self.completed_tasks),
+            "success_rate": self._calculate_success_rate()
+        }
+
+    def _calculate_success_rate(self) -> float:
+        """计算成功率"""
+        completed = [r for r in self.completed_tasks.values() if r.success]
+        total = len(self.completed_tasks)
+        return len(completed) / total if total > 0 else 0
+
+# 使用示例
+async def task_delegation_demo():
+    """任务委托示例"""
+    # 创建智能体
+    agent = AssistantAgent("任务处理者")
+    registry = AgentRegistry()
+
+    agent.register_to_registry(registry)
+    agent.discover_neighbors(registry)
+
+    # 创建任务管理器
+    task_manager = TaskManager(agent)
+    await task_manager.start(num_workers=2)
+
+    # 提交任务
+    for i in range(5):
+        request = TaskRequest(
+            task_id=str(uuid.uuid4())[:8],
+            task_type="analysis",
+            description=f"分析任务 {i+1}",
+            parameters={"data": f"data_{i}"}
+        )
+        await task_manager.submit_task(request)
+
+    # 等待完成
+    await asyncio.sleep(2)
+
+    # 获取统计
+    stats = task_manager.get_statistics()
+    print("任务统计:")
+    print(json.dumps(stats, ensure_ascii=False, indent=2))
+
+    await task_manager.stop()</code></pre>
+                </div>
+
+                <!-- A2A协作模式 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>5. A2A协作模式</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># A2A智能体协作模式
+from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
+import asyncio
+import uuid
+
+class CollaborationMode(Enum):
+    SEQUENTIAL = "sequential"  # 顺序执行
+    PARALLEL = "parallel"      # 并行执行
+    BROADCAST = "broadcast"     # 广播
+    ROUND_ROBIN = "round_robin" # 轮询
+    VOTING = "voting"           # 投票
+
+@dataclass
+class CollaborationTask:
+    """协作任务"""
+    task_id: str
+    mode: CollaborationMode
+    subtasks: List[Dict]
+    aggregator: str = "first_success"  # first_success, all, majority
+
+class CollaborationManager:
+    """协作管理器"""
+
+    def __init__(self, agent: BaseA2AAgent):
+        self.agent = agent
+        self.collaborations: Dict[str, Dict] = {}
+
+    async def start_collaboration(
+        self,
+        task_id: str,
+        mode: CollaborationMode,
+        subtasks: List[Dict],
+        aggregator: str = "first_success"
+    ) -> Dict:
+        """开始协作"""
+        collaboration = {
+            "task_id": task_id,
+            "mode": mode,
+            "subtasks": subtasks,
+            "aggregator": aggregator,
+            "status": "running",
+            "results": [],
+            "start_time": datetime.now()
+        }
+
+        self.collaborations[task_id] = collaboration
+
+        if mode == CollaborationMode.SEQUENTIAL:
+            result = await self._sequential_execute(subtasks, aggregator)
+        elif mode == CollaborationMode.PARALLEL:
+            result = await self._parallel_execute(subtasks, aggregator)
+        elif mode == CollaborationMode.BROADCAST:
+            result = await self._broadcast_execute(subtasks, aggregator)
+        elif mode == CollaborationMode.ROUND_ROBIN:
+            result = await self._round_robin_execute(subtasks, aggregator)
+        else:
+error": f            result = {""Unknown mode: {mode}"}
+
+        collaboration["results"] = result.get("results", [])
+        collaboration["final_result"] = result.get("final_result")
+        collaboration["status"] = "completed"
+        collaboration["end_time"] = datetime.now()
+
+        return collaboration
+
+    async def _sequential_execute(self, subtasks: List[Dict], aggregator: str) -> Dict:
+        """顺序执行"""
+        results = []
+
+        for subtask in subtasks:
+            target = subtask.get("target")
+            if target and target in self.agent.neighbors:
+                result = await self._delegate_to_neighbor(target, subtask)
+            else:
+                result = await self._local_execute(subtask)
+
+            results.append(result)
+
+            # 检查是否需要停止
+            if aggregator == "first_success" and result.get("success"):
+                return {"results": results, "final_result": result}
+
+        return {
+            "results": results,
+            "final_result": self._aggregate(results, aggregator)
+        }
+
+    async def _parallel_execute(self, subtasks: List[Dict], aggregator: str) -> Dict:
+        """并行执行"""
+        tasks = []
+
+        for subtask in subtasks:
+            target = subtask.get("target")
+            if target and target in self.agent.neighbors:
+                tasks.append(self._delegate_to_neighbor(target, subtask))
+            else:
+                tasks.append(self._local_execute(subtask))
+
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        # 处理异常
+        processed_results = [
+            r if isinstance(r, dict) else {"success": False, "error": str(r)}
+            for r in results
+        ]
+
+        return {
+            "results": processed_results,
+            "final_result": self._aggregate(processed_results, aggregator)
+        }
+
+    async def _broadcast_execute(self, subtasks: List[Dict], aggregator: str) -> Dict:
+        """广播执行 - 发送给所有邻居"""
+        tasks = []
+
+        for neighbor_id in self.agent.neighbors:
+            for subtask in subtasks:
+                task = self.agent.delegate_task(
+                    target_agent_id=neighbor_id,
+                    task_type=subtask.get("type", "general"),
+                    description=subtask.get("description", ""),
+                    parameters=subtask.get("parameters", {})
+                )
+                tasks.append(task)
+
+        # 等待所有结果
+        results = []
+        for task_id in tasks:
+            # 简化的结果收集
+            results.append({"task_id": task_id, "status": "completed"})
+
+        return {
+            "results": results,
+            "final_result": self._aggregate(results, aggregator)
+        }
+
+    async def _round_robin_execute(self, subtasks: List[Dict], aggregator: str) -> Dict:
+        """轮询执行"""
+        neighbors = list(self.agent.neighbors.keys())
+        if not neighbors:
+            return {"error": "No neighbors available", "results": []}
+
+        results = []
+        neighbor_index = 0
+
+        for subtask in subtasks:
+            neighbor_id = neighbors[neighbor_index % len(neighbors)]
+            neighbor_index += 1
+
+            result = await self._delegate_to_neighbor(neighbor_id, subtask)
+            results.append(result)
+
+        return {
+            "results": results,
+            "final_result": self._aggregate(results, aggregator)
+        }
+
+    async def _delegate_to_neighbor(self, neighbor_id: str, subtask: Dict) -> Dict:
+        """委托给邻居"""
+        task_id = await self.agent.delegate_task(
+            target_agent_id=neighbor_id,
+            task_type=subtask.get("type", "general"),
+            description=subtask.get("description", ""),
+            parameters=subtask.get("parameters", {})
+        )
+        return {
+            "task_id": task_id,
+            "target": neighbor_id,
+            "type": subtask.get("type"),
+            "status": "delegated"
+        }
+
+    async def _local_execute(self, subtask: Dict) -> Dict:
+        """本地执行"""
+        return {
+            "type": subtask.get("type"),
+            "status": "completed",
+            "result": f"Local result for {subtask.get('description', '')}"
+        }
+
+    def _aggregate(self, results: List[Dict], method: str) -> Any:
+        """聚合结果"""
+        if method == "first_success":
+            for r in results:
+                if r.get("success"):
+                    return r
+            return results[0] if results else None
+
+        elif method == "all":
+            return {
+                "success": all(r.get("success", False) for r in results),
+                "results_count": len(results)
+            }
+
+        elif method == "majority":
+            success_count = sum(1 for r in results if r.get("success", False))
+            return {"majority": success_count > len(results) / 2}
+
+        elif method == "merge":
+            merged = {}
+            for r in results:
+                merged.update(r)
+            return merged
+
+        return results[0] if results else None
+
+    def get_collaboration_status(self, task_id: str) -> Optional[Dict]:
+        """获取协作状态"""
+        return self.collaborations.get(task_id)
+
+# 使用示例
+async def collaboration_demo():
+    """协作示例"""
+    # 创建智能体和注册中心
+    agent = AssistantAgent("协作协调者")
+    registry = AgentRegistry()
+    agent.register_to_registry(registry)
+
+    # 创建一些邻居智能体
+    neighbor1 = AssistantAgent("邻居A")
+    neighbor2 = AssistantAgent("邻居B")
+    neighbor1.register_to_registry(registry)
+    neighbor2.register_to_registry(registry)
+
+    agent.neighbors[neighbor1.agent_id] = neighbor1
+    agent.neighbors[neighbor2.agent_id] = neighbor2
+
+    # 创建协作管理器
+    collab_manager = CollaborationManager(agent)
+
+    # 定义协作任务
+    subtasks = [
+        {"type": "analysis", "description": "数据分析", "target": neighbor1.agent_id},
+        {"type": "report", "description": "生成报告", "target": neighbor2.agent_id},
+        {"type": "review", "description": "审核结果"}
+    ]
+
+    # 顺序协作
+    print("=== 顺序协作 ===")
+    result = await collab_manager.start_collaboration(
+        task_id="seq-001",
+        mode=CollaborationMode.SEQUENTIAL,
+        subtasks=subtasks,
+        aggregator="first_success"
+    )
+    print(f"最终结果: {result.get('final_result')}")
+
+    # 并行协作
+    print("\n=== 并行协作 ===")
+    result = await collab_manager.start_collaboration(
+        task_id="par-001",
+        mode=CollaborationMode.PARALLEL,
+        subtasks=subtasks,
+        aggregator="merge"
+    )
+    print(f"最终结果: {result.get('final_result')}")</code></pre>
+                </div>
+
+                <!-- A2A安全机制 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>6. A2A安全机制</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># A2A安全机制 - 认证、授权、加密
+from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from enum import Enum
+import hashlib
+import hmac
+import json
+import secrets
+import time
+
+class AuthLevel(Enum):
+    NONE = "none"
+    API_KEY = "api_key"
+    TOKEN = "token"
+    CERTIFICATE = "certificate"
+
+@dataclass
+class AgentCredentials:
+    """智能体凭证"""
+    agent_id: str
+    auth_level: AuthLevel
+    api_key: str = None
+    token: str = None
+    public_key: str = None
+    permissions: List[str] = None
+    expires_at: datetime = None
+
+@dataclass
+class SecurityPolicy:
+    """安全策略"""
+    require_auth: bool = True
+    allowed_agents: List[str] = None
+    blocked_agents: List[str] = None
+    allowed_capabilities: List[str] = None
+    blocked_capabilities: List[str] = None
+    max_tasks_per_hour: int = 100
+    require_encryption: bool = False
+    rate_limit_window: int = 3600
+
+class A2ASecurityManager:
+    """A2A安全管理器"""
+
+    def __init__(self, policy: SecurityPolicy = None):
+        self.policy = policy or SecurityPolicy()
+        self.credentials: Dict[str, AgentCredentials] = {}
+        self.api_keys: Dict[str, str] = {}  # api_key -> agent_id
+        self.tokens: Dict[str, str] = {}  # token -> agent_id
+        self.rate_limits: Dict[str, List[datetime]] = {}
+        self.audit_log: List[Dict] = []
+
+    def generate_api_key(self, agent_id: str) -> str:
+        """生成API密钥"""
+        api_key = secrets.token_hex(32)
+        self.api_keys[api_key] = agent_id
+
+        self.credentials[agent_id] = AgentCredentials(
+            agent_id=agent_id,
+            auth_level=AuthLevel.API_KEY,
+            api_key=self._hash_key(api_key)
+        )
+
+        return api_key
+
+    def generate_token(self, agent_id: str, expires_hours: int = 24) -> Dict:
+        """生成令牌"""
+        token = secrets.token_urlsafe(32)
+        expires_at = datetime.now() + timedelta(hours=expires_hours)
+
+        self.tokens[token] = agent_id
+
+        if agent_id not in self.credentials:
+            self.credentials[agent_id] = AgentCredentials(
+                agent_id=agent_id,
+                auth_level=AuthLevel.TOKEN,
+                token=self._hash_key(token),
+                expires_at=expires_at
+            )
+
+        return {
+            "token": token,
+            "expires_at": expires_at.isoformat(),
+            "agent_id": agent_id
+        }
+
+    def authenticate(self, agent_id: str, credentials: Dict) -> tuple[bool, str]:
+        """认证"""
+        # API密钥认证
+        if "api_key" in credentials:
+            api_key = credentials["api_key"]
+            if api_key in self.api_keys and self.api_keys[api_key] == agent_id:
+                self._log_audit(agent_id, "auth", "success", "API key authentication")
+                return True, "API Key authenticated"
+
+            self._log_audit(agent_id, "auth", "failed", "Invalid API key")
+            return False, "Invalid API key"
+
+        # 令牌认证
+        if "token" in credentials:
+            token = credentials["token"]
+            if token in self.tokens and self.tokens[token] == agent_id:
+                self._log_audit(agent_id, "auth", "success", "Token authentication")
+                return True, "Token authenticated"
+
+            self._log_audit(agent_id, "auth", "failed", "Invalid token")
+            return False, "Invalid token"
+
+        # 无认证
+        if not self.policy.require_auth:
+            return True, "No authentication required"
+
+        return False, "Authentication required"
+
+    def authorize(self, source_agent: str, target_agent: str, action: str) -> bool:
+        """授权"""
+        creds = self.credentials.get(source_agent)
+
+        # 检查权限
+        if creds and creds.permissions:
+            required = f"{action}:{target_agent}"
+            if required not in creds.permissions and "*" not in creds.permissions:
+                self._log_audit(source_agent, "authorize", "denied", f"Missing permission: {required}")
+                return False
+
+        # 检查黑名单
+        if self.policy.blocked_agents and source_agent in self.policy.blocked_agents:
+            self._log_audit(source_agent, "authorize", "denied", "Agent blocked")
+            return False
+
+        # 检查白名单
+        if self.policy.allowed_agents and source_agent not in self.policy.allowed_agents:
+            self._log_audit(source_agent, "authorize", "denied", "Agent not in whitelist")
+            return False
+
+        self._log_audit(source_agent, "authorize", "allowed", action)
+        return True
+
+    def check_rate_limit(self, agent_id: str) -> tuple[bool, int]:
+        """检查速率限制"""
+        now = datetime.now()
+        window_start = now - timedelta(seconds=self.policy.rate_limit_window)
+
+        # 清理旧记录
+        if agent_id in self.rate_limits:
+            self.rate_limits[agent_id] = [
+                t for t in self.rate_limits[agent_id]
+                if t > window_start
+            ]
+
+        # 检查限制
+        current_count = len(self.rate_limits.get(agent_id, []))
+
+        if current_count >= self.policy.max_tasks_per_hour:
+            return False, current_count
+
+        # 记录请求
+        if agent_id not in self.rate_limits:
+            self.rate_limits[agent_id] = []
+        self.rate_limits[agent_id].append(now)
+
+        return True, current_count + 1
+
+    def encrypt_message(self, message: Dict, key: str) -> str:
+        """加密消息"""
+        # 简化的加密实现
+        data = json.dumps(message)
+        hmac_key = hashlib.sha256(key.encode()).digest()
+        signature = hmac.new(hmac_key, data.encode(), hashlib.sha256).hexdigest()
+        return json.dumps({"data": data, "signature": signature})
+
+    def decrypt_message(self, encrypted: str, key: str) -> Dict:
+        """解密消息"""
+        try:
+            envelope = json.loads(encrypted)
+            data = envelope["data"]
+            signature = envelope["signature"]
+
+            hmac_key = hashlib.sha256(key.encode()).digest()
+            expected = hmac.new(hmac_key, data.encode(), hashlib.sha256).hexdigest()
+
+            if signature != expected:
+                raise ValueError("Invalid signature")
+
+            return json.loads(data)
+        except Exception as e:
+            raise ValueError(f"Decryption failed: {e}")
+
+    def _hash_key(self, key: str) -> str:
+        """哈希密钥"""
+        return hashlib.sha256(key.encode()).hexdigest()
+
+    def _log_audit(self, agent_id: str, action: str, status: str, details: str):
+        """记录审计日志"""
+        self.audit_log.append({
+            "timestamp": datetime.now().isoformat(),
+            "agent_id": agent_id,
+            "action": action,
+            "status": status,
+            "details": details
+        })
+
+    def get_audit_log(self, agent_id: str = None) -> List[Dict]:
+        """获取审计日志"""
+        if agent_id:
+            return [log for log in self.audit_log if log["agent_id"] == agent_id]
+        return self.audit_log
+
+# 安全通信示例
+class SecureA2AAgent(BaseA2AAgent):
+    """安全A2A智能体"""
+
+    def __init__(self, name: str, capabilities: List[str], security_manager: A2ASecurityManager = None):
+        super().__init__(name, capabilities)
+        self.security_manager = security_manager
+        self.shared_key: str = None
+
+    async def send_secure_message(
+        self,
+        receiver_id: str,
+        message_type: str,
+        content: Dict
+    ) -> bool:
+        """发送安全消息"""
+        # 认证检查
+        if self.security_manager:
+            auth_result, _ = self.security_manager.authenticate(
+                self.agent_id, {"api_key": self.shared_key}
+            )
+            if not auth_result:
+                return False
+
+            # 授权检查
+            if not self.security_manager.authorize(self.agent_id, receiver_id, message_type):
+                return False
+
+            # 速率限制检查
+            allowed, count = self.security_manager.check_rate_limit(self.agent_id)
+            if not allowed:
+                return False
+
+        # 发送消息
+        await self.send_message(receiver_id, message_type, content)
+        return True
+
+# 使用示例
+async def security_demo():
+    """安全机制示例"""
+    # 创建安全管理器
+    security = A2ASecurityManager(SecurityPolicy(
+        require_auth=True,
+        max_tasks_per_hour=50,
+        require_encryption=True
+    ))
+
+    # 创建智能体
+    agent = SecureA2AAgent("安全助手", ["secure_chat"], security)
+
+    # 生成凭证
+    api_key = security.generate_api_key(agent.agent_id)
+    token_info = security.generate_token(agent.agent_id, expires_hours=48)
+
+    print("=== A2A安全示例 ===")
+    print(f"API Key: {api_key[:8]}...")
+    print(f"Token: {token_info['token'][:8]}...")
+    print(f"过期时间: {token_info['expires_at']}")
+
+    # 测试认证
+    success, msg = security.authenticate(agent.agent_id, {"api_key": api_key})
+    print(f"\n认证结果: {msg}")
+
+    # 发送安全消息
+    result = await agent.send_secure_message(
+        receiver_id="target-agent",
+        message_type="task_request",
+        content={"task": "secure_task"}
+    )
+    print(f"安全消息发送: {'成功' if result else '失败'}")</code></pre>
+                </div>
+
+                <!-- A2A实际应用 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>7. A2A实际应用 - 多智能体系统</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># A2A协议实际应用 - 多智能体协作系统
+from typing import Any, Dict, List
+from dataclasses import dataclass
+from datetime import datetime
+import asyncio
+import uuid
+
+@dataclass
+class Project:
+    """项目"""
+    project_id: str
+    name: str
+    description: str
+    status: str = "planning"
+    tasks: List[Dict] = None
+
+class ProjectManagerAgent(BaseA2AAgent):
+    """项目经理智能体"""
+
+    def __init__(self, name: str, registry: 'AgentRegistry'):
+        super().__init__(name, capabilities=["project_management", "task_planning", "coordination"])
+        self.registry = registry
+        self.projects: Dict[str, Project] = {}
+
+    def _get_description(self) -> str:
+        return "项目经理智能体，负责项目管理和任务协调"
+
+    def _get_endpoint(self) -> str:
+        return f"agent://{self.name.lower()}.a2a"
+
+    async def create_project(self, name: str, description: str) -> Project:
+        """创建项目"""
+        project = Project(
+            project_id=str(uuid.uuid4())[:8],
+            name=name,
+            description=description,
+            status="planning"
+        )
+        self.projects[project.project_id] = project
+        return project
+
+    async def assign_task(self, project_id: str, task: Dict, agent_id: str = None) -> str:
+        """分配任务"""
+        project = self.projects.get(project_id)
+        if not project:
+            raise ValueError(f"Project {project_id} not found")
+
+        # 查找合适的智能体
+        if not agent_id:
+            best_agent = self.registry.get_best_agent(
+                capabilities=task.get("required_capabilities", ["general"]),
+                strategy="round_robin"
+            )
+            agent_id = best_agent.agent_id if best_agent else None
+
+        if agent_id:
+            task_id = await self.delegate_task(
+                target_agent_id=agent_id,
+                task_type=task.get("type", "general"),
+                description=task.get("description", ""),
+                parameters={
+                    "project_id": project_id,
+                    "task": task
+                }
+            )
+            return task_id
+
+        return None
+
+    async def get_project_status(self, project_id: str) -> Dict:
+        """获取项目状态"""
+        project = self.projects.get(project_id)
+        if not project:
+            return {"error": f"Project {project_id} not found"}
+
+        return {
+            "project_id": project.project_id,
+            "name": project.name,
+            "status": project.status,
+            "task_count": len(project.tasks or [])
+        }
+
+class DataAnalysisAgent(BaseA2AAgent):
+    """数据分析智能体"""
+
+    def __init__(self, name: str):
+        super().__init__(name, capabilities=["data_analysis", "statistics", "visualization"])
+
+    def _get_description(self) -> str:
+        return "数据分析智能体，提供数据分析和可视化服务"
+
+    def _get_endpoint(self) -> str:
+        return f"agent://{self.name.lower()}.a2a"
+
+    async def _handle_task_request(self, message):
+        """处理任务请求"""
+        params = message.content.get("parameters", {})
+        task_type = message.content.get("task_type")
+
+        if task_type == "data_analysis":
+            result = await self._analyze_data(params)
+        elif task_type == "statistics":
+            result = await self._calculate_statistics(params)
+        else:
+            result = {"status": "unknown_task_type", "type": task_type}
+
+        # 发送结果
+        await self.send_message(
+            receiver_id=message.sender,
+            message_type="task_response",
+            content={
+                "task_id": message.content.get("task_id"),
+                "status": "completed",
+                "result": result
+            },
+            correlation_id=message.correlation_id
+        )
+
+    async def _analyze_data(self, params: Dict) -> Dict:
+        """分析数据"""
+        data = params.get("data", [])
+        return {
+            "analysis_type": "basic",
+            "data_points": len(data),
+            "summary": f"分析了 {len(data)} 个数据点"
+        }
+
+    async def _calculate_statistics(self, params: Dict) -> Dict:
+        """计算统计"""
+        data = params.get("data", [])
+        if not data:
+            return {"error": "No data provided"}
+
+        return {
+            "count": len(data),
+            "mean": sum(data) / len(data) if data else 0,
+            "min": min(data) if data else 0,
+            "max": max(data) if data else 0
+        }
+
+class ReportAgent(BaseA2AAgent):
+    """报告生成智能体"""
+
+    def __init__(self, name: str):
+        super().__init__(name, capabilities=["report_generation", "document_creation"])
+
+    def _get_description(self) -> str:
+        return "报告生成智能体，负责生成各类报告"
+
+    def _get_endpoint(self)) -> str:
+        return f"agent://{self.name.lower()}.a2a"
+
+    async def _handle_task_request(self, message):
+        """处理任务请求"""
+        params = message.content.get("parameters", {})
+        report_type = params.get("report_type", "general")
+
+        result = await self._generate_report(report_type, params)
+
+        await self.send_message(
+            receiver_id=message.sender,
+            message_type="task_response",
+            content={
+                "task_id": message.content.get("task_id"),
+                "status": "completed",
+                "result": result
+            },
+            correlation_id=message.correlation_id
+        )
+
+    async def _generate_report(self, report_type: str, params: Dict) -> Dict:
+        """生成报告"""
+        return {
+            "report_type": report_type,
+            "title": params.get("title", "Untitled Report"),
+            "sections": ["Introduction", "Analysis", "Conclusion"],
+            "generated_at": datetime.now().isoformat()
+        }
+
+# 使用示例
+async def multi_agent_system_demo():
+    """多智能体系统示例"""
+    print("=== A2A多智能体系统示例 ===")
+
+    # 创建注册中心
+    registry = AgentRegistry("项目注册中心")
+
+    # 创建智能体
+    project_manager = ProjectManagerAgent("项目经理", registry)
+    data_analyst = DataAnalysisAgent("数据分析师")
+    report_generator = ReportAgent("报告生成器")
+
+    # 注册智能体
+    project_manager.register_to_registry(registry)
+    data_analyst.register_to_registry(registry)
+    report_generator.register_to_registry(registry)
+
+    # 建立邻居关系
+    project_manager.neighbors[data_analyst.agent_id] = data_analyst
+    project_manager.neighbors[report_generator.agent_id] = report_generator
+
+    # 创建项目
+    project = await project_manager.create_project(
+        name="销售数据分析项目",
+        description="分析销售数据并生成报告"
+    )
+    print(f"\n项目创建: {project.name} ({project.project_id})")
+
+    # 分配数据分析任务
+    analysis_task = {
+        "type": "data_analysis",
+        "description": "分析销售数据",
+        "required_capabilities": ["data_analysis"]
+    }
+    task_id = await project_manager.assign_task(project.project_id, analysis_task)
+    print(f"分析任务分配: {task_id}")
+
+    # 分配报告生成任务
+    report_task = {
+        "type": "report_generation",
+        "description": "生成分析报告",
+        "required_capabilities": ["report_generation"],
+        "title": "销售分析报告"
+    }
+    task_id = await project_manager.assign_task(project.project_id, report_task)
+    print(f"报告任务分配: {task_id}")
+
+    # 获取项目状态
+    status = await project_manager.get_project_status(project.project_id)
+    print(f"\n项目状态:")
+    print(json.dumps(status, ensure_ascii=False, indent=2))
+
+    # 列出所有智能体
+    print(f"\n注册的智能体:")
+    agents = registry.list_agents()
+    for agent in agents:
+        print(f"  - {agent.name}: {agent.capabilities}")</code></pre>
+                </div>
+
+                <!-- A2A最佳实践 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>8. A2A最佳实践总结</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># A2A协议最佳实践总结
+
+A2A_BEST_PRACTICES = """
+【设计原则】
+1. 明确智能体职责 - 每个智能体应该有一个清晰的职责
+2. 最小化通信 - 减少不必要的智能体间通信
+3. 错误处理 - 实现重试和错误恢复机制
+4. 超时控制 - 为每个任务设置合理的超时时间
+
+【架构设计】
+1. 注册中心高可用 - 使用多个注册中心避免单点故障
+2. 智能体发现 - 实现动态发现机制
+3. 负载均衡 - 合理分配任务到不同智能体
+4. 版本管理 - 智能体API版本控制
+
+【安全实践】
+1. 认证加密 - 所有通信使用TLS加密
+2. 最小权限 - 只授予必要的权限
+3. 审计日志 - 记录所有重要操作
+4. 速率限制 - 防止滥用和DDoS攻击
+
+【性能优化】
+1. 连接池 - 复用智能体连接
+2. 消息批处理 - 批量发送小消息
+3. 结果缓存 - 缓存重复请求的结果
+4. 异步通信 - 使用异步消息队列
+
+【监控运维】
+1. 健康检查 - 定期检查智能体状态
+2. 指标收集 - 收集性能指标
+3. 告警机制 - 设置关键指标告警
+4. 日志集中 - 集中管理日志
+"""
+
+print(A2A_BEST_PRACTICES)
+
+# A2A学习路线图
+A2A_LEARNING_ROADMAP = """
+【阶段1 - 入门（1-2周）】
+□ 理解A2A协议基本概念
+□ 学习智能体注册和发现
+□ 实现简单的任务委托
+□ 掌握消息格式和通信模式
+
+【阶段2 - 基础（2-3周）】
+□ 实现任务管理器和队列
+□ 学习协作模式（顺序、并行、广播）
+□ 掌握错误处理和重试机制
+□ 实现基本的负载均衡
+
+【阶段3 - 中级（3-4周）】
+□ 实现安全机制（认证、授权）
+□ 学习速率限制和配额管理
+□ 掌握多智能体协作编排
+□ 实现复杂的任务流程
+
+【阶段4 - 高级（4周+）】
+□ 设计分布式智能体系统
+□ 实现智能体故障转移
+□ 优化大规模系统性能
+□ 探索自主智能体协作
+"""
+
+print(A2A_LEARNING_ROADMAP)
+
+# A2A vs MCP对比
+A2A_VS_MCP = """
+┌─────────────────┬───────────────────┬───────────────────┐
+│     特性        │      A2A          │       MCP          │
+├─────────────────┼───────────────────┼───────────────────┤
+│ 通信对象        │ 智能体 ↔ 智能体   │ 智能体 ↔ 工具/资源 │
+│ 主要用途        │ 任务协作         │ 工具调用          │
+│ 协议层次        │ 应用层协议        │ 协议层协议         │
+│ 发现机制        │ 注册中心         │ 工具清单          │
+│ 任务类型        │ 复杂任务分解      │ 单一操作执行       │
+│ 结果传递        │ 结构化结果        │ 工具返回值         │
+│ 适用场景        │ 多智能体协作      │ 工具集成          │
+└─────────────────┴───────────────────┴───────────────────┘
+
+A2A和MCP可以结合使用：
+- MCP提供工具调用能力
+- A2A协调多个智能体使用工具
+- 形成完整的智能体生态系统
+"""
+
+print(A2A_VS_MCP)
+
+# 推荐资源
+A2A_RESOURCES = """
+【官方资源】
+- A2A Protocol Specification: https://github.com/anthropics/a2a-protocol
+- A2A Python SDK: pip install a2a-sdk
+- 示例代码仓库
+
+【实践项目】
+- Multi-Agent Orchestrator
+- Task Distribution System
+- Collaborative AI Framework
+
+【进阶阅读】
+- 分布式系统设计
+- 多智能体系统理论
+- 任务调度算法
+"""
+
+print(A2A_RESOURCES)
+
+# 完整的A2A开发清单
+A2A_DEVELOPMENT_CHECKLIST = """
+□ 设计智能体职责和接口
+□ 实现BaseA2AAgent基类
+□ 创建AgentRegistry注册中心
+□ 实现TaskManager任务管理
+□ 添加CollaborationManager协作
+□ 集成A2ASecurityManager安全
+□ 编写单元测试
+□ 集成测试多智能体场景
+□ 性能测试和优化
+□ 安全审计
+□ 部署和监控
+"""
+
+print("\n" + A2A_DEVELOPMENT_CHECKLIST)</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

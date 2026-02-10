@@ -1,0 +1,2154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG从入门到精通 - AI技术学习平台</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">RAG从入门到精通</h2>
+            <p class="section-subtitle">检索增强生成完整指南，从基础到高级应用</p>
+
+            <div class="code-sections">
+                <!-- RAG简介 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>1. RAG概述与核心概念</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># RAG（Retrieval-Augmented Generation）检索增强生成
+#
+# RAG是一种结合检索和生成的技术框架
+# 使LLM能够基于外部知识库生成更准确、更实时的回答
+#
+# 为什么需要RAG？
+# 1. 知识截止日期问题 - LLM训练数据有时效性限制
+# 2. 幻觉问题 - LLM可能生成不准确信息
+# 3. 私有知识 - 企业内部数据无法用于训练
+# 4. 可追溯性 - 回答可追溯到具体来源
+
+# RAG vs 传统LLM
+COMPARISON = """
+┌─────────────────────────────────────────────────────────────────┐
+│                     传统LLM vs RAG                               │
+├─────────────────────────────┬───────────────────────────────────┤
+│        传统LLM              │           RAG                      │
+├─────────────────────────────┼───────────────────────────────────┤
+│ 知识固定在训练数据中        │ 动态检索最新信息                  │
+│ 可能产生幻觉                │ 基于检索结果生成，更可靠          │
+│ 无法访问私有数据            │ 支持企业知识库集成                │
+│ 回答不可验证来源            │ 可追溯信息来源                    │
+│ 更新成本高                  │ 更新知识库即可，无需重训练        │
+└─────────────────────────────┴───────────────────────────────────┘
+"""
+
+# RAG核心流程
+RAG_PIPELINE = """
+RAG核心流程：
+
+┌──────────────┐    ┌──────────────────┐    ┌──────────────┐
+│   用户输入   │───▶│   检索阶段       │───▶│   生成阶段   │
+│  Query       │    │  Retrieval       │    │  Generation  │
+└──────────────┘    └──────────────────┘    └──────────────┘
+                           │                        │
+                           ▼                        ▼
+                   ┌──────────────────┐    ┌──────────────┐
+                   │   向量数据库     │    │   LLM模型    │
+                   │  Vector Store   │    │  LLM Model   │
+                   └──────────────────┘    └──────────────┘
+
+详细步骤：
+1. 用户提出问题（Query）
+2. 将问题转换为向量（Embedding）
+3. 在向量数据库中检索相似文档
+4. 选取Top-K相关文档
+5. 将检索结果与问题组合成提示词
+6. LLM基于上下文生成回答
+7. 返回带来源引用的回答
+"""
+
+print("=== RAG检索增强生成 ===")
+print(COMPARISON)
+print(RAG_PIPELINE)</code></pre>
+                </div>
+
+                <!-- 环境配置 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>2. 环境配置与依赖安装</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># RAG环境配置
+#
+# 核心依赖包：
+# pip install langchain langchain-openai langchain-community
+# pip install faiss-cpu pypdf sentence-transformers
+# pip install tiktoken transformers
+
+# 版本检查
+import langchain
+print(f"LangChain版本: {langchain.__version__}")
+
+# 基础导入
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS, Chroma, Milvus
+from langchain_community.document_loaders import (
+    TextLoader, PDFLoader, DocxLoader, CSVLoader,
+    UnstructuredHTMLLoader, UnstructuredMarkdownLoader
+)
+from langchain_text_splitters import (
+    RecursiveCharacterTextSplitter,
+    Language
+)
+from langchain.schema import Document
+from langchain.prompts import ChatPromptTemplate
+from langchain.chains import RetrievalQA, ConversationalRetrievalChain
+from langchain.memory import ConversationBufferMemory
+import os
+
+# API密钥配置
+os.environ["OPENAI_API_KEY"] = "your-openai-api-key"
+os.environ["ANTHROPIC_API_KEY"] = "your-anthropic-api-key"
+
+# 可选：配置其他嵌入模型
+# os.environ["HUGGINGFACEHUB_API_TOKEN"] = "your-hf-token"
+
+# 支持的向量数据库
+VECTOR_STORES = """
+支持的向量数据库：
+
+1. FAISS - Facebook AI Similarity Search
+   - 本地部署，无需外部服务
+   - 支持GPU加速
+   - 适合中小规模数据
+
+2. Chroma - 开源向量数据库
+   - 轻量级，易于使用
+   - 支持元数据过滤
+   - 适合快速原型
+
+3. Milvus - 云原生向量数据库
+   - 分布式架构
+   - 高性能、高可用
+   - 适合生产环境
+
+4. Pinecone - 云服务
+   - 全托管，无需运维
+   - 全球分布式
+   - 适合企业级应用
+
+5. Weaviate - 开源向量搜索引擎
+   - GraphQL查询
+   - 支持多模态
+   - 适合复杂查询
+"""
+print(VECTOR_STORES)
+
+print("\nRAG环境配置完成！")</code></pre>
+                </div>
+
+                <!-- 文档加载 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>3. 文档加载与预处理</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 文档加载器详解
+#
+# LangChain支持多种文档格式的加载
+
+from langchain_community.document_loaders import (
+    TextLoader, PDFLoader, DocxLoader, CSVLoader,
+    UnstructuredHTMLLoader, UnstructuredMarkdownLoader,
+    PyPDFLoader, PDFPlumberLoader, UnstructuredPDFLoader,
+    AsyncHtmlLoader, SeleniumURLLoader
+)
+from langchain.schema import Document
+
+# 1. 文本文件加载
+text_loader = TextLoader("docs/article.txt")
+text_documents = text_loader.load()
+print(f"文本文档数量: {len(text_documents)}")
+print(f"内容预览: {text_documents[0].page_content[:200] if text_documents else '空'}")
+
+# 2. PDF文件加载
+pdf_loader = PyPDFLoader("docs/paper.pdf")
+pdf_documents = pdf_loader.load()
+print(f"PDF页数: {len(pdf_documents)}")
+for i, doc in enumerate(pdf_documents[:2]):
+    print(f"Page {i+1}: {doc.page_content[:100]}...")
+
+# 3. Word文档加载
+docx_loader = DocxLoader("docs/report.docx")
+docx_documents = docx_loader.load()
+print(f"Word文档页数: {len(docx_documents)}")
+
+# 4. CSV文件加载
+csv_loader = CSVLoader("docs/data.csv")
+csv_documents = csv_loader.load()
+print(f"CSV记录数: {len(csv_documents)}")
+
+# 5. HTML网页加载
+html_loader = UnstructuredHTMLLoader("docs/page.html")
+html_documents = html_loader.load()
+
+# 6. Markdown文件加载
+md_loader = UnstructuredMarkdownLoader("docs/readme.md")
+md_documents = md_loader.load()
+
+# 7. 批量加载多个文件
+from langchain_community.document_loaders import DirectoryLoader
+from langchain_community import document_loaders
+
+# 加载目录下所有文件
+dir_loader = DirectoryLoader(
+    "docs/",
+    glob="**/*.txt",
+    loader_cls=TextLoader,
+    show_progress=True
+)
+all_documents = dir_loader.load()
+
+# 8. 自定义文档
+custom_document = Document(
+    page_content="""
+    这是自定义文档内容。
+    可以包含任何文本信息。
+    """,
+    metadata={
+        "source": "custom",
+        "page": 1,
+        "author": "AI"
+    }
+)
+
+# 文档结构说明
+DOCUMENT_STRUCTURE = """
+Document对象结构：
+
+Document {
+    page_content: str  # 文档文本内容
+    metadata: dict     # 元数据
+        - source: str  # 文档来源
+        - page: int    # 页码（PDF）
+        - author: str  # 作者
+        - title: str   # 标题
+        - ...
+}
+
+使用场景：
+- 保持文档来源信息
+- 支持检索后筛选
+- 支持结果追溯
+"""
+print(DOCUMENT_STRUCTURE)</code></pre>
+                </div>
+
+                <!-- 文档分割 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>4. 文档分割策略</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 文档分割详解
+#
+# 将长文档分割成适合检索的小块
+
+from langchain_text_splitters import (
+    RecursiveCharacterTextSplitter,
+    CharacterTextSplitter,
+    SentenceTransformersTokensTextSplitter,
+    Language,
+    MarkdownHeaderTextSplitter,
+    PythonCodeTextSplitter
+)
+from langchain.schema import Document
+
+# 1. 基础字符分割器
+def basic_split():
+    text = """这是第一段内容。
+    这是第二段内容，包含很多文字。
+
+    这是第三段。"""
+
+    splitter = CharacterTextSplitter(
+        chunk_size=100,      # 块大小
+        chunk_overlap=20,    # 重叠大小
+        separator="\n"       # 分隔符
+    )
+    chunks = splitter.create_documents([text])
+    return chunks
+
+# 2. 递归字符分割器（推荐）
+def recursive_split():
+    text = """
+    人工智能（Artificial Intelligence，AI）是计算机科学的一个分支，
+    它企图了解智能的实质，并生产出一种新的能以人类智能相似的方式
+    做出反应的智能机器。研究范围包括机器学习、自然语言处理、计算机
+    视觉等多个领域。
+
+    深度学习是机器学习的一个子集，它基于人工神经网络。
+    神经网络由多层神经元组成，能够自动学习数据的特征表示。
+    近年来，深度学习在图像识别、语音识别、自然语言处理等领域
+    取得了突破性进展。
+
+    大语言模型（LLM）是基于深度学习的自然语言处理模型。
+    代表性模型包括GPT系列、BERT系列、LLaMA等。这些模型能够
+    理解和生成人类语言，广泛应用于对话系统、文本生成、代码辅助
+    等场景。
+    """
+
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=200,           # 块大小
+        chunk_overlap=30,         # 重叠大小
+        separators=[
+            "\n\n",   # 优先按段落分割
+            "\n",     # 然后按句子
+            "。",     # 中文句号
+            "！",
+            "？",
+            "；",
+            " ",      # 空格
+            ""        # 最后按字符
+        ],
+        length_function=len       # 计算长度函数
+    )
+    chunks = splitter.create_documents([text])
+    return chunks
+
+# 3. 代码专用分割器
+def code_split():
+    from langchain_text_splitters import Language
+
+    python_code = '''
+import os
+import sys
+from typing import List, Dict
+
+class DataProcessor:
+    def __init__(self, config: Dict):
+        self.config = config
+        self.data = []
+
+    def load_data(self, path: str) -> List:
+        """加载数据文件"""
+        with open(path, 'r') as f:
+            for line in f:
+                yield line.strip()
+
+    def process(self):
+        """数据处理主流程"""
+        for item in self.load_data('data.txt'):
+            self.data.append(item)
+        return self.data
+'''
+
+    splitter = RecursiveCharacterTextSplitter.from_language(
+        language=Language.PYTHON,
+        chunk_size=200,
+        chunk_overlap=20
+    )
+    chunks = splitter.create_documents([python_code])
+    return chunks
+
+# 4. Markdown标题分割
+def markdown_split():
+    markdown_text = """
+# 第一章：概述
+
+## 1.1 什么是AI
+
+人工智能是计算机科学的一个重要分支。
+
+## 1.2 发展历程
+
+- 1950s：AI概念诞生
+- 1980s：专家系统兴起
+- 2010s：深度学习突破
+
+# 第二章：机器学习
+
+## 2.1 监督学习
+
+监督学习是机器学习的一种方法。
+
+## 2.2 无监督学习
+
+无监督学习不需要标签数据。
+"""
+
+    splitter = MarkdownHeaderTextSplitter(
+        headers_to_split_on=[
+            ("#", "H1"),
+            ("##", "H2"),
+            ("###", "H3")
+        ]
+    )
+    chunks = splitter.create_documents([markdown_text])
+    return chunks
+
+# 5. 按句子分割
+def sentence_split():
+    from langchain_text_splitters import SpacyTextSplitter
+
+    text = "这是第一句话。这是第二句话！这是第三句话？第四句话。"
+
+    splitter = SpacyTextSplitter(
+        chunk_size=2,      # 每块包含句子数
+        chunk_overlap=1    # 重叠句子数
+    )
+    chunks = splitter.create_documents([text])
+    return chunks
+
+# 6. 语义分割（高级）
+def semantic_split():
+    """
+    使用嵌入模型进行语义分割
+    根据语义相似度合并相关段落
+    """
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.cluster import AgglomerativeClustering
+    import numpy as np
+
+    paragraphs = [
+        "人工智能的起源可以追溯到1956年的达特茅斯会议。",
+        "在这次会议上，约翰·麦卡锡首次提出了'人工智能'这一术语。",
+        "同年，阿兰·图灵发表了著名的'图灵测试'论文。",
+        "深度学习是机器学习的一个重要分支。",
+        "它基于人工神经网络的结构。",
+        "近年来，GPU的发展大大加速了深度学习的研究。",
+        "Transformer架构的提出是一个重要的里程碑。",
+        "它完全基于注意力机制。",
+        "GPT和BERT都是基于Transformer的模型。"
+    ]
+
+    # 计算段落嵌入
+    # 这里简化处理，实际应使用嵌入模型
+    vectorizer = TfidfVectorizer()
+    vectors = vectorizer.fit_transform(paragraphs).toarray()
+
+    # 聚类
+    clustering = AgglomerativeClustering(
+        n_clusters=3,
+        metric='cosine',
+        linkage='average'
+    )
+    labels = clustering.fit_predict(vectors)
+
+    # 按聚类结果分组
+    clusters = {}
+    for i, label in enumerate(labels):
+        if label not in clusters:
+            clusters[label] = []
+        clusters[label].append(paragraphs[i])
+
+    return clusters
+
+# 分割策略对比
+CHUNKING_STRATEGIES = """
+文档分割策略对比：
+
+┌──────────────────┬──────────────────┬─────────────────────────┐
+│     策略         │     优点         │        缺点             │
+├──────────────────┼──────────────────┼─────────────────────────┤
+│ 固定大小         │ 简单快速         │ 可能切断语义单元         │
+│ 递归分割         │ 灵活可控         │ 需要调参                 │
+│ 语义分割         │ 语义完整         │ 计算成本高               │
+│ 滑动窗口         │ 上下文连续       │ 可能重复信息             │
+│ 句子级别         │ 粒度细           │ 块数量多                 │
+└──────────────────┴──────────────────┴─────────────────────────┘
+
+最佳实践：
+1. 初始chunk_size设为500-1000
+2. chunk_overlap设为10-20%
+3. 根据实际效果调整
+4. 保留元数据便于追溯
+5. 特殊格式（代码、表格）特殊处理
+"""
+print(CHUNKING_STRATEGIES)</code></pre>
+                </div>
+
+                <!-- 向量嵌入 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>5. 向量嵌入与编码</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 向量嵌入详解
+#
+# 将文本转换为稠密向量表示
+
+from langchain_openai import OpenAIEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import SentenceTransformerEmbeddings
+from sklearn.feature_extraction.text import TfidfVectorizer
+import numpy as np
+
+# 1. OpenAI Embeddings
+def openai_embeddings():
+    embeddings = OpenAIEmbeddings(
+        model="text-embedding-3-small",  # 或 text-embedding-3-large
+        dimensions=1024  # 可选：指定维度
+    )
+
+    texts = [
+        "人工智能是计算机科学的一个分支",
+        "深度学习是机器学习的一种方法",
+        "自然语言处理研究人与计算机的交互"
+    ]
+
+    # 单文本嵌入
+    vector = embeddings.embed_query("什么是人工智能？")
+    print(f"OpenAI向量维度: {len(vector)}")
+
+    # 多文本嵌入
+    vectors = embeddings.embed_documents(texts)
+    print(f"文档向量形状: {len(vectors)} x {len(vectors[0])}")
+
+    return embeddings
+
+# 2. HuggingFace Embeddings
+def huggingface_embeddings():
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2",
+        model_kwargs={'device': 'cpu'},  # 或 'cuda'
+        encode_kwargs={'normalize_embeddings': True}
+    )
+
+    texts = ["人工智能", "机器学习", "深度学习"]
+
+    vectors = embeddings.embed_documents(texts)
+    print(f"HuggingFace向量维度: {len(vectors[0])}")
+
+    return embeddings
+
+# 3. 中文嵌入模型
+def chinese_embeddings():
+    # 支持中文的嵌入模型
+    embeddings = HuggingFaceEmbeddings(
+        model_name="BAAI/bge-small-zh",
+        model_kwargs={'device': 'cpu'},
+        encode_kwargs={'normalize_embeddings': True}
+    )
+
+    texts = [
+        "人工智能改变世界",
+        "机器学习是AI的核心",
+        "深度学习需要大量数据"
+    ]
+
+    vectors = embeddings.embed_documents(texts)
+    print(f"中文向量维度: {len(vectors[0])}")
+
+    return embeddings
+
+# 4. TF-IDF向量化（传统方法）
+def tfidf_vectorization():
+    texts = [
+        "人工智能在医疗领域的应用",
+        "机器学习算法帮助诊断疾病",
+        "深度学习技术改善医疗影像分析"
+    ]
+
+    vectorizer = TfidfVectorizer(
+        max_features=1000,      # 最大特征数
+        ngram_range=(1, 2),     # unigram + bigram
+        stop_words=['的', '在'] # 停用词
+    )
+
+    tfidf_matrix = vectorizer.fit_transform(texts)
+    print(f"TF-IDF矩阵形状: {tfidf_matrix.shape}")
+    print(f"词汇表大小: {len(vectorizer.vocabulary_)}")
+    print(f"词汇表示例: {list(vectorizer.vocabulary_.keys())[:5]}")
+
+    return vectorizer, tfidf_matrix
+
+# 5. 向量相似度计算
+def similarity_calculation():
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+
+    # 文本向量
+    doc = "人工智能技术正在快速发展"
+    query = "AI技术的进步"
+
+    doc_vec = embeddings.embed_query(doc)
+    query_vec = embeddings.embed_query(query)
+
+    # 余弦相似度
+    from sklearn.metrics.pairwise import cosine_similarity
+
+    cos_sim = cosine_similarity([doc_vec], [query_vec])[0][0]
+    print(f"余弦相似度: {cos_sim:.4f}")
+
+    # 点积
+    dot_product = np.dot(doc_vec, query_vec)
+    print(f"点积: {dot_product:.4f}")
+
+    # 欧氏距离
+    euclidean_dist = np.linalg.norm(np.array(doc_vec) - np.array(query_vec))
+    print(f"欧氏距离: {euclidean_dist:.4f}")
+
+# 6. 批量处理与缓存
+class EmbeddingProcessor:
+    def __init__(self, embeddings_model):
+        self.embeddings = embeddings_model
+        self.cache = {}
+
+    def embed_with_cache(self, text):
+        """带缓存的嵌入"""
+        if text in self.cache:
+            return self.cache[text]
+        vector = self.embeddings.embed_query(text)
+        self.cache[text] = vector
+        return vector
+
+    def embed_batch(self, texts, batch_size=100):
+        """批量嵌入"""
+        all_vectors = []
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i:i+batch_size]
+            vectors = self.embeddings.embed_documents(batch)
+            all_vectors.extend(vectors)
+        return all_vectors
+
+# 嵌入模型选择指南
+EMBEDDING_GUIDE = """
+嵌入模型选择指南：
+
+┌─────────────────────────────────────────────────────────────────┐
+│                     嵌入模型对比                                 │
+├────────────────┬──────────────┬─────────────┬───────────────────┤
+│    模型        │   语言       │   维度      │    特点           │
+├────────────────┼──────────────┼─────────────┼───────────────────┤
+│ text-embedding-3-small │ 多语言 │ 1536/1024  │ OpenAI云服务      │
+│ text-embedding-3-large │ 多语言 │ 3072       │ 高质量            │
+│ all-MiniLM-L6-v2 │ 英文 │ 384          │ 轻量快速          │
+│ all-mpnet-base-v2 │ 多语言 │ 768         │ 高质量            │
+│ bge-small-zh   │ 中文     │ 512          │ 中文优化          │
+│ m3e-large      │ 中文     │ 1024         │ 中文高质量        │
+└────────────────┴──────────────┴─────────────┴───────────────────┘
+
+选择建议：
+- 通用场景：text-embedding-3-small
+- 高质量要求：text-embedding-3-large
+- 中文场景：bge-small-zh 或 m3e-large
+- 本地部署：all-MiniLM-L6-v2
+- 资源受限：MiniLM系列
+"""
+print(EMBEDDING_GUIDE)</code></pre>
+                </div>
+
+                <!-- 向量数据库 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>6. 向量数据库详解</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 向量数据库详解
+#
+# 存储和检索向量数据的专用数据库
+
+from langchain_community.vectorstores import FAISS, Chroma, Milvus
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.schema import Document
+import os
+
+# 1. FAISS - 本地向量数据库
+def faiss_vectorstore():
+    embeddings = OpenAIEmbeddings()
+
+    documents = [
+        Document(page_content="人工智能是计算机科学的一个分支", metadata={"source": "doc1"}),
+        Document(page_content="机器学习是AI的核心技术", metadata={"source": "doc2"}),
+        Document(page_content="深度学习基于神经网络结构", metadata={"source": "doc3"}),
+        Document(page_content="自然语言处理研究语言理解", metadata={"source": "doc4"}),
+        Document(page_content="计算机视觉让机器看懂世界", metadata={"source": "doc5"}),
+    ]
+
+    # 创建向量存储
+    vectorstore = FAISS.from_documents(
+        documents=documents,
+        embedding=embeddings
+    )
+
+    # 保存到本地
+    vectorstore.save_local("faiss_index")
+
+    # 检索
+    results = vectorstore.similarity_search("什么是人工智能？", k=3)
+    for i, doc in enumerate(results):
+        print(f"结果{i+1}: {doc.page_content} (来源: {doc.metadata['source']})")
+
+    # 带相似度分数的检索
+    results_with_scores = vectorstore.similarity_search_with_score(
+        "深度学习的工作原理", k=3
+    )
+    for doc, score in results_with_scores:
+        print(f"相似度分数: {score:.4f} - {doc.page_content}")
+
+    # MMR检索（多样性）
+    mmr_results = vectorstore.max_marginal_relevance_search(
+        "机器学习算法", k=2, fetch_k=5
+    )
+
+    return vectorstore
+
+# 2. Chroma - 轻量级向量数据库
+def chroma_vectorstore():
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+
+    documents = [
+        "AI技术正在改变各行各业",
+        "机器学习推动智能化发展",
+        "深度学习在图像识别中表现优异",
+        "自然语言处理实现人机对话",
+        "强化学习用于游戏和机器人控制"
+    ]
+
+    # 创建Chroma向量存储
+    vectorstore = Chroma.from_texts(
+        texts=documents,
+        embedding=embeddings,
+        collection_name="ai_knowledge",
+        persist_directory="chroma_db"
+    )
+
+    # 检索
+    results = vectorstore.similarity_search("AI的应用场景", k=3)
+    for doc in results:
+        print(doc.page_content)
+
+    # 元数据过滤
+    results = vectorstore.similarity_search(
+        "机器学习",
+        k=3,
+        filter={"source": "doc2"}
+    )
+
+    # 删除集合
+    # vectorstore.delete_collection()
+
+    return vectorstore
+
+# 3. Milvus - 生产级向量数据库
+def milvus_vectorstore():
+    from pymilvus import MilvusClient
+
+    # 连接Milvus
+    # client = MilvusClient(uri="http://localhost:19530")
+
+    # 使用LangChain接口
+    vectorstore = Milvus(
+        embedding_function=OpenAIEmbeddings(),
+        collection_name="documents",
+        connection_args={"uri": "http://localhost:19530"}
+    )
+
+    return vectorstore
+
+# 4. Pinecone（云服务）
+def pinecone_vectorstore():
+    from langchain_pinecone import PineconeVectorStore
+
+    embeddings = OpenAIEmbeddings()
+
+    vectorstore = PineconeVectorStore.from_documents(
+        documents=[],
+        embedding=embeddings,
+        index_name="my-index",
+        pinecone_api_key="your-api-key"
+    )
+
+    return vectorstore
+
+# 5. 混合搜索
+def hybrid_search():
+    """
+    结合关键词搜索和向量搜索
+    """
+    from langchain_community.retrievers import BM25Retriever
+
+    # 关键词检索器
+    keyword_retriever = BM25Retriever.from_documents(documents)
+    keyword_retriever.k = 2
+
+    # 向量检索器
+    vectorstore = FAISS.from_documents(documents, OpenAIEmbeddings())
+    vector_retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
+
+    # 合并检索器
+    from langchain.retrievers import EnsembleRetriever
+
+    ensemble_retriever = EnsembleRetriever(
+        retrievers=[keyword_retriever, vector_retriever],
+        weights=[0.5, 0.5]  # 权重分配
+    )
+
+    results = ensemble_retriever.invoke("机器学习")
+    return results
+
+# 6. 自定义检索器
+class CustomRetriever:
+    def __init__(self, vectorstore, keyword_index):
+        self.vectorstore = vectorstore
+        self.keyword_index = keyword_index
+
+    def get_relevant_documents(self, query):
+        # 向量搜索
+        vector_results = self.vectorstore.similarity_search(query, k=3)
+        # 关键词搜索
+        keyword_results = self.keyword_index.search(query, k=2)
+        # 合并去重
+        combined = vector_results + keyword_results
+        seen = set()
+        unique_results = []
+        for doc in combined:
+            if doc.page_content not in seen:
+                seen.add(doc.page_content)
+                unique_results.append(doc)
+        return unique_results[:5]
+
+# 向量数据库选择
+DB_COMPARISON = """
+向量数据库对比：
+
+┌─────────────┬──────────────┬─────────────────┬───────────────────┐
+│   数据库    │   部署方式   │   规模          │    特点           │
+├─────────────┼──────────────┼─────────────────┼───────────────────┤
+│   FAISS     │   本地      │   中小规模      │   免费、快速       │
+│   Chroma    │   本地/云   │   中小规模      │   轻量、易用       │
+│   Milvus    │   本地/云   │   大规模        │   分布式、高性能   │
+│   Pinecone  │   云服务    │   超大规模      │   全托管           │
+│   Weaviate  │   本地/云   │   大规模        │   GraphQL、多模态 │
+│   Qdrant    │   本地/云   │   大规模        │   Rust实现、高性能 │
+└─────────────┴──────────────┴─────────────────┴───────────────────┘
+
+选择建议：
+- 原型开发：FAISS / Chroma
+- 中小规模：Milvus / Qdrant
+- 企业级：Pinecone（云）
+- 混合搜索：Weaviate
+"""
+print(DB_COMPARISON)</code></pre>
+                </div>
+
+                <!-- RAG检索策略 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>7. 高级检索策略</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 高级检索策略
+#
+# 提升RAG系统检索质量的各种技术
+
+from langchain.retrievers import (
+    ContextualCompressionRetriever,
+    MultiQueryRetriever,
+    EnsembleRetriever,
+    BM25Retriever,
+    TfdfRetriever
+)
+from langchain_community.retrievers import WikipediaRetriever
+from langchain_community.document_transformers import (
+    LongContextReorder,
+    EmbeddingsRedundantFilter
+)
+from langchain_openai import OpenAIEmbeddings
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
+from langchain.schema import BaseRetriever, Document
+
+# 1. Multi-Query检索器
+def multi_query_retriever():
+    """通过生成多个查询变体来提高召回率"""
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents, embeddings)
+
+    llm = OpenAI(temperature=0)
+
+    retriever = MultiQueryRetriever.from_llm(
+        retriever=vectorstore.as_retriever(),
+        llm=llm
+    )
+
+    # 自动生成查询变体并检索
+    unique_docs = retriever.invoke("机器学习在医疗中的应用")
+    return unique_docs
+
+# 2. 上下文压缩检索
+def compression_retriever():
+    """压缩检索结果，减少冗余信息"""
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents, embeddings)
+
+    # 使用LLM压缩文档
+    from langchain_community.document_compressors import LLMChainExtractor
+
+    compressor = LLMChainExtractor.from_llm(OpenAI())
+
+    compression_retriever = ContextualCompressionRetriever(
+        base_retriever=vectorstore.as_retriever(),
+        base_compressor=compressor
+    )
+
+    compressed_docs = compression_retriever.invoke("AI技术")
+    return compressed_docs
+
+# 3. 重排序检索
+def rerank_retriever():
+    """使用重排序模型优化结果顺序"""
+    from langchain_community.cross_encoders import CrossEncoder
+
+    # 交叉编码器（用于重排序）
+    reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-12-v2")
+
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents, embeddings)
+
+    # 初始检索
+    initial_results = vectorstore.similarity_search("深度学习", k=10)
+
+    # 重排序
+    query = "深度学习"
+    pairs = [(query, doc.page_content) for doc in initial_results]
+    scores = reranker.predict(pairs)
+
+    # 按分数排序
+    ranked_results = sorted(
+        zip(initial_results, scores),
+        key=lambda x: x[1],
+        reverse=True
+    )[:3]
+
+    return ranked_results
+
+# 4. 混合检索
+def hybrid_retriever():
+    """结合多种检索方法"""
+    from langchain.retrievers import EnsembleRetriever
+    from langchain_community.retrievers import BM25Retriever
+
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents, embeddings)
+
+    # 向量检索器
+    vector_retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+
+    # BM25关键词检索器
+    bm25_retriever = BM25Retriever.from_documents(documents)
+    bm25_retriever.k = 3
+
+    # 知识图谱检索器（简化）
+    # kg_retriever = KnowledgeGraphRetriever(...)
+
+    # 集成检索器
+    ensemble_retriever = EnsembleRetriever(
+        retrievers=[vector_retriever, bm25_retriever],
+        weights=[0.6, 0.4]  # 向量权重更高
+    )
+
+    results = ensemble_retriever.invoke("机器学习算法")
+    return results
+
+# 5. 层级检索
+def hierarchical_retriever():
+    """先检索摘要，再检索详情"""
+    # 第一层：文档级别检索
+    doc_vectorstore = FAISS.from_documents(documents, OpenAIEmbeddings())
+
+    # 第二层：段落级别检索
+    # 需要更细粒度的文档
+    # paragraph_vectorstore = FAISS.from_documents(paragraphs, ...)
+
+    def retrieve_with_hierarchy(query):
+        # 检索相关文档
+        relevant_docs = doc_vectorstore.similarity_search(query, k=3)
+
+        # 在每个文档内检索具体段落
+        all_passages = []
+        for doc in relevant_docs:
+            # 这里应该对每个文档做内部检索
+            # 简化处理：直接使用文档内容
+            all_passages.append(doc)
+
+        return all_passages
+
+    return retrieve_with_hierarchy
+
+# 6. 自适应检索
+def adaptive_retriever():
+    """根据查询类型选择不同的检索策略"""
+    class AdaptiveRetriever:
+        def __init__(self, vectorstore, kg_store):
+            self.vectorstore = vectorstore
+            self.kg_store = kg_store
+
+        def retrieve(self, query):
+            query_lower = query.lower()
+
+            # 实体查询：使用知识图谱
+            if any(keyword in query_lower for keyword in ["谁", "什么", "定义"]):
+                return self.kg_store.search(query)
+
+            # 关系查询
+            if any(keyword in query_lower for keyword in ["关系", "区别", "比较"]):
+                return self.vectorstore.similarity_search(query, k=5)
+
+            # 默认使用向量检索
+            return self.vectorstore.similarity_search(query, k=3)
+
+    return AdaptiveRetriever(None, None)
+
+# 7. 查询路由
+def query_router():
+    """将查询路由到不同的数据源或处理路径"""
+    from langchain.schema import BaseMessage
+
+    class QueryRouter:
+        def __init__(self, retriever_map):
+            self.retriever_map = retriever_map
+
+        def route(self, query):
+            query_lower = query.lower()
+
+            if "技术" in query_lower or "原理" in query_lower:
+                return {
+                    "destination": "technical_docs",
+                    "retriever": self.retriever_map["technical"]
+                }
+            elif "最新" in query_lower or "新闻" in query_lower:
+                return {
+                    "destination": "news",
+                    "retriever": self.retriever_map["news"]
+                }
+            else:
+                return {
+                    "destination": "general",
+                    "retriever": self.retriever_map["general"]
+                }
+
+    return QueryRouter({})
+
+# 检索策略对比
+RETRIEVAL_STRATEGIES = """
+高级检索策略对比：
+
+┌──────────────────┬──────────────────────────────────────────────┐
+│     策略         │                  适用场景                    │
+├──────────────────┼──────────────────────────────────────────────┤
+│ Multi-Query      │ 查询表述多样、语义模糊                       │
+│ 上下文压缩       │ 文档冗长、需要精炼信息                       │
+│ 重排序           │ 初步结果多、需要精准排序                     │
+│ 混合检索         │ 需要兼顾语义和关键词匹配                     │
+│ 层级检索         │ 文档结构层次分明、需细粒度检索               │
+│ 自适应检索       │ 多数据源、查询类型多样                       │
+│ 查询路由         │ 不同查询需要不同处理逻辑                     │
+└──────────────────┴──────────────────────────────────────────────┘
+
+调优技巧：
+1. 调整k值：不同查询可能需要不同数量的结果
+2. 相似度阈值：过滤低相关结果
+3. MMR参数：平衡相关性和多样性
+4. 权重配置：多检索器时调整权重
+"""
+print(RETRIEVAL_STRATEGIES)</code></pre>
+                </div>
+
+                <!-- RAG链构建 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>8. RAG链构建与优化</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># RAG链构建详解
+#
+# 从基础RAG到高级RAG的完整实现
+
+from langchain_openai import ChatOpenAI, OpenAI
+from langchain.prompts import ChatPromptTemplate, PromptTemplate
+from langchain.chains import (
+    RetrievalQA, ConversationalRetrievalChain,
+    StuffDocumentsChain, MapReduceDocumentsChain,
+    RefineDocumentsChain, LLMChain
+)
+from langchain.schema import (
+    Document, StrOutputParser,
+    BasePromptTemplate
+)
+from langchain_core.runnables import (
+    RunnablePassthrough, RunnableLambda
+)
+from operator import itemgetter
+
+# 1. 基础RAG链（Stuff模式）
+def basic_rag_chain():
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents, embeddings)
+    retriever = vectorstore.as_retriever()
+
+    llm = ChatOpenAI(model="gpt-4", temperature=0)
+
+    # 提示词模板
+    prompt = ChatPromptTemplate.from_template("""
+基于以下上下文回答问题。如果上下文中没有相关信息，请说"根据提供的上下文，我无法回答这个问题"。
+
+上下文：
+{context}
+
+问题：{question}
+
+回答：
+""")
+
+    # 构建链
+    chain = (
+        {"context": retriever, "question": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+
+    result = chain.invoke("什么是机器学习？")
+    return chain
+
+# 2. 带历史记忆的对话RAG
+def conversational_rag_chain():
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents, embeddings)
+    retriever = vectorstore.as_retriever()
+
+    llm = ChatOpenAI(model="gpt-4", temperature=0)
+
+    # 记忆组件
+    memory = ConversationBufferMemory(
+        memory_key="chat_history",
+        return_messages=True,
+        output_key="answer"
+    )
+
+    # 对话检索链
+    chain = ConversationalRetrievalChain.from_llm(
+        llm=llm,
+        retriever=retriever,
+        memory=memory,
+        combine_docs_chain_kwargs={
+            "prompt": ChatPromptTemplate.from_template("""
+根据以下上下文回答问题。
+
+上下文：
+{context}
+
+当前问题：{question}
+对话历史：{chat_history}
+
+请基于对话历史理解上下文，给出连贯的回答。
+""")
+        },
+        return_source_documents=True,
+        verbose=True
+    )
+
+    # 使用
+    result = chain.invoke({
+        "question": "深度学习是什么？",
+        "chat_history": []
+    })
+
+    print(f"回答: {result['answer']}")
+    print(f"来源: {[doc.metadata for doc in result['source_documents']]}")
+
+    return chain
+
+# 3. Map-Reduce模式（长文档）
+def map_reduce_rag_chain():
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents, embeddings)
+    retriever = vectorstore.as_retriever()
+
+    llm = ChatOpenAI(model="gpt-4", temperature=0)
+
+    # Map链：对每个文档单独处理
+    map_prompt = ChatPromptTemplate.from_template("""
+请简要总结以下文档片段：
+
+{doc_text}
+
+总结：
+""")
+    map_chain = LLMChain(llm=llm, prompt=map_prompt)
+
+    # Reduce链：合并所有总结
+    reduce_prompt = ChatPromptTemplate.from_template("""
+以下是对长文档各个部分的总结，请整合成最终回答：
+
+{summaries}
+
+原始问题：{question}
+
+最终回答：
+""")
+    reduce_chain = LLMChain(llm=llm, prompt=reduce_prompt)
+
+    # 构建Map-Reduce链
+    chain = MapReduceDocumentsChain(
+        llm_chain=map_chain,
+        reduce_documents_chain=reduce_chain,
+        document_variable_name="doc_text",
+        return_intermediate_steps=True
+    )
+
+    return chain
+
+# 4. Refine模式（迭代优化）
+def refine_rag_chain():
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents, embeddings)
+    retriever = vectorstore.as_retriever()
+
+    llm = ChatOpenAI(model="gpt-4", temperature=0)
+
+    refine_prompt = ChatPromptTemplate.from_template("""
+基于之前的回答和新的上下文，优化回答。
+
+之前的回答：
+{existing_answer}
+
+新上下文：
+{context}
+
+新问题：
+{question}
+
+请根据新上下文优化之前的回答，保持风格一致。
+""")
+
+    initial_prompt = ChatPromptTemplate.from_template("""
+基于以下上下文给出初始回答：
+
+{context}
+
+问题：{question}
+
+初始回答：
+""")
+
+    chain = RefineDocumentsChain(
+        initial_llm_chain=LLMChain(llm=llm, prompt=initial_prompt),
+        refine_llm_chain=LLMChain(llm=llm, prompt=refine_prompt),
+        document_variable_name="context",
+        initial_response_name="existing_answer"
+    )
+
+    return chain
+
+# 5. 自定义RAG链
+def custom_rag_chain():
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents, embeddings)
+    retriever = vectorstore.as_retriever()
+
+    llm = ChatOpenAI(model="gpt-4", temperature=0)
+
+    # 检索
+    def retrieve_docs(question):
+        docs = retriever.invoke(question)
+        return docs
+
+    # 格式化
+    def format_docs(docs):
+        return "\n\n".join([
+            f"[来源{i+1}] {doc.page_content}"
+            for i, doc in enumerate(docs)
+        ])
+
+    # 生成回答
+    def generate_answer(inputs):
+        context = format_docs(inputs["docs"])
+        question = inputs["question"]
+
+        prompt = f"""
+你是AI助手。请基于以下来源信息回答问题。
+
+来源信息：
+{context}
+
+问题：{question}
+
+要求：
+1. 优先使用来源信息回答
+2. 引用具体来源
+3. 如信息不足，诚实说明
+
+回答：
+"""
+        response = llm.invoke([HumanMessage(content=prompt)])
+        return response.content
+
+    # 构建链
+    chain = (
+        {"question": RunnablePassthrough()}
+        | RunnableLambda(retrieve_docs)
+        | RunnableLambda(lambda docs: {"docs": docs, "question": "dummy"})
+        | RunnableLambda(generate_answer)
+    )
+
+    return chain
+
+# 6. RAG优化技巧
+RAG_OPTIMIZATION = """
+RAG链优化技巧：
+
+1. 提示词优化
+   - 明确指令
+   - 提供示例（Few-shot）
+   - 要求引用来源
+   - 设定回答格式
+
+2. 检索优化
+   - 调整chunk_size和chunk_overlap
+   - 使用高级检索策略
+   - 过滤低质量结果
+   - 重排序优化
+
+3. 生成优化
+   - 选择合适的模型
+   - 调整temperature
+   - 设置max_tokens限制
+   - 后处理输出
+
+4. 性能优化
+   - 缓存检索结果
+   - 异步处理
+   - 批量检索
+   - 预计算嵌入
+
+5. 评估与迭代
+   - 评估检索质量
+   - 评估生成质量
+   - A/B测试不同策略
+   - 收集用户反馈
+"""
+print(RAG_OPTIMIZATION)</code></pre>
+                </div>
+
+                <!-- 高级RAG模式 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>9. 高级RAG架构</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 高级RAG架构
+#
+# 复杂的RAG系统设计和实现
+
+from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema import Document
+from langchain_core.runnables import (
+    RunnableBranch, RunnableLambda
+)
+from typing import List, Dict, Any
+
+# 1. 路由RAG
+def routing_rag():
+    """根据问题类型路由到不同处理路径"""
+    embeddings = OpenAIEmbeddings()
+    llm = ChatOpenAI(model="gpt-4", temperature=0)
+
+    # 知识库
+    tech_vectorstore = FAISS.from_documents(tech_docs, embeddings)
+    news_vectorstore = FAISS.from_documents(news_docs, embeddings)
+
+    # 路由逻辑
+    def route_question(question: str) -> str:
+        if any(kw in question.lower() for kw in ["技术", "原理", "代码"]):
+            return "technical"
+        elif any(kw in question.lower() for kw in ["最新", "新闻", "最近"]):
+            return "news"
+        else:
+            return "general"
+
+    # 路由链
+    class Router:
+        def __init__(self):
+            self.chains = {
+                "technical": self._create_chain(tech_vectorstore),
+                "news": self._create_chain(news_vectorstore),
+                "general": self._create_chain(tech_vectorstore)
+            }
+
+        def _create_chain(self, vectorstore):
+            retriever = vectorstore.as_retriever()
+            prompt = ChatPromptTemplate.from_template("回答技术问题：{context}\n问题：{question}")
+            return (
+                {"context": retriever, "question": RunnablePassthrough()}
+                | prompt
+                | llm
+            )
+
+        def invoke(self, question):
+            route = route_question(question)
+            return self.chains[route].invoke(question)
+
+    return Router()
+
+# 2. 条件RAG
+def conditional_rag():
+    """根据条件选择是否检索"""
+    llm = ChatOpenAI(model="gpt-4", temperature=0)
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents, embeddings)
+
+    # 判断是否需要检索
+    def need_retrieval(question: str) -> bool:
+        # 简单规则：包含特定关键词时检索
+        retrieval_keywords = ["根据", "文档", "资料", "具体"]
+        return any(kw in question for kw in retrieval_keywords)
+
+    chain = RunnableBranch(
+        (RunnableLambda(need_retrieval),
+         # 需要检索的路径
+         ({"context": vectorstore.as_retriever(), "question": RunnablePassthrough()}
+          | ChatPromptTemplate.from_template("基于上下文：{context}\n问题：{question}")
+          | llm)),
+        # 无需检索的路径
+        (RunnablePassthrough()
+         | (lambda x: f"直接回答：{llm.invoke([HumanMessage(content=x['question'])])}"))
+    )
+
+    return chain
+
+# 3. 迭代RAG
+def iterative_rag():
+    """多次迭代检索直到得到满意结果"""
+    llm = ChatOpenAI(model="gpt-4", temperature=0)
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents, embeddings)
+
+    max_iterations = 3
+
+    def iterative_retrieve(question: str) -> str:
+        context = ""
+        for i in range(max_iterations):
+            # 检索
+            docs = vectorstore.similarity_search(question, k=3)
+            new_context = "\n".join([doc.page_content for doc in docs])
+
+            # 判断是否需要更多迭代
+            if i == 0:
+                context = new_context
+            else:
+                # 检查是否已获取足够信息
+                check_prompt = f"""
+判断以下回答是否已足够回答问题。如果足够，回答"足够"；否则回答"不足"。
+
+问题：{question}
+已有信息：{context}
+新信息：{new_context}
+
+判断：
+"""
+                response = llm.invoke([HumanMessage(content=check_prompt)])
+                if "足够" in response.content:
+                    context = new_context
+                    break
+                context += "\n" + new_context
+
+        return context
+
+    return iterative_retrieve
+
+# 4. 自省RAG
+def self_reflective_rag():
+    """让LLM评估和反思检索结果"""
+    llm = ChatOpenAI(model="gpt-4", temperature=0)
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents, embeddings)
+
+    def retrieve_with_reflection(question: str) -> str:
+        # 初始检索
+        docs = vectorstore.similarity_search(question, k=5)
+        context = "\n\n".join([doc.page_content for doc in docs])
+
+        # 自省：评估检索质量
+        reflection_prompt = f"""
+你是RAG系统的自省模块。请评估以下检索结果是否足够回答问题。
+
+问题：{question}
+检索结果：{context}
+
+请评估：
+1. 检索结果是否与问题相关？（是/否）
+2. 是否包含足够信息回答问题？（是/否）
+3. 需要补充什么信息？
+
+评估结果：
+"""
+        reflection = llm.invoke([HumanMessage(content=reflection_prompt)])
+
+        # 根据自省结果调整
+        if "否" in reflection.content:
+            # 重新检索或修改查询
+            refined_question = f"{question} {reflection}"
+            docs = vectorstore.similarity_search(refined_question, k=5)
+            context = "\n\n".join([doc.page_content for doc in docs])
+
+        return context
+
+    return retrieve_with_reflection
+
+# 5. Agentic RAG
+def agentic_rag():
+    """使用Agent控制RAG流程"""
+    from langchain.agents import AgentType, initialize_agent
+    from langchain.tools import Tool
+
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents, embeddings)
+    llm = ChatOpenAI(model="gpt-4-turbo", temperature=0)
+
+    # 定义工具
+    tools = [
+        Tool(
+            name="retrieve",
+            func=lambda q: "\n".join([
+                doc.page_content
+                for doc in vectorstore.similarity_search(q, k=3)
+            ]),
+            description="用于检索相关信息。当需要查找具体信息时使用。"
+        ),
+        Tool(
+            name="search_web",
+            func=lambda q: f"搜索'{q}'的结果...",
+            description="用于搜索网络信息。当需要最新信息时使用。"
+        ),
+        Tool(
+            name="calculate",
+            func=lambda x: str(eval(x)),
+            description="用于数学计算。"
+        )
+    ]
+
+    # 创建Agent
+    agent = initialize_agent(
+        tools=tools,
+        llm=llm,
+        agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+        verbose=True
+    )
+
+    return agent
+
+# 6. 知识图谱增强RAG
+def kg_augmented_rag():
+    """结合知识图谱的RAG"""
+    # 简化实现
+    class KnowledgeGraphRAG:
+        def __init__(self, vectorstore, kg_store):
+            self.vectorstore = vectorstore
+            self.kg = kg_store
+
+        def retrieve(self, question: str) -> str:
+            # 从向量库检索
+            docs = self.vectorstore.similarity_search(question, k=3)
+
+            # 从知识图谱检索实体关系
+            entities = self.extract_entities(question)
+            kg_info = self.query_kg(entities)
+
+            # 合并信息
+            context = "\n".join([
+                doc.page_content for doc in docs
+            ]) + f"\n知识图谱信息：{kg_info}"
+
+            return context
+
+        def extract_entities(self, text):
+            # 实体抽取逻辑
+            return []
+
+        def query_kg(self, entities):
+            # 知识图谱查询逻辑
+            return ""
+
+    return KnowledgeGraphRAG(None, None)
+
+# 高级架构对比
+ADVANCED_PATTERNS = """
+高级RAG架构对比：
+
+┌──────────────────┬────────────────────────────────────────────┐
+│     架构         │                  特点                      │
+├──────────────────┼────────────────────────────────────────────┤
+│ 路由RAG          │ 根据问题类型选择不同处理路径               │
+│ 条件RAG          │ 根据条件决定是否进行检索                   │
+│ 迭代RAG          │ 多次迭代检索直到结果满意                   │
+│ 自省RAG          │ LLM评估检索质量并自动优化                  │
+│ Agentic RAG      │ Agent智能控制检索和推理流程               │
+│ KG+RAG           │ 结合知识图谱，增强关系理解                 │
+└──────────────────┴────────────────────────────────────────────┘
+
+适用场景：
+- 路由RAG：多数据源、问题类型多样
+- 条件RAG：简单问题直接回答，复杂问题检索
+- 迭代RAG：需要全面信息的关键问题
+- 自省RAG：需要高质量检索的场景
+- Agentic RAG：需要工具调用的复杂任务
+- KG+RAG：需要关系推理的专业领域
+"""
+print(ADVANCED_PATTERNS)</code></pre>
+                </div>
+
+                <!-- RAG评估 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>10. RAG评估与优化</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># RAG评估与优化
+#
+# 系统化评估和提升RAG系统性能
+
+from langchain_openai import ChatOpenAI, OpenAI
+from langchain.chains import RetrievalQA
+from sklearn.metrics import precision_score, recall_score, f1_score
+import numpy as np
+
+# 1. 检索质量评估
+def evaluate_retrieval():
+    """评估检索结果的准确性和召回率"""
+    from langchain_community.evaluation import EmbeddingDistance
+
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents, embeddings)
+
+    # 测试查询和期望结果
+    test_cases = [
+        {
+            "query": "机器学习的定义",
+            "relevant_docs": ["doc1", "doc2"],  # 期望返回的文档ID
+        },
+        {
+            "query": "深度学习的应用",
+            "relevant_docs": ["doc3"],
+        }
+    ]
+
+    def calculate_recall(query, relevant_ids, retrieved_docs):
+        """计算召回率"""
+        retrieved_ids = [doc.metadata.get("id") for doc in retrieved_docs]
+        relevant_set = set(relevant_ids)
+        retrieved_set = set(retrieved_ids)
+
+        if len(relevant_set) == 0:
+            return 1.0
+
+        intersection = relevant_set & retrieved_set
+        return len(intersection) / len(relevant_set)
+
+    def calculate_precision(query, relevant_ids, retrieved_docs):
+        """计算准确率"""
+        retrieved_ids = [doc.metadata.get("id") for doc in retrieved_docs]
+        relevant_set = set(relevant_ids)
+        retrieved_set = set(retrieved_ids)
+
+        if len(retrieved_set) == 0:
+            return 1.0
+
+        intersection = relevant_set & retrieved_set
+        return len(intersection) / len(retrieved_set)
+
+    # 评估
+    all_recalls = []
+    all_precisions = []
+
+    for case in test_cases:
+        retrieved = vectorstore.similarity_search(case["query"], k=5)
+
+        recall = calculate_recall(
+            case["query"],
+            case["relevant_docs"],
+            retrieved
+        )
+        precision = calculate_precision(
+            case["query"],
+            case["relevant_docs"],
+            retrieved
+        )
+
+        all_recalls.append(recall)
+        all_precisions.append(precision)
+
+    avg_recall = np.mean(all_recalls)
+    avg_precision = np.mean(all_precisions)
+    avg_f1 = 2 * avg_precision * avg_recall / (avg_precision + avg_recall + 1e-8)
+
+    print(f"平均召回率: {avg_recall:.4f}")
+    print(f"平均准确率: {avg_precision:.4f}")
+    print(f"F1分数: {avg_f1:.4f}")
+
+    return avg_recall, avg_precision, avg_f1
+
+# 2. 生成质量评估
+def evaluate_generation():
+    """评估生成回答的质量"""
+    llm = ChatOpenAI(model="gpt-4", temperature=0)
+
+    # 评估维度
+    evaluation_prompt = """
+你是RAG系统评估专家。请评估以下回答的质量。
+
+问题：{question}
+真实回答：{ground_truth}
+系统回答：{answer}
+
+请从以下维度打分（1-5分）：
+
+1. 准确性 - 回答是否正确？（1-5）
+2. 完整性 - 是否覆盖所有要点？（1-5）
+3. 相关性 - 是否紧扣问题？（1-5）
+4. 连贯性 - 表达是否流畅？（1-5）
+5. 引用准确性 - 引用的来源是否正确？（1-5）
+
+请以JSON格式输出：
+{{
+    "准确性": x,
+    "完整性": x,
+    "相关性": x,
+    "连贯性": x,
+    "引用准确性": x,
+    "总分": x,
+    "详细评价": "..."
+}}
+"""
+
+    test_cases = [
+        {
+            "question": "什么是机器学习？",
+            "ground_truth": "机器学习是人工智能的一个分支..."
+        }
+    ]
+
+    for case in test_cases:
+        prompt = evaluation_prompt.format(
+            question=case["question"],
+            ground_truth=case["ground_truth"],
+            answer="系统生成的回答..."
+        )
+        # 实际评估时调用LLM评估
+
+# 3. 端到端评估（使用RAGAS）
+def ragas_evaluation():
+    """
+    使用RAGAS框架评估RAG系统
+    pip install ragas
+    """
+    # pip install ragas
+    from ragas import evaluate
+    from ragas.metrics import (
+        faithfulness, answer_relevancy,
+        context_precision, context_recall
+    )
+    from ragas.dataset import Dataset
+
+    # 准备测试数据
+    data = {
+        "question": ["机器学习是什么？", "深度学习的原理？"],
+        "answer": ["机器学习是...", "深度学习是..."],
+        "ground_truth": ["机器学习是...", "深度学习是..."],
+        "contexts": [
+            ["人工智能的一个分支...", "使用算法..."],
+            ["基于神经网络...", "多层结构..."]
+        ]
+    }
+
+    # 评估
+    # result = evaluate(
+    #     data,
+    #     metrics=[faithfulness, answer_relevancy]
+    # )
+    # print(result)
+
+    return None
+
+# 4. A/B测试
+def ab_test():
+    """A/B测试不同RAG配置"""
+    import random
+
+    class ABTest:
+        def __init__(self, variant_a, variant_b, test_size=100):
+            self.variant_a = variant_a
+            self.variant_b = variant_b
+            self.test_size = test_size
+            self.results_a = []
+            self.results_b = []
+
+        def run_test(self, test_cases):
+            for case in test_cases[:self.test_size]:
+                # 随机分配
+                if random.random() < 0.5:
+                    result = self.variant_a.invoke(case["question"])
+                    self.results_a.append(self.evaluate_result(result, case))
+                else:
+                    result = self.variant_b.invoke(case["question"])
+                    self.results_b.append(self.evaluate_result(result, case))
+
+        def evaluate_result(self, result, expected):
+            # 计算相似度或准确率
+            return {"score": 0.9, "relevant": True}
+
+        def get_statistics(self):
+            avg_a = np.mean([r["score"] for r in self.results_a])
+            avg_b = np.mean([r["score"] for r in self.results_b])
+            return {
+                "variant_a_avg": avg_a,
+                "variant_b_avg": avg_b,
+                "winner": "A" if avg_a > avg_b else "B",
+                "improvement": abs(avg_a - avg_b) / min(avg_a, avg_b)
+            }
+
+    return ABTest(None, None)
+
+# 5. 持续优化流程
+def continuous_improvement():
+    """建立持续优化机制"""
+
+    # 问题收集
+    feedback_data = []
+
+    # 分析问题模式
+    def analyze_issues(feedback_data):
+        """分析常见问题"""
+        issues = {
+            "检索不准确": [],
+            "回答不完整": [],
+            "幻觉": [],
+            "格式问题": []
+        }
+
+        for feedback in feedback_data:
+            if "找不到" in feedback.get("comment", ""):
+                issues["检索不准确"].append(feedback)
+            elif "不全" in feedback.get("comment", ""):
+                issues["回答不完整"].append(feedback)
+
+        return issues
+
+    # 优化策略
+    optimization_strategies = {
+        "检索不准确": [
+            "调整chunk_size和chunk_overlap",
+            "尝试不同的嵌入模型",
+            "增加检索结果数量",
+            "使用重排序模型"
+        ],
+        "回答不完整": [
+            "增加检索上下文",
+            "调整提示词要求",
+            "使用Map-Reduce模式",
+            "增加迭代次数"
+        ],
+        "幻觉": [
+            "强化提示词要求",
+            "增加来源验证",
+            "降低temperature",
+            "增加后处理验证"
+        ]
+    }
+
+    return optimization_strategies
+
+# 评估框架对比
+EVALUATION_FRAMEWORKS = """
+RAG评估框架对比：
+
+┌──────────────────┬────────────────────────────────────────────┐
+│     框架         │                  特点                      │
+├──────────────────┼────────────────────────────────────────────┤
+│ RAGAS            │ 专门为RAG设计，指标丰富                    │
+│ TruLens          │ 实时监控，集成方便                         │
+│ LangSmith       │ LangChain生态，可视化强                    │
+│ DeepEval        │ 简单易用，pytest集成                       │
+│ RAGChecker       │ 细粒度评估，支持自定义                    │
+└──────────────────┴────────────────────────────────────────────┘
+
+核心评估指标：
+- 检索：Hit Rate, MRR, NDCG
+- 生成：Faithfulness, Answer Relevancy, Context Precision
+- 端到端：RAGAS Score, 人工评分
+"""
+print(EVALUATION_FRAMEWORKS)</code></pre>
+                </div>
+
+                <!-- 生产级RAG系统 -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>11. 生产级RAG系统</h3>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 生产级RAG系统设计与实现
+#
+# 从原型到生产的完整指南
+
+from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.memory import ConversationBufferMemory
+from langchain.callbacks.base import BaseCallbackHandler
+from langchain_community.vectorstores import FAISS
+from dataclasses import dataclass
+from typing import Optional, List, Dict
+import time
+import logging
+
+# 1. 配置管理
+@dataclass
+class RAGConfig:
+    """RAG系统配置"""
+    # 模型配置
+    llm_model: str = "gpt-4"
+    embedding_model: str = "text-embedding-3-small"
+    temperature: float = 0.0
+
+    # 检索配置
+    top_k: int = 5
+    chunk_size: int = 1000
+    chunk_overlap: int = 200
+    similarity_threshold: float = 0.7
+
+    # 性能配置
+    cache_enabled: bool = True
+    cache_ttl: int = 3600
+    max_retries: int = 3
+
+    # 监控配置
+    log_level: str = "INFO"
+    enable_tracing: bool = True
+
+# 2. 日志与监控
+class MetricsCollector(BaseCallbackHandler):
+    """指标收集器"""
+
+    def __init__(self):
+        self.metrics = {
+            "total_requests": 0,
+            "successful_requests": 0,
+            "failed_requests": 0,
+            "total_latency": 0,
+            "token_usage": {"prompt": 0, "completion": 0}
+        }
+
+    def on_llm_start(self, serialized, prompts, **kwargs):
+        self.metrics["total_requests"] += 1
+        self.start_time = time.time()
+
+    def on_llm_end(self, response, **kwargs):
+        self.metrics["successful_requests"] += 1
+        self.metrics["total_latency"] += time.time() - self.start_time
+
+        if hasattr(response, 'response_metadata'):
+            usage = response.response_metadata.get('token_usage', {})
+            self.metrics["token_usage"]["prompt"] += usage.get('prompt_tokens', 0)
+            self.metrics["token_usage"]["completion"] += usage.get('completion_tokens', 0)
+
+    def on_llm_error(self, error, **kwargs):
+        self.metrics["failed_requests"] += 1
+
+    def get_report(self) -> Dict:
+        avg_latency = self.metrics["total_latency"] / max(1, self.metrics["successful_requests"])
+        return {
+            **self.metrics,
+            "avg_latency": avg_latency,
+            "success_rate": self.metrics["successful_requests"] / max(1, self.metrics["total_requests"])
+        }
+
+# 3. 缓存层
+class SemanticCache:
+    """语义缓存，缓存相似查询的结果"""
+
+    def __init__(self, vectorstore, threshold=0.95):
+        self.vectorstore = vectorstore
+        self.threshold = threshold
+
+    def get(self, query: str) -> Optional[str]:
+        """获取缓存结果"""
+        results = self.vectorstore.similarity_search(query, k=1)
+        if results and results[0].metadata.get("similarity", 0) > self.threshold:
+            return results[0].page_content
+        return None
+
+    def set(self, query: str, response: str):
+        """缓存结果"""
+        self.vectorstore.add_texts(
+            texts=[response],
+            metadatas=[{"query": query, "similarity": 1.0}]
+        )
+
+# 4. 速率限制
+import asyncio
+from typing import Optional
+
+class RateLimiter:
+    def __init__(self, rate: int, per: float):
+        self.rate = rate
+        self.per = per
+        self.tokens = rate
+        self.last_update = asyncio.get_event_loop().time()
+
+    async def acquire(self):
+        now = asyncio.get_event_loop().time()
+        time_passed = now - self.last_update
+        self.tokens = min(self.rate, self.tokens + time_passed * self.rate / self.per)
+        if self.tokens >= 1:
+            self.tokens -= 1
+            self.last_update = now
+            return
+        await asyncio.sleep((1 - self.tokens) * self.per / self.rate)
+
+# 5. 生产级RAG服务
+class ProductionRAG:
+    """生产级RAG服务"""
+
+    def __init__(self, config: RAGConfig):
+        self.config = config
+        self.metrics = MetricsCollector()
+        self.memory = ConversationBufferMemory()
+
+        # 初始化组件
+        self.llm = ChatOpenAI(
+            model=config.llm_model,
+            temperature=config.temperature,
+            callbacks=[self.metrics]
+        )
+        self.embeddings = OpenAIEmbeddings(model=config.embedding_model)
+        self.vectorstore = None
+        self.cache = None
+        self.rate_limiter = RateLimiter(100, 60)  # 100次/分钟
+
+    def load_knowledge_base(self, documents: List[Document]):
+        """加载知识库"""
+        from langchain.text_splitters import RecursiveCharacterTextSplitter
+
+        # 文档分割
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=self.config.chunk_size,
+            chunk_overlap=self.config.chunk_overlap
+        )
+        split_docs = splitter.split_documents(documents)
+
+        # 创建向量存储
+        self.vectorstore = FAISS.from_documents(
+            documents=split_docs,
+            embedding=self.embeddings
+        )
+
+        # 初始化缓存
+        self.cache = SemanticCache(self.vectorstore)
+
+    def query(self, question: str, user_id: Optional[str] = None) -> Dict:
+        """查询接口"""
+        import asyncio
+
+        # 速率限制
+        asyncio.get_event_loop().run_until_complete(self.rate_limiter.acquire())
+
+        start_time = time.time()
+
+        # 1. 检查缓存
+        if self.config.cache_enabled and self.cache:
+            cached = self.cache.get(question)
+            if cached:
+                return {
+                    "answer": cached,
+                    "source": "cache",
+                    "latency": time.time() - start_time,
+                    "cached": True
+                }
+
+        # 2. 检索
+        retriever = self.vectorstore.as_retriever(
+            search_kwargs={"k": self.config.top_k}
+        )
+        docs = retriever.invoke(question)
+
+        # 过滤低相似度结果
+        docs = [d for d in docs if d.metadata.get("score", 1) > self.config.similarity_threshold]
+
+        # 3. 生成
+        context = "\n\n".join([doc.page_content for doc in docs])
+        prompt = f"""基于以下上下文回答问题。如果上下文中没有相关信息，请说明。
+
+上下文：
+{context}
+
+问题：{question}
+
+回答：
+"""
+        response = self.llm.invoke([HumanMessage(content=prompt)])
+        answer = response.content
+
+        # 4. 缓存结果
+        if self.config.cache_enabled and self.cache:
+            self.cache.set(question, answer)
+
+        # 5. 记录到记忆
+        self.memory.save_context(
+            {"input": question},
+            {"output": answer}
+        )
+
+        return {
+            "answer": answer,
+            "source": "retrieval",
+            "sources": [doc.metadata for doc in docs],
+            "latency": time.time() - start_time,
+            "cached": False
+        }
+
+    def get_metrics(self) -> Dict:
+        """获取监控指标"""
+        return self.metrics.get_report()
+
+# 6. 部署配置
+DEPLOYMENT_CONFIG = """
+生产部署配置：
+
+1. 基础设施
+   - 向量数据库：Milvus/Pinecone（生产规模）
+   - LLM服务：OpenAI API / 自部署
+   - 嵌入服务：专用GPU实例
+   - 缓存：Redis
+
+2. 扩展策略
+   - 水平扩展：多实例负载均衡
+   - 向量分片：按数据分片
+   - 缓存层：分布式Redis
+
+3. 监控告警
+   - 请求延迟：P50/P95/P99
+   - 错误率：>1% 告警
+   - 缓存命中率：<80% 检查
+   - 资源使用：CPU/Memory/GPU
+
+4. 安全配置
+   - API认证：JWT/OAuth
+   - 数据加密：传输加密
+   - 访问控制：角色权限
+   - 审计日志：操作记录
+
+5. 灾备方案
+   - 多区域部署
+   - 自动故障转移
+   - 数据备份恢复
+"""
+print(DEPLOYMENT_CONFIG)
+
+print("\n=== RAG完整指南完成 ===")
+print("下一步：实际部署和持续优化")</code></pre>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</body>
+</html>

@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM API 接口 - AI技术学习平台</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">🌐 LLM API 接口汇总</h2>
+            <p class="section-subtitle">国内外主流大模型API调用指南</p>
+
+            <div class="card">
+                <div class="card-header">为什么需要了解LLM API？</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     LLM API 的价值                                        │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐              │
+│   │ 即开即用    │  →  │ 按需付费    │  →  │ 快速集成    │              │
+│   │             │     │             │     │             │              │
+│   │ 无需训练    │     │ 按token计费 │     │ SDK封装    │              │
+│   │ 开箱即用    │     │ 成本可控    │     │ 几行代码   │              │
+│   └─────────────┘     └─────────────┘     └─────────────┘              │
+│                                                                         │
+│   主流场景：原型开发、聊天机器人、内容生成、应用集成                   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <h3>🇺🇸 国外主流API</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>厂商</th>
+                            <th>模型</th>
+                            <th>特点</th>
+                            <th>价格</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>OpenAI</strong></td>
+                            <td>GPT-4o, GPT-4, GPT-3.5</td>
+                            <td>生态完善、功能全面</td>
+                            <td>$5-30/M tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Anthropic</strong></td>
+                            <td>Claude 3.5, Claude 3</td>
+                            <td>长上下文、安全对齐</td>
+                            <td>$3-15/M tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Google</strong></td>
+                            <td>Gemini 1.5, Gemini Pro</td>
+                            <td>多模态原生、多语言</td>
+                            <td>$0.5-5/M tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Meta</strong></td>
+                            <td>Llama 3 (开源)</td>
+                            <td>开源免费、可私有部署</td>
+                            <td>免费</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>🇨🇳 国内主流API</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>厂商</th>
+                            <th>模型</th>
+                            <th>特点</th>
+                            <th>价格</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>百度</strong></td>
+                            <td>ERNIE 4.0, ERNIE 3.5</td>
+                            <td>中文理解强、推理能力强</td>
+                            <td>¥0.012-0.12/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>阿里</strong></td>
+                            <td>Qwen 2.5, Qwen-Max</td>
+                            <td>开源生态好、性能优秀</td>
+                            <td>¥0.008-0.02/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>腾讯</strong></td>
+                            <td>混元, 混元-Pro</td>
+                            <td>多模态能力强</td>
+                            <td>¥0.01-0.1/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>字节跳动</strong></td>
+                            <td>豆包, Doubao-pro</td>
+                            <td>性价比高、响应快</td>
+                            <td>¥0.001-0.005/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>智谱AI</strong></td>
+                            <td>GLM-4, GLM-3-Turbo</td>
+                            <td>中英双语、工具调用强</td>
+                            <td>¥0.005-0.1/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>深度求索</strong></td>
+                            <td>DeepSeek-V2, DeepSeek-Chat</td>
+                            <td>推理能力强、价格低</td>
+                            <td>¥0.001-0.004/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>月之暗面</strong></td>
+                            <td>Kimi (Moonshot)</td>
+                            <td>超长上下文(200万字)</td>
+                            <td>¥0.012-0.12/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>百川智能</strong></td>
+                            <td>Baichuan 4</td>
+                            <td>中文优化</td>
+                            <td>¥0.012/千tokens</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>💻 Python API 调用示例</h3>
+
+            <div class="card">
+                <div class="card-header">示例1：OpenAI GPT-4</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install openai
+from openai import OpenAI
+
+# 初始化客户端
+client = OpenAI(
+    api_key="your-api-key",  # 替换为你的API Key
+    base_url="https://api.openai.com/v1"
+)
+
+# 调用模型
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "system", "content": "你是一个专业助手"},
+        {"role": "user", "content": "请解释什么是机器学习？"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# 获取回复
+print(response.choices[0].message.content)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例2：Claude (Anthropic)</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install anthropic
+from anthropic import Anthropic
+
+# 初始化客户端
+client = Anthropic(
+    api_key="your-api-key"  # 替换为你的API Key
+)
+
+# 调用模型
+response = client.messages.create(
+    model="claude-sonnet-4-20250514",
+    max_tokens=1000,
+    messages=[
+        {"role": "user", "content": "请解释什么是深度学习？"}
+    ]
+)
+
+# 获取回复
+print(response.content[0].text)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例3：百度文心一言</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install qianfan
+import qianfan
+
+# 初始化客户端
+client = qianfan.ChatCompletion(
+    ak="your-access-key",      # 替换为你的AK
+    sk="your-secret-key"       # 替换为你的SK
+)
+
+# 调用模型
+response = client.do(
+    model="ernie-4.5-8k",
+    messages=[
+        {"role": "user", "content": "请解释什么是自然语言处理？"}
+    ],
+    temperature=0.7,
+    penalty_score=1.0
+)
+
+# 获取回复
+print(response["body"]["result"])</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例4：阿里通义千问</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install dashscope
+from dashscope import ChatCompletion
+
+# 调用模型
+response = ChatCompletion.call(
+    model="qwen-max",
+    messages=[
+        {"role": "user", "content": "请解释什么是卷积神经网络？"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# 获取回复
+print(response.output.choices[0].message.content)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例5：智谱 GLM</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install zhipuai
+from zhipuai import ZhipuAI
+
+# 初始化客户端
+client = ZhipuAI(api_key="your-api-key")  # 替换为你的API Key
+
+# 调用模型
+response = client.chat.completions.create(
+    model="glm-4",
+    messages=[
+        {"role": "user", "content": "请解释什么是强化学习？"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# 获取回复
+print(response.choices[0].message.content)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例6：深度求索 DeepSeek</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install openai
+from openai import OpenAI
+
+# 初始化客户端（兼容OpenAI接口）
+client = OpenAI(
+    api_key="your-api-key",  # 替换为你的API Key
+    base_url="https://api.deepseek.com/v1"
+)
+
+# 调用模型
+response = client.chat.completions.create(
+    model="deepseek-chat",
+    messages=[
+        {"role": "user", "content": "请解释什么是Transformer架构？"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# 获取回复
+print(response.choices[0].message.content)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例7：字节豆包</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install openai
+from openai import OpenAI
+
+# 初始化客户端（兼容OpenAI接口）
+client = OpenAI(
+    api_key="your-api-key",  # 替换为你的API Key
+    base_url="https://ark.cn-beijing.volces.com/api/v3"
+)
+
+# 调用模型
+response = client.chat.completions.create(
+    model="doubao-pro-32k",
+    messages=[
+        {"role": "user", "content": "请解释什么是注意力机制？"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# 获取回复
+print(response.choices[0].message.content)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例8：月之暗面 Kimi</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install openai
+from openai import OpenAI
+
+# 初始化客户端（兼容OpenAI接口）
+client = OpenAI(
+    api_key="your-api-key",  # 替换为你的API Key
+    base_url="https://api.moonshot.cn/v1"
+)
+
+# 调用模型
+response = client.chat.completions.create(
+    model="moonshot-v1-8k",
+    messages=[
+        {"role": "user", "content": "请解释什么是大语言模型？"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# 获取回复
+print(response.choices[0].message.content)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例9：统一调用封装</div>
+                <pre class="code-block"><code class="language-python">"""
+统一的大语言模型调用封装
+支持切换不同提供商
+"""
+from abc import ABC, abstractmethod
+from typing import List, Dict
+
+class LLMProvider(ABC):
+    """LLM提供商抽象基类"""
+    
+    @abstractmethod
+    def chat(self, messages: List[Dict], **kwargs) -> str:
+        pass
+
+class OpenAIProvider(LLMProvider):
+    def __init__(self, api_key: str, model: str = "gpt-4o"):
+        from openai import OpenAI
+        self.client = OpenAI(api_key=api_key)
+        self.model = model
+    
+    def chat(self, messages: List[Dict], temperature: float = 0.7, **kwargs) -> str:
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            temperature=temperature,
+            **kwargs
+        )
+        return response.choices[0].message.content
+
+class DeepSeekProvider(LLMProvider):
+    def __init__(self, api_key: str, model: str = "deepseek-chat"):
+        from openai import OpenAI
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.deepseek.com/v1"
+        )
+        self.model = model
+    
+    def chat(self, messages: List[Dict], temperature: float = 0.7, **kwargs) -> str:
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            temperature=temperature,
+            **kwargs
+        )
+        return response.choices[0].message.content
+
+class QwenProvider(LLMProvider):
+    def __init__(self, api_key: str, model: str = "qwen-max"):
+        self.api_key = api_key
+        self.model = model
+    
+    def chat(self, messages: List[Dict], temperature: float = 0.7, **kwargs) -> str:
+        from dashscope import ChatCompletion
+        response = ChatCompletion.call(
+            model=self.model,
+            messages=messages,
+            temperature=temperature,
+            **kwargs
+        )
+        return response.output.choices[0].message.content
+
+# 工厂函数
+def create_llm_provider(provider: str, api_key: str, model: str = None) -> LLMProvider:
+    providers = {
+        "openai": lambda: OpenAIProvider(api_key, model or "gpt-4o"),
+        "deepseek": lambda: DeepSeekProvider(api_key, model or "deepseek-chat"),
+        "qwen": lambda: QwenProvider(api_key, model or "qwen-max"),
+    }
+    return providers[provider.lower()]()
+
+# 使用示例
+if __name__ == "__main__":
+    messages = [
+        {"role": "system", "content": "你是一个专业助手"},
+        {"role": "user", "content": "什么是机器学习？"}
+    ]
+    
+    # 切换不同提供商
+    provider = create_llm_provider(
+        provider="deepseek",
+        api_key="your-api-key",
+        model="deepseek-chat"
+    )
+    
+    response = provider.chat(messages)
+    print(response)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">API调用最佳实践</div>
+                <div class="cards-grid card-grid-3" style="margin-top: 1rem;">
+                    <div class="card" style="padding: 1rem;">
+                        <h4 style="margin-bottom: 0.5rem;">🔐 安全建议</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>使用环境变量存储API Key</li>
+                            <li>不要在代码中硬编码密钥</li>
+                            <li>设置API Key使用限制</li>
+                            <li>定期轮换密钥</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="padding: 1rem;">
+                        <h4 style="margin-bottom: 0.5rem;">💰 成本优化</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>选择合适的模型大小</li>
+                            <li>减少不必要的上下文</li>
+                            <li>使用缓存避免重复调用</li>
+                            <li>设置max_tokens限制</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="padding: 1rem;">
+                        <h4 style="margin-bottom: 0.5rem;">🛡️ 错误处理</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>实现重试机制</li>
+                            <li>处理Rate Limit错误</li>
+                            <li>设置超时时间</li>
+                            <li>记录调用日志</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3>💬 messages 参数详解</h3>
+
+            <div class="card">
+                <div class="card-header">什么是 messages 参数？</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    messages 参数的作用                                    │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   messages = 对话历史记录                                               │
+│                                                                         │
+│   ┌─────────────────────────────────────────────────────────────────┐   │
+│   │                                                                 │   │
+│   │   你 → "帮我写一首诗"    ←  发送给模型的信息                     │   │
+│   │                                                                 │   │
+│   │   模型 → "好的，这是诗..."  ←  模型的回复                       │   │
+│   │                                                                 │   │
+│   │   messages 保存了对话的上下文，让模型理解对话的来龙去脉         │   │
+│   │                                                                 │   │
+│   └─────────────────────────────────────────────────────────────────┘   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">role 角色类型</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      role 的四种角色                                      │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────┬──────────────────────────────────────────────────┐   │
+│   │ role        │ 说明                                            │   │
+│   ├─────────────┼──────────────────────────────────────────────────┤   │
+│   │ system      │ 系统指令：设定AI的身份和行为规则                 │   │
+│   │             │ "你是一个专业编程助手"                           │   │
+│   ├─────────────┼──────────────────────────────────────────────────┤   │
+│   │ user        │ 用户输入：人类说的话                             │   │
+│   │             │ "帮我写一个排序算法"                             │   │
+│   ├─────────────┼──────────────────────────────────────────────────┤   │
+│   │ assistant   │ AI回复：模型生成的内容                           │   │
+│   │             │ "这是Python的快速排序实现..."                    │   │
+│   ├─────────────┼──────────────────────────────────────────────────┤   │
+│   │ tool        │ 工具调用：AI调用外部工具的结果（高级功能）       │   │
+│   └─────────────┴──────────────────────────────────────────────────┘   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <h4 style="margin: 1.5rem 0 1rem; font-size: 1.1rem;">📝 通俗类比</h4>
+
+            <div class="cards-grid card-grid-2">
+                <div class="card">
+                    <h4>📖 想象一个剧本</h4>
+                    <div class="diagram-box" style="margin: 0.5rem 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│                                         │
+│  system: 设定角色                       │
+│  "你是一个老师，教初中生数学"           │
+│                                         │
+│  user: 学生提问                         │
+│  "老师，什么是勾股定理？"               │
+│                                         │
+│  assistant: 老师回答                    │
+│  "勾股定理是..."                        │
+│                                         │
+└─────────────────────────────────────────┘
+                        </div>
+                    </div>
+                    <p style="font-size: 0.9rem; color: #666;">system 决定角色，user 和 assistant 轮流对话</p>
+                </div>
+
+                <div class="card">
+                    <h4>💬 微信聊天记录</h4>
+                    <div class="diagram-box" style="margin: 0.5rem 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│                                         │
+│  system: 群公告                         │
+│  "本群是技术交流群，禁止灌水"           │
+│                                         │
+│  user: 张三发消息                       │
+│  "有人知道Python怎么安装吗？"           │
+│                                         │
+│  assistant: 李四回复                    │
+│  "去官网下载安装包..."                  │
+│                                         │
+└─────────────────────────────────────────┘
+                        </div>
+                    </div>
+                    <p style="font-size: 0.9rem; color: #666;">messages 就是聊天记录，AI根据上下文回复</p>
+                </div>
+            </div>
+
+            <h4 style="margin: 1.5rem 0 1rem; font-size: 1.1rem;">💻 代码示例对比</h4>
+
+            <div class="card">
+                <div class="card-header">示例：最简单的对话</div>
+                <pre class="code-block"><code class="language-python"># 最简单的 messages 格式
+messages = [
+    {"role": "user", "content": "你好！"}
+]
+
+# 返回的 reply
+# assistant: "你好！有什么我可以帮你的吗？"</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例：带 system 设定</div>
+                <pre class="code-block"><code class="language-python"># 定义AI的角色和行为
+messages = [
+    {"role": "system", "content": "你是一个温柔的老师，说话要鼓励学生"},
+    {"role": "user", "content": "我学不会编程怎么办？"}
+]
+
+# 返回的 reply
+# assistant: "别担心，编程很有趣，我们从简单开始..."</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例：多轮对话</div>
+                <pre class="code-block"><code class="language-python"># 对话历史会累积
+messages = [
+    {"role": "system", "content": "你是一个助手"},
+    # 第一轮
+    {"role": "user", "content": "什么是AI？"},
+    {"role": "assistant", "content": "AI是人工智能..."},
+    # 第二轮
+    {"role": "user", "content": "它能做什么？"},
+    {"role": "assistant", "content": "AI可以..."},
+    # 第三轮
+    {"role": "user", "content": "python怎么学？"},  # AI还记得之前的上下文
+]
+
+# ⚠️ 注意：每次请求都要把之前的对话历史都传进去！
+# 模型没有记忆，你需要把历史都发给它</code></pre>
+            </div>
+
+            <h4 style="margin: 1.5rem 0 1rem; font-size: 1.1rem;">⚠️ 重要注意事项</h4>
+
+            <div class="cards-grid card-grid-2">
+                <div class="card">
+                    <h4>🔄 历史必须传递</h4>
+                    <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                        <li>模型每次都是"全新"的，不记得上次对话</li>
+                        <li>必须把历史 messages 全部传入</li>
+                        <li>新消息追加到列表末尾</li>
+                    </ul>
+                    <div class="info-box warning" style="margin-top: 0.5rem;">
+                        <p>❌ 错误做法：每次只传最新问题</p>
+                        <p>✅ 正确做法：每次都传完整对话历史</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>📏 长度限制</h4>
+                    <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                        <li>messages 有最大长度限制（通常是几万token）</li>
+                        <li>超长对话需要"裁剪"历史</li>
+                        <li>可以只保留最近的对话，或摘要关键信息</li>
+                    </ul>
+                    <div class="info-box info" style="margin-top: 0.5rem;">
+                        <p>💡 提示：不同模型的上下文长度不同</p>
+                    </div>
+                </div>
+            </div>
+
+            <h4 style="margin: 1.5rem 0 1rem; font-size: 1.1rem;">🎯 最佳实践</h4>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>场景</th>
+                            <th>建议</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>设定角色</strong></td>
+                            <td>第一条 system 消息设定AI身份，如"你是一个专业客服"</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Few-shot示例</strong></td>
+                            <td>给几个例子让模型学习格式，如：用户问"北京"，回复"北京是中国的首都"</td>
+                        </tr>
+                        <tr>
+                            <td><strong>多轮对话</strong></td>
+                            <td>每次追加 user 和 assistant 的对话，保持上下文</td>
+                        </tr>
+                        <tr>
+                            <td><strong>长对话</strong></td>
+                            <td>只保留最近N轮，或使用 RAG 检索关键信息</td>
+                        </tr>
+                        <tr>
+                            <td><strong>结构化输出</strong></td>
+                            <td>在 system 中明确要求输出格式，如"用JSON格式回答"</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>🇺🇸 国外主流API</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>厂商</th>
+                            <th>模型</th>
+                            <th>特点</th>
+                            <th>价格</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>OpenAI</strong></td>
+                            <td>GPT-4o, GPT-4, GPT-3.5</td>
+                            <td>生态完善、功能全面</td>
+                            <td>$5-30/M tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Anthropic</strong></td>
+                            <td>Claude 3.5, Claude 3</td>
+                            <td>长上下文、安全对齐</td>
+                            <td>$3-15/M tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Google</strong></td>
+                            <td>Gemini 1.5, Gemini Pro</td>
+                            <td>多模态原生、多语言</td>
+                            <td>$0.5-5/M tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Meta</strong></td>
+                            <td>Llama 3 (开源)</td>
+                            <td>开源免费、可私有部署</td>
+                            <td>免费</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>🇨🇳 国内主流API</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>厂商</th>
+                            <th>模型</th>
+                            <th>特点</th>
+                            <th>价格</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>百度</strong></td>
+                            <td>ERNIE 4.0, ERNIE 3.5</td>
+                            <td>中文理解强、推理能力强</td>
+                            <td>¥0.012-0.12/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>阿里</strong></td>
+                            <td>Qwen 2.5, Qwen-Max</td>
+                            <td>开源生态好、性能优秀</td>
+                            <td>¥0.008-0.02/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>腾讯</strong></td>
+                            <td>混元, 混元-Pro</td>
+                            <td>多模态能力强</td>
+                            <td>¥0.01-0.1/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>字节跳动</strong></td>
+                            <td>豆包, Doubao-pro</td>
+                            <td>性价比高、响应快</td>
+                            <td>¥0.001-0.005/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>智谱AI</strong></td>
+                            <td>GLM-4, GLM-3-Turbo</td>
+                            <td>中英双语、工具调用强</td>
+                            <td>¥0.005-0.1/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>深度求索</strong></td>
+                            <td>DeepSeek-V2, DeepSeek-Chat</td>
+                            <td>推理能力强、价格低</td>
+                            <td>¥0.001-0.004/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>月之暗面</strong></td>
+                            <td>Kimi (Moonshot)</td>
+                            <td>超长上下文(200万字)</td>
+                            <td>¥0.012-0.12/千tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>百川智能</strong></td>
+                            <td>Baichuan 4</td>
+                            <td>中文优化</td>
+                            <td>¥0.012/千tokens</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>💻 Python API 调用示例</h3>
+
+            <div class="card">
+                <div class="card-header">示例1：OpenAI GPT-4</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install openai
+from openai import OpenAI
+
+# 初始化客户端
+client = OpenAI(
+    api_key="your-api-key",  # 替换为你的API Key
+    base_url="https://api.openai.com/v1"
+)
+
+# 调用模型
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "system", "content": "你是一个专业助手"},
+        {"role": "user", "content": "请解释什么是机器学习？"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# 获取回复
+print(response.choices[0].message.content)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例2：Claude (Anthropic)</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install anthropic
+from anthropic import Anthropic
+
+# 初始化客户端
+client = Anthropic(
+    api_key="your-api-key"  # 替换为你的API Key
+)
+
+# 调用模型
+response = client.messages.create(
+    model="claude-sonnet-4-20250514",
+    max_tokens=1000,
+    messages=[
+        {"role": "user", "content": "请解释什么是深度学习？"}
+    ]
+)
+
+# 获取回复
+print(response.content[0].text)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例3：百度文心一言</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install qianfan
+import qianfan
+
+# 初始化客户端
+client = qianfan.ChatCompletion(
+    ak="your-access-key",      # 替换为你的AK
+    sk="your-secret-key"       # 替换为你的SK
+)
+
+# 调用模型
+response = client.do(
+    model="ernie-4.5-8k",
+    messages=[
+        {"role": "user", "content": "请解释什么是自然语言处理？"}
+    ],
+    temperature=0.7,
+    penalty_score=1.0
+)
+
+# 获取回复
+print(response["body"]["result"])</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例4：阿里通义千问</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install dashscope
+from dashscope import ChatCompletion
+
+# 调用模型
+response = ChatCompletion.call(
+    model="qwen-max",
+    messages=[
+        {"role": "user", "content": "请解释什么是卷积神经网络？"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# 获取回复
+print(response.output.choices[0].message.content)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例5：深度求索 DeepSeek</div>
+                <pre class="code-block"><code class="language-python"># 安装: pip install openai
+from openai import OpenAI
+
+# 初始化客户端（兼容OpenAI接口）
+client = OpenAI(
+    api_key="your-api-key",  # 替换为你的API Key
+    base_url="https://api.deepseek.com/v1"
+)
+
+# 调用模型
+response = client.chat.completions.create(
+    model="deepseek-chat",
+    messages=[
+        {"role": "user", "content": "请解释什么是Transformer架构？"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# 获取回复
+print(response.choices[0].message.content)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">示例6：统一调用封装</div>
+                <pre class="code-block"><code class="language-python">"""
+统一的大语言模型调用封装
+支持切换不同提供商
+"""
+from abc import ABC, abstractmethod
+from typing import List, Dict
+
+class LLMProvider(ABC):
+    """LLM提供商抽象基类"""
+    
+    @abstractmethod
+    def chat(self, messages: List[Dict], **kwargs) -> str:
+        pass
+
+class OpenAIProvider(LLMProvider):
+    def __init__(self, api_key: str, model: str = "gpt-4o"):
+        from openai import OpenAI
+        self.client = OpenAI(api_key=api_key)
+        self.model = model
+    
+    def chat(self, messages: List[Dict], temperature: float = 0.7, **kwargs) -> str:
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            temperature=temperature,
+            **kwargs
+        )
+        return response.choices[0].message.content
+
+class DeepSeekProvider(LLMProvider):
+    def __init__(self, api_key: str, model: str = "deepseek-chat"):
+        from openai import OpenAI
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.deepseek.com/v1"
+        )
+        self.model = model
+    
+    def chat(self, messages: List[Dict], temperature: float = 0.7, **kwargs) -> str:
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            temperature=temperature,
+            **kwargs
+        )
+        return response.choices[0].message.content
+
+class QwenProvider(LLMProvider):
+    def __init__(self, api_key: str, model: str = "qwen-max"):
+        self.api_key = api_key
+        self.model = model
+    
+    def chat(self, messages: List[Dict], temperature: float = 0.7, **kwargs) -> str:
+        from dashscope import ChatCompletion
+        response = ChatCompletion.call(
+            model=self.model,
+            messages=messages,
+            temperature=temperature,
+            **kwargs
+        )
+        return response.output.choices[0].message.content
+
+# 工厂函数
+def create_llm_provider(provider: str, api_key: str, model: str = None) -> LLMProvider:
+    providers = {
+        "openai": lambda: OpenAIProvider(api_key, model or "gpt-4o"),
+        "deepseek": lambda: DeepSeekProvider(api_key, model or "deepseek-chat"),
+        "qwen": lambda: QwenProvider(api_key, model or "qwen-max"),
+    }
+    return providers[provider.lower()]()
+
+# 使用示例
+if __name__ == "__main__":
+    messages = [
+        {"role": "system", "content": "你是一个专业助手"},
+        {"role": "user", "content": "什么是机器学习？"}
+    ]
+    
+    # 切换不同提供商
+    provider = create_llm_provider(
+        provider="deepseek",
+        api_key="your-api-key",
+        model="deepseek-chat"
+    )
+    
+    response = provider.chat(messages)
+    print(response)</code></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">API调用最佳实践</div>
+                <div class="cards-grid card-grid-3" style="margin-top: 1rem;">
+                    <div class="card" style="padding: 1rem;">
+                        <h4 style="margin-bottom: 0.5rem;">🔐 安全建议</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>使用环境变量存储API Key</li>
+                            <li>不要在代码中硬编码密钥</li>
+                            <li>设置API Key使用限制</li>
+                            <li>定期轮换密钥</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="padding: 1rem;">
+                        <h4 style="margin-bottom: 0.5rem;">💰 成本优化</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>选择合适的模型大小</li>
+                            <li>减少不必要的上下文</li>
+                            <li>使用缓存避免重复调用</li>
+                            <li>设置max_tokens限制</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="padding: 1rem;">
+                        <h4 style="margin-bottom: 0.5rem;">🛡️ 错误处理</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>实现重试机制</li>
+                            <li>处理Rate Limit错误</li>
+                            <li>设置超时时间</li>
+                            <li>记录调用日志</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

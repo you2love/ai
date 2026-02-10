@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM API 优化指南 - AI技术学习平台</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">⚡ LLM API 优化指南</h2>
+            <p class="section-subtitle">调整参数与策略，提升大模型输出的准确性与效果</p>
+
+            <div class="card">
+                <div class="card-header">为什么要优化 LLM API？</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     优化 LLM API 的价值                                   │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐              │
+│   │  参数调优   │  →  │  输出质量↑  │  →  │  成本↓     │              │
+│   │             │     │             │     │             │              │
+│   │ 温度/长度   │     │ 更准确/稳定 │     │ 减少重试   │              │
+│   │ 提示词设计  │     │ 符合预期    │     │ 精准控制   │              │
+│   └─────────────┘     └─────────────┘     └─────────────┘              │
+│                                                                         │
+│   核心目标：让模型输出更准确、更可控、更高效                              │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <h3>🎛️ 核心参数详解</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>参数</th>
+                            <th>取值范围</th>
+                            <th>作用</th>
+                            <th>优化建议</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>temperature</strong></td>
+                            <td>0.0 - 2.0</td>
+                            <td>控制输出的随机性和创意程度</td>
+                            <td>准确任务: 0.1-0.3 | 创意任务: 0.7-1.0</td>
+                        </tr>
+                        <tr>
+                            <td><strong>max_tokens</strong></td>
+                            <td>正整数</td>
+                            <td>限制模型输出的最大 token 数量</td>
+                            <td>根据任务需求设置，避免截断</td>
+                        </tr>
+                        <tr>
+                            <td><strong>top_p</strong></td>
+                            <td>0.0 - 1.0</td>
+                            <td>核采样，控制在每个步骤考虑的 token 分布</td>
+                            <td>与 temperature 配合，低值更确定</td>
+                        </tr>
+                        <tr>
+                            <td><strong>frequency_penalty</strong></td>
+                            <td>-2.0 - 2.0</td>
+                            <td>根据 token 在已生成内容中的出现频率进行惩罚</td>
+                            <td>提高 (>0) 可减少重复内容</td>
+                        </tr>
+                        <tr>
+                            <td><strong>presence_penalty</strong></td>
+                            <td>-2.0 - 2.0</td>
+                            <td>惩罚已经出现在生成内容中的 token</td>
+                            <td>提高 (>0) 鼓励生成新内容</td>
+                        </tr>
+                        <tr>
+                            <td><strong>penalty_score</strong></td>
+                            <td>1.0 - 2.0</td>
+                            <td>百度特有重复惩罚参数</td>
+                            <td>设 >1 减少重复，设 1.0 无惩罚</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-header">temperature 参数对比</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      temperature 对比                                     │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   temperature = 0.1 (低)          temperature = 0.7 (中)    temp = 1.0  │
+│   ┌────────────────────┐        ┌────────────────────┐    ┌───────────┐ │
+│   │                    │        │                    │    │           │ │
+│   │ • 确定性高         │        │ • 平衡创造力      │    │ • 高创意  │ │
+│   │ • 回答一致         │        │ • 适度的多样性    │    │ • 不可预测 │ │
+│   │ • 适合事实性任务   │        │ • 日常对话合适    │    │ • 适合写诗 │ │
+│   │ • 可能过于保守     │        │ • 推荐日常使用    │    │           │ │
+│   │                    │        │                    │    │           │ │
+│   └────────────────────┘        └────────────────────┘    └───────────┘ │
+│                                                                         │
+│   💡 经验法则：准确任务温度设低，创意任务温度设高                          │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <h3>🎯 准确性优化策略</h3>
+
+            <div class="cards-grid card-grid-2">
+                <div class="card">
+                    <div class="card-header">策略1：降低随机性</div>
+                    <pre class="code-block"><code class="language-python"># 准确任务：温度设为最低
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "user", "content": "中国的首都是哪里？"}
+    ],
+    temperature=0.1,  # 最低，输出更确定
+    top_p=0.1,        # 只考虑最可能的 token
+    max_tokens=500
+)
+
+# 输出：中国的首都是北京。</code></pre>
+                    <ul style="font-size: 0.9rem; padding-left: 1.2rem; margin-top: 1rem;">
+                        <li>适用于：问答、事实核查、代码生成</li>
+                        <li>效果：输出稳定，减少幻觉</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">策略2：强化系统提示</div>
+                    <pre class="code-block"><code class="language-python"># 设计详细的系统提示
+messages = [
+    {
+        "role": "system",
+        "content": """你是一个专业的技术写作助手。
+你的工作要求：
+1. 只基于提供的事实信息回答，不编造内容
+2. 如果信息不足，明确说"根据当前信息无法确定"
+3. 回答结构清晰，使用 Markdown 格式
+4. 引用具体的数据和来源
+5. 避免使用不确定的语气词（如"可能"、"大概"）"""
+    },
+    {
+        "role": "user",
+        "content": "请分析这篇论文的主要贡献。"
+    }
+]</code></pre>
+                    <ul style="font-size: 0.9rem; padding-left: 1.2rem; margin-top: 1rem;">
+                        <li>明确角色和约束</li>
+                        <li>设定回答规则</li>
+                        <li>减少不确定性</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">策略3：Few-shot 示例学习</div>
+                <pre class="code-block"><code class="language-python"># 通过示例引导模型按特定格式输出
+messages = [
+    {"role": "system", "content": "根据示例格式回答问题。"},
+    {"role": "user", "content": "北京是中国的首都吗？"},
+    {"role": "assistant", "content": "是的。北京是中华人民共和国的首都。"},
+    {"role": "user", "content": "东京是美国的首都吗？"},
+    {"role": "assistant", "content": "不是。东京是日本的首都，不是美国的首都。"},
+    {"role": "user", "content": "渥太华是澳大利亚的首都吗？"}
+]
+
+# 模型会模仿示例格式回答：不是。渥太华是加拿大的首都...</code></pre>
+                    <div class="info-box info" style="margin-top: 1rem;">
+                        <p>💡 <strong>Few-shot 技巧</strong>：提供 2-5 个高质量示例，让模型学习期望的格式和推理方式</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">策略4：Chain-of-Thought 思维链</div>
+                <pre class="code-block"><code class="language-python"># 要求模型分步骤思考
+messages = [
+    {"role": "system", "content": "解决问题时请按以下步骤：
+1. 首先理解问题要求
+2. 分析关键信息
+3. 逐步推理
+4. 给出最终答案"},
+    {"role": "user", "content": "如果一根绳子长10米，剪掉一半后还剩多少？"}
+]
+
+# 模型会逐步输出：
+# 1. 理解问题：绳子原来10米，剪掉一半
+# 2. 分析：一半就是 10 ÷ 2 = 5 米
+# 3. 推理：正确
+# 4. 答案：还剩 5 米</code></pre>
+                    <ul style="font-size: 0.9rem; padding-left: 1.2rem; margin-top: 1rem;">
+                        <li>适用于：数学、逻辑推理、复杂决策</li>
+                        <li>效果：减少错误，提高可解释性</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🔧 高级优化技术</h3>
+
+            <div class="cards-grid card-grid-2">
+                <div class="card">
+                    <div class="card-header">RAG 检索增强生成</div>
+                    <div class="diagram-box" style="margin: 0.5rem 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│           RAG 工作流程                    │
+├─────────────────────────────────────────┤
+│                                         │
+│  用户问题 → 向量化 → 向量检索 → 相关文档 │
+│      ↓                                  │
+│  问题 + 检索文档 → LLM → 答案           │
+│                                         │
+│  优点：                                  │
+│  • 减少幻觉（基于事实）                  │
+│  • 解决知识时效性问题                   │
+│  • 支持私有知识库                       │
+└─────────────────────────────────────────┘
+                        </div>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 伪代码：RAG 流程
+# 1. 检索相关文档
+retrieved_docs = vector_search(query, top_k=5)
+
+# 2. 构建增强提示
+augmented_prompt = f"""基于以下信息回答问题。
+
+参考信息：
+{retrieved_docs}
+
+用户问题：{query}
+
+请根据参考信息回答，如果信息不足请说明。"""
+
+# 3. 调用 LLM
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": augmented_prompt}],
+    temperature=0.1
+)</code></pre>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Self-Consistency 自一致性</div>
+                    <div class="diagram-box" style="margin: 0.5rem 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│        自一致性策略                       │
+├─────────────────────────────────────────┤
+│                                         │
+│  同一问题 → 多次生成 → 投票选择 → 最终答案│
+│                                         │
+│  步骤：                                  │
+│  1. 用 CoT 生成多个答案                  │
+│  2. 统计结果，取最常见的答案             │
+│  3. 提高准确率                           │
+│                                         │
+└─────────────────────────────────────────┘
+                        </div>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 多次生成取多数答案
+answers = []
+for _ in range(5):  # 生成 5 次
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": question}],
+        temperature=0.7
+    )
+    answers.append(response.choices[0].message.content)
+
+# 统计最常见的答案（简化版）
+from collections import Counter
+most_common_answer = Counter(answers).most_common(1)[0][0]</code></pre>
+                </div>
+            </div>
+
+            <h3>📋 场景化参数配置</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>场景</th>
+                            <th>temperature</th>
+                            <th>top_p</th>
+                            <th>其他设置</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>代码生成</strong></td>
+                            <td>0.1 - 0.2</td>
+                            <td>0.1</td>
+                            <td>明确要求代码格式，添加注释</td>
+                        </tr>
+                        <tr>
+                            <td><strong>事实问答</strong></td>
+                            <td>0.1 - 0.3</td>
+                            <td>0.1 - 0.3</td>
+                            <td>要求引用来源，不确定时说不知道</td>
+                        </tr>
+                        <tr>
+                            <td><strong>文案创作</strong></td>
+                            <td>0.7 - 0.9</td>
+                            <td>0.8 - 0.95</td>
+                            <td>设定风格、语气、受众</td>
+                        </tr>
+                        <tr>
+                            <td><strong>翻译任务</strong></td>
+                            <td>0.2 - 0.4</td>
+                            <td>0.3</td>
+                            <td>明确语言对，指定翻译风格</td>
+                        </tr>
+                        <tr>
+                            <td><strong>数据分析</strong></td>
+                            <td>0.1 - 0.2</td>
+                            <td>0.1</td>
+                            <td>要求分步骤，给出置信度</td>
+                        </tr>
+                        <tr>
+                            <td><strong>角色扮演</strong></td>
+                            <td>0.5 - 0.8</td>
+                            <td>0.7 - 0.9</td>
+                            <td>详细设定角色背景、性格</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>💰 成本优化技巧</h3>
+
+            <div class="cards-grid card-grid-3">
+                <div class="card">
+                    <h4>📉 控制输出长度</h4>
+                    <ul style="font-size: 0.85rem; padding-left: 1rem;">
+                        <li>设置 max_tokens 上限</li>
+                        <li>提示词中明确"简要回答"</li>
+                        <li>避免开放式问题</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>📝 精简上下文</h4>
+                    <ul style="font-size: 0.85rem; padding-left: 1rem;">
+                        <li>只传递必要的对话历史</li>
+                        <li>摘要长对话</li>
+                        <li>使用 RAG 替代长文档</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>🔄 模型分流</h4>
+                    <ul style="font-size: 0.85rem; padding-left: 1rem;">
+                        <li>简单任务用小模型</li>
+                        <li>复杂任务用大模型</li>
+                        <li>批量任务考虑离线处理</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🛡️ 错误处理与容错</h3>
+
+            <div class="card">
+                <pre class="code-block"><code class="language-python">import time
+from openai import OpenAI, RateLimitError, APIError
+
+client = OpenAI(api_key="your-api-key")
+
+def call_llm_with_retry(messages, max_retries=3):
+    """带重试机制的 LLM 调用"""
+    for attempt in range(max_retries):
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=messages,
+                temperature=0.7,
+                timeout=30  # 超时设置
+            )
+            return response.choices[0].message.content
+
+        except RateLimitError:
+            # Rate Limit 错误：等待后重试
+            wait_time = (attempt + 1) * 2
+            print(f"Rate limit, waiting {wait_time}s...")
+            time.sleep(wait_time)
+
+        except APIError as e:
+            # API 错误：检查是否可恢复
+            if "server_error" in str(e):
+                print(f"Server error, retry {attempt + 1}/{max_retries}")
+                time.sleep(2)
+            else:
+                raise  # 其他错误直接抛出
+
+        except Exception as e:
+            print(f"Unknown error: {e}")
+            raise
+
+    raise Exception("Max retries exceeded")</code></pre>
+            </div>
+
+            <h3>✅ 最佳实践清单</h3>
+
+            <div class="cards-grid card-grid-2">
+                <div class="card">
+                    <h4>🔧 参数调优</h4>
+                    <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                        <li>准确任务：temperature ≤ 0.3</li>
+                        <li>创意任务：temperature = 0.7-1.0</li>
+                        <li>设置 max_tokens 防止过长输出</li>
+                        <li>配合 top_p 使用效果更好</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>📝 提示词设计</h4>
+                    <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                        <li>明确角色和任务要求</li>
+                        <li>使用 Few-shot 示例</li>
+                        <li>复杂任务分步骤引导</li>
+                        <li>设定输出格式约束</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>🏗️ 系统架构</h4>
+                    <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                        <li>RAG 减少幻觉</li>
+                        <li>实现重试和容错机制</li>
+                        <li>缓存常见问题结果</li>
+                        <li>监控 API 调用成本</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>📊 质量保障</h4>
+                    <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                        <li>建立评估数据集</li>
+                        <li>定期测试输出质量</li>
+                        <li>收集用户反馈</li>
+                        <li>持续迭代优化</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

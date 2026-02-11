@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>程序员应对 - AI技术学习平台</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">💻 程序员应对指南</h2>
+            <p class="section-subtitle">充分利用大模型提升开发效率 - 从编码到运维的全方位实践</p>
+
+            <div class="card">
+                <div class="card-header">为什么要关注 AI 编程？</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     AI 编程带来的效率革命                                   │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   传统开发                    AI 辅助开发                               │
+│   ┌─────────┐                ┌─────────┐                               │
+│   │  手写   │                │  描述   │                               │
+│   │  所有   │      →        │  需求   │                               │
+│   │  代码   │                │  AI生成 │                               │
+│   └─────────┘                └─────────┘                               │
+│                                                                         │
+│   ┌─────────────────────────────────────────────────────────────┐     │
+│   │                    效率提升数据                              │     │
+│   │  • 代码生成速度提升 40-70%                                   │     │
+│   │  • Bug 修复时间减少 50%+                                     │     │
+│   │  • 文档编写时间减少 60%+                                     │     │
+│   │  • 学习新技术栈时间减少 70%+                                 │     │
+│   └─────────────────────────────────────────────────────────────┘     │
+│                                                                         │
+│   💡 结论：AI 不会取代程序员，但善用 AI 的程序员会取代不会用 AI 的程序员    │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <h3>🤖 1. 代码生成与补全</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">🤖 百度 Comate（文心快码）</div>
+                    <div class="diagram-box" style="margin: 0.5rem 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│         Comate 工作模式                   │
+├─────────────────────────────────────────┤
+│                                         │
+│  注释 → 代码自动生成                      │
+│  函数名 → 代码自动补全                   │
+│  Tab 键 → 接受建议                       │
+│                                         │
+│  支持：VS Code、JetBrains 全系           │
+│                                         │
+└─────────────────────────────────────────┘
+                        </div>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># 输入注释，Comate 自动生成代码
+def calculate_ema(prices, period):
+    """
+    计算指数移动平均线
+    Args:
+        prices: 价格数据列表
+        period: 周期（如 20 日 EMA）
+    Returns:
+        EMA 值列表
+    """
+    # Comate 会自动生成...
+    pass
+
+# 使用自然语言描述需求
+"""
+请帮我写一个计算斐波那契数列的函数
+"""
+def fibonacci(n): pass</code></pre>
+                    <div class="info-box tip" style="margin-top: 1rem;">
+                        <p>💡 <strong>技巧</strong>：Comate 对中文理解优化，写中文注释效果更好</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">💻 腾讯 CodeBuddy</div>
+                    <div class="diagram-box" style="margin: 0.5rem 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│          CodeBuddy 核心功能              │
+├─────────────────────────────────────────┤
+│                                         │
+│  🤖 Chat - 对话式编程                   │
+│  📝 Edit - 选中代码智能修改             │
+│  🔍 Index - 项目级索引，理解上下文       │
+│  📜 Ctrl+K - 内联编辑                    │
+│  🌐 Ctrl+L - 侧边栏对话                  │
+│                                         │
+│  优势：微信生态深度集成                  │
+└─────────────────────────────────────────┘
+                        </div>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># Ctrl+K 快捷编辑示例
+# 选中现有代码，按 Ctrl+K 输入需求
+
+# 原代码
+def process_data(data):
+    return data
+
+# Ctrl+K 输入: "添加数据验证和错误处理"
+# AI 自动修改为：
+def process_data(data):
+    if not isinstance(data, list):
+        raise ValueError("Data must be a list")
+    
+    if not data:
+        return []
+    
+    try:
+        return [item * 2 for item in data]
+    except Exception as e:
+        print(f"Error processing data: {e}")
+        return []</code></pre>
+                    <div class="info-box info" style="margin-top: 1rem;">
+                        <p>📌 <strong>提示</strong>：CodeBuddy 支持 Craft 智能体，自动拆解复杂任务</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">🛡️ 阿里 Lingma（通义灵码）</div>
+                    <div class="diagram-box" style="margin: 0.5rem 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│          Lingma 核心功能                 │
+├─────────────────────────────────────────┤
+│                                         │
+│  💬 Ask - 智能问答模式                   │
+│  ✏️ Edit - 文件编辑模式                 │
+│  🤖 Agent - 智能体模式                  │
+│  📡 Ctrl+I - 唤起智能会话               │
+│                                         │
+│  优势：阿里云生态集成                    │
+└─────────────────────────────────────────┘
+                        </div>
+                    </div>
+                    <pre class="code-block"><code class="language-python"># Lingma 多种会话模式
+
+# 模式 1：简单问答
+"""
+这个函数是做什么的？
+"""
+
+# 模式 2：文件编辑
+# 选中代码，输入需求
+"给这个函数添加类型注解和错误处理"
+
+# 模式 3：智能体模式
+"""
+创建一个用户认证模块，包含：
+- 登录、注册、登出功能
+- 使用 JWT 进行身份验证
+"""
+
+# AI 会自动规划并执行完整任务</code></pre>
+                    <ul style="font-size: 0.85rem; padding-left: 1rem; margin-top: 1rem;">
+                        <li>支持 200+ 语言</li>
+                        <li>Java/Go 覆盖率 98%</li>
+                        <li>MCP 协议支持</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🐛 2. Bug 修复与调试</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">报错信息分析</div>
+                    <pre class="code-block"><code class="language-python"># 常见场景：直接粘贴报错信息让 AI 分析
+
+"""
+Python TypeError: 'int' object is not callable
+
+Traceback (most recent call last):
+  File "app.py", line 42, in <module>
+    result = calculate_average(values)
+  File "app.py", line 25, in calculate_average
+    return sum(values) / len(values)
+TypeError: 'int' object is not callable
+"""
+
+# AI 分析结果：
+# 问题：变量名 `sum` 被覆盖了！
+# 解决：将 `sum` 重命名为其他变量名，如 `total` 或 `values_sum`</code></pre>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">逻辑 Bug 定位</div>
+                    <pre class="code-block"><code class="language-python"># 场景：代码运行正常，但结果不对
+
+"""
+这段 Python 代码用于计算用户活跃天数，
+但统计结果比实际多了 30%，请帮我找出问题：
+
+def count_active_days(user_logs):
+    active_days = set()
+    for log in user_logs:
+        date = log['timestamp'].date()
+        active_days.add(date)
+    return len(active_days) * 24  # 转换为小时
+"""
+
+# AI 分析：
+# 问题：`* 24` 是多余的
+# 分析：set 去重后是唯一天数，直接返回 len(active_days) 即可
+# * 24 会把天数错误转换为"小时"，导致结果偏大</code></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">安全漏洞扫描</div>
+                <pre class="code-block"><code class="language-python"># AI 辅助安全审计
+
+"""
+请检查以下代码是否存在安全漏洞：
+
+@app.route('/userprofile')
+def get_user_profile():
+    user_id = request.args.get('id')
+    query = f"SELECT * FROM users WHERE id = '{user_id}'"
+    result = db.execute(query)
+    return jsonify(result)
+
+# AI 分析结果：
+# 🚨 SQL 注入漏洞！
+# 
+# 问题：
+# 1. 直接拼接用户输入到 SQL 语句
+# 2. 攻击者可以通过 id 参数注入恶意 SQL
+#
+# 修复建议：
+# 1. 使用参数化查询
+# 2. 输入验证
+
+# 修复后代码：
+from sqlalchemy import text
+
+@app.route('/userprofile')
+def get_user_profile():
+    user_id = request.args.get('id')
+    if not user_id.isdigit():
+        return jsonify({"error": "Invalid user ID"}), 400
+    
+    query = text("SELECT * FROM users WHERE id = :id")
+    result = db.execute(query, {"id": user_id}).fetchone()
+    return jsonify(result)</code></pre>
+            </div>
+
+            <h3>📖 3. 代码解释与学习</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">快速理解陌生代码</div>
+                    <pre class="code-block"><code class="language-python">"""
+请帮我解释这段 React Hook 代码的工作原理，
+并说明每个状态变量的作用：
+
+function useDeepCompareEffect(callback, dependencies) {
+  const currentRef = useRef(undefined);
+  const previousRef = useRef(undefined);
+
+  if (!isEqual(currentRef.current, dependencies)) {
+    previousRef.current = currentRef.current;
+    currentRef.current = dependencies;
+  }
+
+  useEffect(() => {
+    if (!isEqual(previousRef.current, currentRef.current)) {
+      callback();
+    }
+  }, [callback]);
+}
+"""
+
+# AI 解释：
+# 这是一个深度比较依赖变化的 Hook...
+# currentRef: 存储当前依赖值
+# previousRef: 存储上一次依赖值
+# 作用：只有当依赖的"深度值"变化时才触发回调...</code></pre>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">学习新技术栈</div>
+                    <pre class="code-block"><code class="language-python"># 学习场景：我是 Python 开发者，现在需要用 Go
+"""
+我之前用 Python，写过 Django 和 FastAPI。
+现在需要用 Go 写一个 RESTful API，
+请告诉我：
+1. Go 中对应的 Web 框架是什么
+2. 路由如何组织
+3. 中间件如何添加
+4. 数据库操作怎么做
+5. 和 Python 对应的代码风格
+"""
+
+# AI 会给出 Go vs Python 的对比指南，
+# 帮助快速迁移知识</code></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">设计模式解释</div>
+                <pre class="code-block"><code class="language-python">"""
+请解释这个 JavaScript 代码使用的设计模式：
+
+class EventEmitter {
+    constructor() {
+        this.events = {};
+    }
+    
+    on(event, listener) {
+        if (!this.events[event]) {
+            this.events[event] = [];
+        }
+        this.events[event].push(listener);
+        return this;
+    }
+    
+    emit(event, ...args) {
+        if (this.events[event]) {
+            this.events[event].forEach(listener => listener(...args));
+        }
+        return this;
+    }
+}
+
+# AI 回答：
+# 使用的设计模式：发布-订阅模式（Publish-Subscribe）
+# 也称为观察者模式（Observer Pattern）的变体
+# 
+# 核心思想：
+# 1. 发布者不直接调用订阅者
+# 2. 通过事件通道解耦
+# 3. 支持一对多的通知机制</code></pre>
+            </div>
+
+            <h3>📝 4. 文档与注释生成</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">自动生成 Docstring</div>
+                    <pre class="code-block"><code class="language-python">"""
+请为这个函数生成完整的 Google 风格 docstring：
+
+def process_user_data(users: List[Dict], 
+                      filters: Dict = None,
+                      sort_by: str = 'created_at',
+                      reverse: bool = True) -> List[Dict]:
+    if filters is None:
+        filters = {}
+    
+    filtered = [u for u in users if all(
+        u.get(k) == v for k, v in filters.items()
+    )]
+    
+    return sorted(filtered, 
+                  key=lambda x: x.get(sort_by), 
+                  reverse=reverse)
+
+# AI 生成的文档：
+def process_user_data(users: List[Dict], 
+                      filters: Dict = None,
+                      sort_by: str = 'created_at',
+                      reverse: bool = True) -> List[Dict]:
+    """
+    Process and filter a list of user dictionaries.
+    
+    Args:
+        users: List of user dictionaries containing user data.
+        filters: Dictionary of filter conditions. Defaults to None.
+        sort_by: Field name to sort by. Defaults to 'created_at'.
+        reverse: Whether to sort in descending order. Defaults to True.
+    
+    Returns:
+        List of filtered and sorted user dictionaries.
+    
+    Raises:
+        KeyError: If sort_by field doesn't exist in user dict.
+        TypeError: If users is not iterable.
+    
+    Example:
+        >>> users = [{'name': 'Alice', 'score': 90}, {'name': 'Bob', 'score': 85}]
+        >>> process_user_data(users, {'score': 90})
+        [{'name': 'Alice', 'score': 90}]
+    """</code></pre>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">API 文档生成</div>
+                    <pre class="code-block"><code class="language-python">"""
+根据以下 FastAPI 端点代码生成 OpenAPI 文档说明：
+
+@app.post("/api/v1/users/{user_id}/orders")
+async def create_order(
+    user_id: int,
+    order: OrderCreate,
+    background_tasks: BackgroundTasks
+):
+    # 验证用户
+    user = await get_user(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # 创建订单
+    order = await OrderService.create(user_id, order)
+    
+    # 发送通知
+    background_tasks.add_task(send_order_email, order.id)
+    
+    return {"status": "success", "order_id": order.id}
+
+# 生成 API 文档：
+"""
+# 创建用户订单
+
+## 接口信息
+- **URL**: `/api/v1/users/{user_id}/orders`
+- **Method**: `POST`
+- **认证**: 需要 JWT Token
+
+## 请求参数
+
+### Path Parameters
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| user_id | integer | 是 | 用户ID |
+
+### Request Body (OrderCreate)
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| items | array | 是 | 订单商品列表 |
+| shipping_address | string | 是 | 收货地址 |
+"""</code></pre>
+                </div>
+            </div>
+
+            <h3>🧪 5. 测试代码生成</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">单元测试</div>
+                    <pre class="code-block"><code class="language-python">"""
+请为以下函数生成 pytest 单元测试，
+覆盖正常情况和边界情况：
+
+def validate_email(email: str) -> bool:
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not email or not isinstance(email, str):
+        return False
+    return bool(re.match(pattern, email))
+
+# AI 生成的测试：
+import pytest
+from your_module import validate_email
+
+class TestValidateEmail:
+    def test_valid_email(self):
+        assert validate_email("user@example.com") is True
+        assert validate_email("test.user@domain.co.uk") is True
+    
+    def test_invalid_email(self):
+        assert validate_email("invalid") is False
+        assert validate_email("@nodomain.com") is False
+        assert validate_email("no@domain") is False
+    
+    def test_edge_cases(self):
+        assert validate_email("") is False
+        assert validate_email(None) is False
+        assert validate_email(123) is False
+        assert validate_email("   ") is False
+    
+    def test_special_characters(self):
+        assert validate_email("user+tag@example.com") is True
+        assert validate_email("user_name@company-name.com") is True</code></pre>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">集成测试</div>
+                    <pre class="code-block"><code class="language-python">"""
+请为这个 Flask 路由编写集成测试：
+
+@app.route('/api/users/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    user = User.query.get_or_404(user_id)
+    return jsonify(user.to_dict())
+
+# AI 生成的测试：
+import pytest
+from flask import jsonify
+
+class TestGetUserAPI:
+    def test_get_existing_user(self, client, sample_user):
+        """测试获取已存在用户"""
+        response = client.get(f'/api/users/{sample_user.id}')
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data['id'] == sample_user.id
+        assert data['name'] == sample_user.name
+    
+    def test_get_nonexistent_user(self, client):
+        """测试获取不存在的用户"""
+        response = client.get('/api/users/99999')
+        assert response.status_code == 404
+    
+    def test_user_response_format(self, client, sample_user):
+        """测试响应格式正确"""
+        response = client.get(f'/api/users/{sample_user.id}')
+        data = json.loads(response.data)
+        assert 'id' in data
+        assert 'name' in data
+        assert 'email' in data
+        assert 'created_at' in data</code></pre>
+                </div>
+            </div>
+
+            <h3>🔄 6. 代码重构与优化</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">性能优化</div>
+                    <pre class="code-block"><code class="language-python">"""
+请优化这段代码的性能：
+
+def find_duplicates(items):
+    duplicates = []
+    for i in range(len(items)):
+        for j in range(i + 1, len(items)):
+            if items[i] == items[j] and items[i] not in duplicates:
+                duplicates.append(items[i])
+    return duplicates
+
+# AI 优化后：
+def find_duplicates(items):
+    """使用集合快速查找重复元素"""
+    seen = set()
+    duplicates = set()
+    for item in items:
+        if item in seen:
+            duplicates.add(item)
+        else:
+            seen.add(item)
+    return list(duplicates)
+
+# 复杂度分析：
+# 原始版本：O(n²)
+# 优化版本：O(n)</code></pre>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">设计改进</div>
+                    <pre class="code-block"><code class="language-python">"""
+请用更 Pythonic 的方式重写这段代码：
+
+class User:
+    def __init__(self, name, age, email, phone, address):
+        self.name = name
+        self.age = age
+        self.email = email
+        self.phone = phone
+        self.address = address
+    
+    def to_json(self):
+        return {
+            'name': self.name,
+            'age': self.age,
+            'email': self.email,
+            'phone': self.phone,
+            'address': self.address
+        }
+    
+    @staticmethod
+    def from_json(data):
+        return User(
+            name=data['name'],
+            age=data['age'],
+            email=data['email'],
+            phone=data['phone'],
+            address=data['address']
+        )
+
+# AI 优化后：
+from dataclasses import dataclass
+
+@dataclass
+class User:
+    name: str
+    age: int
+    email: str
+    phone: str
+    address: str
+    
+    def to_json(self):
+        return asdict(self)
+    
+    @classmethod
+    def from_json(cls, data):
+        return cls(**data)
+
+# 使用 attrs 也可：
+# import attrs
+# @attrs.define
+# class User:
+#     name: str
+#     age: int</code></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">设计模式应用</div>
+                <pre class="code-block"><code class="language-python">"""
+这段代码有多个支付方式，请用策略模式重构：
+
+class PaymentProcessor:
+    def __init__(self, method):
+        self.method = method
+    
+    def pay(self, amount):
+        if self.method == 'credit_card':
+            return self._pay_by_credit_card(amount)
+        elif self.method == 'paypal':
+            return self._pay_by_paypal(amount)
+        elif self.method == 'bank_transfer':
+            return self._pay_by_bank(amount)
+        else:
+            raise ValueError(f"Unknown payment method: {self.method}")
+    
+    def _pay_by_credit_card(self, amount):
+        # 信用卡支付逻辑
+        pass
+    
+    def _pay_by_paypal(self, amount):
+        # PayPal 支付逻辑
+        pass
+    
+    def _pay_by_bank(self, amount):
+        # 银行转账逻辑
+        pass
+
+# AI 重构 - 策略模式：
+from abc import ABC, abstractmethod
+
+class PaymentStrategy(ABC):
+    @abstractmethod
+    def pay(self, amount: float) -> bool:
+        pass
+
+class CreditCardPayment(PaymentStrategy):
+    def __init__(self, card_number, expiry):
+        self.card_number = card_number
+        self.expiry = expiry
+    
+    def pay(self, amount) -> bool:
+        # 信用卡支付逻辑
+        return True
+
+class PayPalPayment(PaymentStrategy):
+    def __init__(self, email):
+        self.email = email
+    
+    def pay(self, amount) -> bool:
+        # PayPal 支付逻辑
+        return True
+
+class PaymentProcessor:
+    def __init__(self, strategy: PaymentStrategy):
+        self.strategy = strategy
+    
+    def pay(self, amount):
+        return self.strategy.pay(amount)
+
+# 使用：
+processor = PaymentProcessor(CreditCardPayment("1234", "12/25"))
+processor.pay(99.99)</code></pre>
+            </div>
+
+            <h3>🔧 7. DevOps 与自动化</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">Shell 脚本生成</div>
+                    <pre class="code-block"><code class="language-python">"""
+请编写一个 Bash 脚本，实现：
+1. 备份 /data 目录到 /backup
+2. 只保留最近 7 天的备份
+3. 备份文件名带时间戳
+4. 备份完成后发送通知
+
+#!/bin/bash
+
+BACKUP_SOURCE="/data"
+BACKUP_DIR="/backup"
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_FILE="${BACKUP_DIR}/backup_${DATE}.tar.gz"
+
+# 创建备份目录
+mkdir -p "$BACKUP_DIR"
+
+# 创建压缩备份
+tar -czf "$BACKUP_FILE" "$BACKUP_SOURCE"
+
+# 检查备份是否成功
+if [ $? -eq 0 ]; then
+    echo "Backup created: $BACKUP_FILE"
+    
+    # 删除 7 天前的旧备份
+    find "$BACKUP_DIR" -name "backup_*.tar.gz" -mtime +7 -delete
+    
+    # 发送通知（示例用 wall，可替换为邮件/钉钉）
+    echo "Backup completed: $BACKUP_FILE" | wall
+    
+    # 输出备份大小
+    du -h "$BACKUP_FILE"
+else
+    echo "Backup failed!" >&2
+    exit 1
+fi</code></pre>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Dockerfile 优化</div>
+                    <pre class="code-block"><code class="language-python">"""
+请优化这个 Dockerfile，减少镜像体积：
+
+FROM python:3.9
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+
+CMD ["python", "app.py"]
+
+# AI 优化后：
+# 阶段 1: 构建
+FROM python:3.9-slim AS builder
+
+WORKDIR /build
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# 阶段 2: 运行
+FROM python:3.9-slim
+
+WORKDIR /app
+
+# 只复制必要文件
+COPY --from=builder /install /usr/local
+COPY app.py .
+
+# 非 root 用户运行
+RUN useradd --create-home --shell /bin/bash appuser && \
+    chown -R appuser:appuser /app
+USER appuser
+
+CMD ["python", "app.py"]
+
+# 优化点：
+# 1. 使用 slim 基础镜像（减少 70%+）
+# 2. 多阶段构建
+# 3. pip --no-cache-dir 减少层大小
+# 4. 只复制必要文件
+# 5. 非 root 用户运行</code></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">CI/CD 流水线</div>
+                <pre class="code-block"><code class="language-python">"""
+请编写 GitHub Actions CI/CD 流程，实现：
+1. 代码检查（lint）
+2. 运行测试
+3. 构建镜像
+4. 推送到 Docker Hub
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest
+          pip install -r requirements.txt
+      
+      - name: Lint with flake8
+        run: |
+          flake8 . --max-line-length=100 --ignore=E501,W503
+      
+      - name: Run tests
+        run: |
+          pytest --cov=./ --cov-report=xml
+  
+  build-and-deploy:
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build Docker image
+        run: docker build -t myapp:${{ github.sha }} .
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Push to Docker Hub
+        run: |
+          docker tag myapp:${{ github.sha }} myuser/myapp:latest
+          docker push myuser/myapp:latest</code></pre>
+            </div>
+
+            <h3>🛠️ 8. 数据库操作</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">SQL 查询优化</div>
+                    <pre class="code-block"><code class="language-python">"""
+请优化这条查询：
+
+SELECT * FROM orders 
+WHERE YEAR(created_at) = 2024 
+  AND MONTH(created_at) = 1 
+  AND status = 'completed'
+ORDER BY created_at DESC;
+
+# AI 优化后：
+
+-- 1. 避免函数操作，使用范围查询
+SELECT * FROM orders 
+WHERE created_at >= '2024-01-01' 
+  AND created_at < '2024-02-01'
+  AND status = 'completed'
+ORDER BY created_at DESC;
+
+-- 2. 确保有复合索引
+-- ALTER TABLE orders ADD INDEX idx_date_status (created_at, status);
+
+-- 优化原理：
+-- WHERE YEAR(created_at) = 2024 无法使用索引
+-- 改为范围查询后可以利用索引
+-- 复合索引 (created_at, status) 覆盖查询条件</code></pre>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">生成建表 SQL</div>
+                    <pre class="code-block"><code class="language-python">"""
+请生成 MySQL 建表语句，要求：
+1. 用户表：id, 姓名, 邮箱, 手机, 创建时间
+2. 邮箱唯一，手机可空
+3. 添加索引
+4. 使用 InnoDB 引擎
+
+CREATE TABLE users (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL COMMENT '用户姓名',
+    email VARCHAR(100) NOT NULL COMMENT '邮箱地址',
+    phone VARCHAR(20) NULL COMMENT '手机号码',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    UNIQUE KEY uk_email (email),
+    INDEX idx_phone (phone),
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='用户信息表';</code></pre>
+                </div>
+            </div>
+
+            <h3>📊 9. 数据处理与分析</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">Pandas 高效操作</div>
+                    <pre class="code-block"><code class="language-python">"""
+请用高效的方式完成以下数据处理：
+1. 读取 CSV 文件
+2. 过滤出 2024 年的数据
+3. 按月份分组计算销售额
+4. 保存结果
+
+import pandas as pd
+
+# 低效方式（循环）
+df = pd.read_csv('sales.csv')
+result = []
+for year in df['date'].dt.year.unique():
+    for month in range(1, 13):
+        mask = (df['date'].dt.year == year) & (df['date'].dt.month == month)
+        monthly_sales = df.loc[mask, 'amount'].sum()
+        result.append({'year': year, 'month': month, 'sales': monthly_sales})
+
+# 高效方式（向量化）
+df = pd.read_csv('sales.csv', parse_dates=['date'])
+df['year'] = df['date'].dt.year
+df['month'] = df['date'].dt.month
+
+result = (
+    df.groupby(['year', 'month'])['amount']
+    .sum()
+    .reset_index()
+    .rename(columns={'amount': 'sales'})
+)
+
+result.to_csv('monthly_sales.csv', index=False)</code></pre>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">日志分析</div>
+                    <pre class="code-block"><code class="language-python">"""
+请编写 Python 脚本，分析 Nginx 访问日志：
+1. 统计每个 IP 的访问次数
+2. 找出访问量最高的 10 个 IP
+3. 统计 HTTP 状态码分布
+4. 找出 404 错误最多的页面
+
+import re
+from collections import Counter
+
+LOG_PATTERN = r'^(\S+) \S+ \S+ \[([^\]]+)\] "(\S+) (\S+) \S+" (\d{3}) (\d+)'
+
+def analyze_access_log(log_file):
+    ip_counter = Counter()
+    status_counter = Counter()
+    not_found_pages = Counter()
+    
+    with open(log_file) as f:
+        for line in f:
+            match = re.match(LOG_PATTERN, line)
+            if match:
+                ip, timestamp, method, url, status, size = match.groups()
+                
+                ip_counter[ip] += 1
+                status_counter[status] += 1
+                
+                if status == '404':
+                    not_found_pages[url] += 1
+    
+    print("Top 10 IPs:")
+    for ip, count in ip_counter.most_common(10):
+        print(f"  {ip}: {count}")
+    
+    print("\nStatus Code Distribution:")
+    for status, count in status_counter.most_common():
+        print(f"  {status}: {count}")
+    
+    print("\nTop 10 Not Found Pages:")
+    for url, count in not_found_pages.most_common(10):
+        print(f"  {url}: {count}")</code></pre>
+                </div>
+            </div>
+
+            <h3>💡 最佳实践总结</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <h4>🎯 提问技巧</h4>
+                    <ul style="font-size: 0.85rem; padding-left: 1rem;">
+                        <li>提供完整的上下文代码</li>
+                        <li>说明期望的行为</li>
+                        <li>附上报错信息</li>
+                        <li>说明技术栈和版本</li>
+                        <li>给出约束条件</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>⚠️ 注意事项</h4>
+                    <ul style="font-size: 0.85rem; padding-left: 1rem;">
+                        <li>不要上传敏感代码</li>
+                        <li>验证 AI 生成的代码</li>
+                        <li>检查安全漏洞</li>
+                        <li>测试边界情况</li>
+                        <li>理解后再使用</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>🚀 效率提升</h4>
+                    <ul style="font-size: 0.85rem; padding-left: 1rem;">
+                        <li>建立个人提示词库</li>
+                        <li>善用快捷键</li>
+                        <li>配置常用模板</li>
+                        <li>结合多种工具</li>
+                        <li>持续学习新技巧</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <p>💡 <strong>核心理念</strong>：AI 是强大的编程助手，但最终决策权在程序员手中。保持批判性思维，确保代码质量和安全。</p>
+            </div>
+
+        </div>
+    </section>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

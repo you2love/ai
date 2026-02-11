@@ -32,7 +32,7 @@
             </div>
 
             <h3>核心能力</h3>
-            <div class="cards-grid card-grid-3">
+            <div class="cards-grid">
                 <div class="card">
                     <h4>📝 文本生成</h4>
                     <p>续写文章、创作内容</p>
@@ -147,7 +147,7 @@
             </div>
 
             <h3>预训练与微调范式</h3>
-            <div class="cards-grid card-grid-2">
+            <div class="cards-grid">
                 <div class="card">
                     <h4>预训练阶段</h4>
                     <div class="comparison-row">
@@ -188,7 +188,7 @@
             <div class="info-box tip">
                 <strong>大模型的关键特性：</strong>随着模型规模增大，突然出现小模型不具备的能力
             </div>
-            <div class="cards-grid card-grid-3">
+            <div class="cards-grid">
                 <div class="card">
                     <h4>🧩 复杂推理</h4>
                     <p>多步逻辑推理、数学计算</p>
@@ -256,6 +256,7 @@
             </div>
 
             <h3>模型分类与最佳实践</h3>
+
             <div class="card">
                 <div class="card-header">按功能类型分类</div>
                 <div class="diagram-box">
@@ -277,93 +278,69 @@
                 </div>
             </div>
 
-            <div class="cards-grid card-grid-2">
-                <div class="card">
-                    <h4>🗣️ 通用对话模型</h4>
-                    <p>擅长日常对话、文本创作、知识问答</p>
-                    <div class="comparison-row">
-                        <div class="comparison-cell">
-                            <strong>代表</strong><br>
-                            GPT-4, Claude 3, Qwen
-                        </div>
-                        <div class="comparison-cell">
-                            <strong>特点</strong><br>
-                            知识广泛、表达自然
-                        </div>
-                    </div>
-                    <h4 style="margin-top: 1rem;">最佳实践</h4>
-                    <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
-                        <li>明确任务目标和期望输出格式</li>
-                        <li>提供上下文信息帮助理解</li>
-                        <li>使用Few-shot示例引导风格</li>
-                        <li>复杂任务分步骤提问</li>
-                    </ul>
-                </div>
+            <div class="card">
+                <h4>🗣️ 通用对话模型</h4>
+                <p>擅长日常对话、文本创作、知识问答</p>
+                <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                    <li><strong>代表模型</strong>：GPT-4, Claude 3, Qwen, 文心一言</li>
+                    <li><strong>特点</strong>：知识广泛、表达自然</li>
+                </ul>
+                <h4 style="margin-top: 1rem;">最佳实践</h4>
+                <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                    <li>明确任务目标和期望输出格式</li>
+                    <li>提供上下文信息帮助理解</li>
+                    <li>使用Few-shot示例引导风格</li>
+                    <li>复杂任务分步骤提问</li>
+                </ul>
+            </div>
 
-                <div class="card">
-                    <h4>⌨️ 代码生成模型</h4>
-                    <p>专注于代码编写、调试、解释、重构</p>
-                    <div class="comparison-row">
-                        <div class="comparison-cell">
-                            <strong>代表</strong><br>
-                            GPT-4o, Claude 3.5, DeepSeek
-                        </div>
-                        <div class="comparison-cell">
-                            <strong>特点</strong><br>
-                            代码准确、懂编程范式
-                        </div>
-                    </div>
-                    <h4 style="margin-top: 1rem;">最佳实践</h4>
-                    <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
-                        <li>明确编程语言和框架版本</li>
-                        <li>描述输入输出和数据结构</li>
-                        <li>要求添加注释和单元测试</li>
-                        <li>让模型解释代码逻辑</li>
-                    </ul>
-                </div>
+            <div class="card">
+                <h4>⌨️ 代码生成模型</h4>
+                <p>专注于代码编写、调试、解释，重构</p>
+                <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                    <li><strong>代表模型</strong>：GPT-4o, Claude 3.5, DeepSeek, Codex</li>
+                    <li><strong>特点</strong>：代码准确、懂编程范式</li>
+                </ul>
+                <h4 style="margin-top: 1rem;">最佳实践</h4>
+                <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                    <li>明确编程语言和框架版本</li>
+                    <li>描述输入输出和数据结构</li>
+                    <li>要求添加注释和单元测试</li>
+                    <li>让模型解释代码逻辑</li>
+                </ul>
+            </div>
 
-                <div class="card">
-                    <h4>🖼️ 多模态模型</h4>
-                    <p>支持图像、视频、音频理解和生成</p>
-                    <div class="comparison-row">
-                        <div class="comparison-cell">
-                            <strong>代表</strong><br>
-                            GPT-4V, Gemini 1.5, Claude 3V
-                        </div>
-                        <div class="comparison-cell">
-                            <strong>特点</strong><br>
-                            多模态输入、理解图像
-                        </div>
-                    </div>
-                    <h4 style="margin-top: 1rem;">最佳实践</h4>
-                    <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
-                        <li>图像清晰、关键信息突出</li>
-                        <li>明确需要识别的内容</li>
-                        <li>提供图像相关的文字说明</li>
-                        <li>复杂图表分区域提问</li>
-                    </ul>
-                </div>
+            <div class="card">
+                <h4>🖼️ 多模态模型</h4>
+                <p>支持图像、视频、音频理解和生成</p>
+                <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                    <li><strong>代表模型</strong>：GPT-4V, Gemini 1.5, Claude 3V, LLaVA</li>
+                    <li><strong>特点</strong>：多模态输入，理解图像</li>
+                </ul>
+                <h4 style="margin-top: 1rem;">最佳实践</h4>
+                <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                    <li>图像清晰、关键信息突出</li>
+                    <li>明确需要识别的内容</li>
+                    <li>提供图像相关的文字说明</li>
+                    <li>复杂图表分区域提问</li>
+                </ul>
+            </div>
 
-                <div class="card">
-                    <h4>🧠 推理增强模型</h4>
-                    <p>擅长复杂推理、数学计算、逻辑分析</p>
-                    <div class="comparison-row">
-                        <div class="comparison-cell">
-                            <strong>代表</strong><br>
-                            o1, o3, DeepSeek-R1
-                        </div>
-                        <div class="comparison-cell">
-                            <strong>特点</strong><br>
-                            深度思考、步骤清晰
-                        </div>
-                    </div>
-                    <h4 style="margin-top: 1rem;">最佳实践</h4>
-                    <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
-                        <li>给充足时间思考</li>
-                        <li>提供完整的背景信息</li>
-                        <li>要求展示推理过程</li>
-                        <li>验证中间步骤正确性</li>
-                    </ul>
+            <div class="card">
+                <h4>🧠 推理增强模型</h4>
+                <p>擅长复杂推理、数学计算、逻辑分析</p>
+                <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                    <li><strong>代表模型</strong>：o1, o3, DeepSeek-R1, o3-mini</li>
+                    <li><strong>特点</strong>：深度思考、步骤清晰</li>
+                </ul>
+                <h4 style="margin-top: 1rem;">最佳实践</h4>
+                <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
+                    <li>给充足时间思考</li>
+                    <li>提供完整的背景信息</li>
+                    <li>要求展示推理过程</li>
+                    <li>验证中间步骤正确性</li>
+                </ul>
+            </div>
                 </div>
             </div>
 

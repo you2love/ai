@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trae IDE - AI技术学习平台</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">🔧 Trae IDE 使用指南</h2>
+            <p class="section-subtitle">字节跳动推出的 AI 原生 IDE - 真正的 AI 工程师</p>
+
+            <div class="card">
+                <div class="card-header">Trae 是什么？</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     Trae IDE 简介                                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────────────────────────────────────────────────────┐     │
+│   │                                                              │     │
+│   │                    字节跳动出品 ✓                            │     │
+│   │                                                              │     │
+│   │   • Trae 2.0 全新设计升级                                   │     │
+│   │   • 深度集成 Claude / DeepSeek 多模型                      │     │
+│   │   • SOLO 模式：端到端自主开发                               │     │
+│   │   • @Agent 多代理协作系统                                   │     │
+│   │   • MCP 协议支持                                            │     │
+│   │   • 免费使用，无次数限制                                    │     │
+│   │   • 企业版已发布（600万+用户）                              │     │
+│   │                                                              │     │
+│   │   定位：真正的 AI 工程师 (The Real AI Engineer)             │     │
+│   │                                                              │     │
+│   └─────────────────────────────────────────────────────────────┘     │
+│                                                                         │
+│   💡 核心优势：免费 + 多模型 + SOLO 自主开发 + 中文优化                   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <h3>🤖 AI 模型支持</h3>
+
+            <div class="card">
+                <div class="card-header">内置模型</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     Trae 支持的 AI 模型                                     │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────────────────────────────────────────────────────┐     │
+│   │                     免费模型 ✓                              │     │
+│   ├─────────────────────────────────────────────────────────────┤     │
+│   │  • Claude-3.5-Sonnet    - 快速响应，日常编程首选            │     │
+│   │  • Claude-3.7-Sonnet    - 深度思考，强推理能力              │     │
+│   │  • DeepSeek-Reasoner(R1)- 国产推理模型                     │     │
+│   │  • DeepSeek-Chat(v3)   - 国产对话模型                      │     │
+│   └─────────────────────────────────────────────────────────────┘     │
+│                                                                         │
+│   💡 模型选择建议：                                                     │
+│   • 简单代码生成 → Claude-3.5-Sonnet（快）                              │
+│   • 复杂问题分析 → Claude-3.7-Sonnet（准）                              │
+│   • 国产模型偏好 → DeepSeek 系列                                        │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <h3>🗣️ AI 对话功能</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">打开 AI 对话</div>
+                    <div class="diagram-box" style="margin: 0.5rem 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│           打开对话的方式                  │
+├─────────────────────────────────────────┤
+│                                         │
+│  快捷键：                               │
+│  • Ctrl/Cmd + I → 侧边对话栏           │
+│  • Ctrl/Cmd + J → 浮动输入框           │
+│                                         │
+│  界面操作：                             │
+│  • 右侧边栏 AI 图标                     │
+│  • 选中代码 → 右键 → Ask AI            │
+│  • 输入 # 关联当前文件上下文             │
+│                                         │
+└─────────────────────────────────────────┘
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">对话指令技巧</div>
+                    <pre class="code-block"><code class="language-python"># 常用对话指令
+
+# 解释代码
+"解释这段代码的功能"
+"这个函数是怎么工作的？"
+
+# 修复 Bug
+"这段代码报错了，帮修复"
+"为什么 API 返回 404？"
+
+# 生成代码
+"写一个 Python 快速排序"
+"用 React 写登录组件"
+
+# 代码审查
+"检查这段代码的安全性"
+"有什么优化建议？"
+
+# 项目相关
+"在用户模块添加忘记密码功能"
+"在 #开头 关联当前文件"
+
+# 特殊用法
+# 输入 # 自动关联当前文件上下文
+# AI 结合语法规则和项目结构给出精准建议</code></pre>
+                </div>
+            </div>
+
+            <h3>🏗️ Builder 模式</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">Builder 核心功能</div>
+                    <div class="diagram-box" style="margin: 0.5rem 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│           Builder 模式                    │
+├─────────────────────────────────────────┤
+│                                         │
+│  📝 自然语言生成完整项目                 │
+│                                         │
+│  快捷键：                               │
+│  • Ctrl/Cmd + Enter                     │
+│                                         │
+│  特点：                                │
+│  • 自动拆解需求结构                      │
+│  • 配置开发环境                          │
+│  • 生成可运行代码                        │
+│  • 多文件智能生成                        │
+│  • 垂直领域模板库                        │
+│                                         │
+└─────────────────────────────────────────┘
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Builder 使用示例</div>
+                    <pre class="code-block"><code class="language-python"># 输入需求示例：
+"""
+创建一个电商 Demo，包含：
+- 商品列表展示
+- 购物车功能
+- 结账流程
+- 使用 React + Node.js
+"""
+
+# AI 自动生成：
+# 1. 项目结构
+# 2. 前端页面组件
+# 3. 后端 API
+# 4. 数据库模型
+# 5. 部署脚本
+
+# 垂直领域模板：
+# • 电商、社交、办公...
+# 基于模板二次修改
+
+# 效率提升：
+# 30分钟完成传统开发需半天的工作量</code></pre>
+                </div>
+            </div>
+
+            <h3>🚀 SOLO 模式</h3>
+
+            <div class="card">
+                <div class="card-header">SOLO 端到端自主开发</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     SOLO 模式核心                                           │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────────────────────────────────────────────────────┐     │
+│   │                                                              │     │
+│   │   输入需求 → AI 自主拆解 → 计划生成 → 多轮编码 → 测试验证      │     │
+│   │                            ↓                                  │     │
+│   │                      部署上线 🚀                             │     │
+│   │                                                              │     │
+│   │   特点：                                                     │     │
+│   │   • 需求到部署全流程自动化                                    │     │
+│   │   • 双智能体架构协同                                          │     │
+│   │   • Plan 模式：先规划再执行                                   │     │
+│   │   • 规划卡 → 产物 → 部署步骤                                  │     │
+│   │                                                              │     │
+│   │   适用场景：                                                  │     │
+│   │   • 复杂项目从 0 到 1                                         │     │
+│   │   • 需要多模块协作的任务                                       │     │
+│   │   • 端到端交付场景                                            │     │
+│   │                                                              │     │
+│   └─────────────────────────────────────────────────────────────┘     │
+│                                                                         │
+│   💡 SOLO Builder：通过自然语言从零构建完整应用                            │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">SOLO vs Builder</div>
+                    <pre class="code-block"><code class="language-python"># Builder 模式
+# • 单次代码生成
+# • 适合功能模块开发
+# • 快速原型验证
+
+# SOLO 模式
+# • 自主多轮迭代
+# • 端到端交付
+# • 复杂项目首选
+
+# 使用建议：
+# 简单功能 → Builder
+# 完整项目 → SOLO</code></pre>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Plan 模式</div>
+                    <pre class="code-block"><code class="language-python"># SOLO 的 Plan 模式
+
+# 1. 检索项目上下文
+# 2. 生成详细开发计划
+# 3. 调度子智能体分工协作
+
+# 示例计划输出：
+# ┌─────────────────────────────────────┐
+# │ 任务规划                            │
+# ├─────────────────────────────────────┤
+# │ 1. 数据库设计 → 数据库专家智能体      │
+# │ 2. API 开发 → 后端专家智能体         │
+# │ 3. 前端页面 → 前端专家智能体         │
+# │ 4. 测试验证 → 测试专家智能体         │
+# │ 5. 部署上线 → DevOps 智能体          │
+# └─────────────────────────────────────┘</code></pre>
+                </div>
+            </div>
+
+            <h3>🤖 @Agent 多代理系统</h3>
+
+            <div class="card">
+                <div class="card-header">@Agent 智能体协作</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     @Agent 系统                                               │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────────────────────────────────────────────────────┐     │
+│   │                     核心特性                                 │     │
+│   ├─────────────────────────────────────────────────────────────┤     │
+│   │  • 自定义 Agent 技能                                         │     │
+│   │  • MCP 协议支持（Model Context Protocol）                    │     │
+│   │  • 多 Agent 协作                                             │     │
+│   │  • .rules 行为规则配置                                       │     │
+│   │  • 外部工具集成（Supabase、Vercel 等）                      │     │
+│   │                                                              │     │
+│   └─────────────────────────────────────────────────────────────┘     │
+│                                                                         │
+│   适用场景：                                                            │
+│   • 复杂任务分解                                                        │
+│   • 跨模块协同开发                                                      │
+│   • 自动化工作流                                                        │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <h3>💡 Cue 预测性编码</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">Cue 智能预测</div>
+                    <div class="diagram-box" style="margin: 0.5rem 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│           Cue 核心功能                    │
+├─────────────────────────────────────────┤
+│                                         │
+│  ⚡ 预测性编码                          │
+│  • 预测下一个编辑点                      │
+│  • 一键完成                             │
+│  • 闪电速度编码                          │
+│                                         │
+│  Cue-Pro 升级：                         │
+│  • 仓库级编辑序列                       │
+│  • 保持编码流程                          │
+│  • 最大月度更新                          │
+│                                         │
+└─────────────────────────────────────────┘
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">深度上下文补全</div>
+                    <pre class="code-block"><code class="language-python"># 智能感知整个项目上下文
+
+# 功能：
+# • 自动检索项目内接口定义
+# • 提示参数类型和返回值结构
+# • 补全建议符合项目规范
+
+# 大规模重构：
+# • 同步更新所有关联调用点
+# • 规避遗漏修改导致的错误
+# • 减少手动追溯依赖链
+
+# 技术实现：
+# • 实时代码索引仓库
+# • 跨文件理解能力
+# • 增量编译 < 300ms</code></pre>
+                </div>
+            </div>
+
+            <h3>🎨 多模态功能</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">图像转代码</div>
+                    <pre class="code-block"><code class="language-python"># 上传 UI 截图生成代码
+
+# 支持：
+# • Figma 截图
+# • 设计稿导出图片
+# • 手绘原型图
+
+# 生成结果：
+# • HTML/CSS 代码
+# • 响应式布局
+# • 保留设计细节
+
+# 测试数据：
+# • 电商商品卡片 → 90秒转化
+# • 保留间距、字体等细节
+# • 支持 hover 效果</code></pre>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Webview 实时预览</div>
+                    <pre class="code-block"><code class="language-python"># 内置 Webview 预览
+
+# 特点：
+# • 所见即所得编辑
+# • 右侧实时渲染
+# • 支持交互事件响应
+
+# 技术实现：
+# • 基于 V8 引擎
+# • 热重载机制
+# • 增量编译 < 300ms
+
+# 适用：
+# • React 组件开发
+# • Vue 组件开发
+# • 样式调试</code></pre>
+                </div>
+            </div>
+
+            <h3>🔧 MCP 协议与 .rules</h3>
+
+            <div class="card">
+                <div class="card-header">MCP 协议支持</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     MCP 协议（Model Context Protocol）                    │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────────────────────────────────────────────────────┐     │
+│   │                     MCP 核心作用                             │     │
+│   ├─────────────────────────────────────────────────────────────┤     │
+│   │  • 外部工具和资源的智能接入                                  │     │
+│   │  • 自动化工作流编排                                          │     │
+│   │  • 跨工具上下文共享                                          │     │
+│   │  • Agent 任务路由和协调                                      │     │
+│   │                                                              │     │
+│   └─────────────────────────────────────────────────────────────┘     │
+│                                                                         │
+│   .rules 行为规则：                                                     │
+│   • 定义 Agent 行为约束                                                │
+│   • 自定义技能集                                                       │
+│   • 配置文件：.trae/rules/                                             │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <h3>🎯 快捷键速查</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>功能</th>
+                            <th>Windows / Linux</th>
+                            <th>macOS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>打开侧边 AI 对话</strong></td>
+                            <td>Ctrl + U</td>
+                            <td>Cmd + U</td>
+                        </tr>
+                        <tr>
+                            <td><strong>打开内嵌 AI 对话</strong></td>
+                            <td>Ctrl + I</td>
+                            <td>Cmd + I</td>
+                        </tr>
+                        <tr>
+                            <td><strong>打开浮动输入框</strong></td>
+                            <td>Ctrl + J</td>
+                            <td>Cmd + J</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Builder 生成</strong></td>
+                            <td>Ctrl + Enter</td>
+                            <td>Cmd + Enter</td>
+                        </tr>
+                        <tr>
+                            <td><strong>接受 AI 代码</strong></td>
+                            <td>Tab</td>
+                            <td>Tab</td>
+                        </tr>
+                        <tr>
+                            <td><strong>拒绝 AI 代码</strong></td>
+                            <td>Esc</td>
+                            <td>Esc</td>
+                        </tr>
+                        <tr>
+                            <td><strong>命令面板</strong></td>
+                            <td>Ctrl + Shift + P</td>
+                            <td>Cmd + Shift + P</td>
+                        </tr>
+                        <tr>
+                            <td><strong>文件导航</strong></td>
+                            <td>Ctrl + P</td>
+                            <td>Cmd + P</td>
+                        </tr>
+                        <tr>
+                            <td><strong>全局搜索</strong></td>
+                            <td>Ctrl + Shift + F</td>
+                            <td>Cmd + Shift + F</td>
+                        </tr>
+                        <tr>
+                            <td><strong>代码补全</strong></td>
+                            <td>Ctrl + Space</td>
+                            <td>Ctrl + Space</td>
+                        </tr>
+                        <tr>
+                            <td><strong>关联当前文件（#）</strong></td>
+                            <td>在对话中输入 #</td>
+                            <td>在对话中输入 #</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="info-box info" style="margin-top: 1rem;">
+                <p>📌 <strong>说明</strong>：更多快捷键可在 Trae 中通过 Ctrl/Cmd + Shift + P → "Keyboard Shortcuts" 查看和自定义</p>
+            </div>
+
+            <h3>📦 扩展与配置</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">推荐扩展</div>
+                    <pre class="code-block"><code class="language-python"># Git 增强
+# • GitLens - 查看代码历史
+# • Git Graph - 可视化分支
+
+# 代码质量
+# • ESLint - 代码检查
+# • Prettier - 代码格式化
+# • SonarLint - 问题发现
+
+# 主题美化
+# • One Dark Pro - 主题
+# • Material Icon - 图标
+
+# 其他工具
+# • REST Client - API 测试
+# • Docker - 容器支持
+# • YAML / TOML - 配置文件
+
+# VS Code 扩展兼容
+# • 支持大部分 VS Code 插件
+# • 无缝迁移</code></pre>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Trae 专属设置</div>
+                    <pre class="code-block"><code class="language-python"># 1. AI 模型选择
+# Settings → Trae → Model
+# Claude-3.5-Sonnet / Claude-3.7-Sonnet
+# DeepSeek-Reasoner(R1) / DeepSeek-Chat(v3)
+
+# 2. Index 配置
+# Settings → Trae → Index
+# 索引范围、排除文件
+
+# 3. Max Mode（深度编码）
+# Settings → Trae → Max Mode
+# 更大上下文窗口
+# 更多工具调用
+
+# 4. .traeignore
+# 排除敏感文件
+.env
+secrets/
+node_modules/
+
+# 5. .rules 配置
+# .trae/rules/*.rules
+# 自定义 Agent 行为规则</code></pre>
+                </div>
+            </div>
+
+            <h3>🏢 其他国产 AI IDE</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">🤖 百度 Comate（文心快码）</div>
+                    <div class="diagram-box" style="margin: 0.5rem 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│         百度 Comate 核心优势              │
+├─────────────────────────────────────────┤
+│                                         │
+│  🏛️ Multi-Agent 架构                   │
+│  • Zulu - 日常助手                      │
+│  • Plan - 策划专家                      │
+│  • Architect - 架构师                   │
+│                                         │
+│  📊 核心数据：                          │
+│  • C++ 代码质量行业第一                 │
+│  • Python 首生成率 92.3%                │
+│  • 百度内部 80% 工程师使用              │
+│  • 跨文件任务理解 91%                   │
+│  • 代码采纳率 44%+                      │
+│                                         │
+│  💡 特色功能：                          │
+│  • SPEC 规范驱动开发                    │
+│  • Figma2Code 设计稿转代码              │
+│  • 200+ 语言支持                        │
+│                                         │
+└─────────────────────────────────────────┘
+                    </div>
+                    <ul style="font-size: 0.85rem; padding-left: 1rem; margin-top: 0.5rem;">
+                        <li>官网：comate.baidu.com</li>
+                        <li>形态：VS Code / JetBrains 插件</li>
+                        <li>定价：个人免费，企业版付费</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">💻 腾讯 CodeBuddy</div>
+                    <div class="diagram-box" style="margin: 0.5rem 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│          腾讯 CodeBuddy 核心优势          │
+├─────────────────────────────────────────┤
+│                                         │
+│  🤖 Craft 智能体                       │
+│  • Plan 模式自动拆解任务                 │
+│  • 腾讯混元大模型驱动                   │
+│                                         │
+│  📊 核心数据：                          │
+│  • 代码采纳率高达 93%                    │
+│  • 腾讯内部 43% 代码 AI 生成            │
+│  • 微信小程序开发提升 125%              │
+│  • 多语言支持 200+                       │
+│                                         │
+│  💡 特色功能：                          │
+│  • 微信生态深度集成                     │
+│  • MCP 协议支持                         │
+│  • 设计稿一键转代码                     │
+│  • IDE / 插件 / CLI 多形态              │
+│                                         │
+└─────────────────────────────────────────┘
+                    </div>
+                    <ul style="font-size: 0.85rem; padding-left: 1rem; margin-top: 0.5rem;">
+                        <li>官网：codebuddy.cloud.tencent.com</li>
+                        <li>形态：独立 IDE / VS Code 插件</li>
+                        <li>定价：个人免费，企业版付费</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">🛡️ 阿里 Lingma（通义灵码）</div>
+                    <div class="diagram-box" style="margin: 0.5rem 0;">
+                        <div class="diagram-content">
+┌─────────────────────────────────────────┐
+│        阿里 Lingma 核心优势               │
+├─────────────────────────────────────────┤
+│                                         │
+│  🧠 编程智能体                          │
+│  • Agent Mode 自主完成任务               │
+│  • 千问 3 大模型驱动                    │
+│                                         │
+│  📊 核心数据：                          │
+│  • Java/Go 覆盖率 98%                   │
+│  • 200+ 语言支持                         │
+│  • 开发者满意率 87%+                    │
+│  • 哈啰集团 AI 代码采纳率 25%            │
+│                                         │
+│  💡 特色功能：                          │
+│  • 阿里云生态深度集成                   │
+│  • 魔搭 MCP 市场 3000+ 服务             │
+│  • 企业私有化部署支持                   │
+│  • 工程自动感知                         │
+│                                         │
+└─────────────────────────────────────────┘
+                    </div>
+                    <ul style="font-size: 0.85rem; padding-left: 1rem; margin-top: 0.5rem;">
+                        <li>官网：lingma.aliyun.com</li>
+                        <li>形态：独立 IDE / VS Code / JetBrains</li>
+                        <li>定价：个人免费，企业版付费</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

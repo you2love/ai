@@ -114,7 +114,7 @@
 
             <h3>🎯 准确性优化策略</h3>
 
-            <div class="cards-grid card-grid-2">
+            <div class="cards-grid">
                 <div class="card">
                     <div class="card-header">策略1：降低随机性</div>
                     <pre class="code-block"><code class="language-python"># 准确任务：温度设为最低
@@ -207,7 +207,7 @@ messages = [
 
             <h3>🔧 高级优化技术</h3>
 
-            <div class="cards-grid card-grid-2">
+            <div class="cards-grid">
                 <div class="card">
                     <div class="card-header">RAG 检索增强生成</div>
                     <div class="diagram-box" style="margin: 0.5rem 0;">
@@ -338,7 +338,7 @@ most_common_answer = Counter(answers).most_common(1)[0][0]</code></pre>
 
             <h3>💰 成本优化技巧</h3>
 
-            <div class="cards-grid card-grid-3">
+            <div class="cards-grid">
                 <div class="card">
                     <h4>📉 控制输出长度</h4>
                     <ul style="font-size: 0.85rem; padding-left: 1rem;">
@@ -406,9 +406,350 @@ def call_llm_with_retry(messages, max_retries=3):
     raise Exception("Max retries exceeded")</code></pre>
             </div>
 
+            <h3>📊 LLM API 回包分析</h3>
+
+            <div class="card">
+                <div class="card-header">理解 API 响应结构</div>
+                <div class="diagram-box">
+                    <div class="diagram-content">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     OpenAI API 响应结构                                   │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  {                                                                     │
+│    "id": "chatcmpl-abc123",         ← 响应唯一标识                      │
+│    "object": "chat.completion",     ← 对象类型                         │
+│    "created": 1690000000,           ← 创建时间戳                        │
+│    "model": "gpt-4o",               ← 使用的模型                       │
+│    "choices": [                    ← 生成结果数组                      │
+│      {                                                                     │
+│        "index": 0,                 ← 结果索引                          │
+│        "message": {                ← 模型回复内容                       │
+│          "role": "assistant",      ← 角色                              │
+│          "content": "回答内容"     ← 实际回复                          │
+│        },                                                                │
+│        "finish_reason": "stop",     ← 结束原因 (stop/length/tool_calls) │
+│        "logprobs": null             ← 概率信息（可选）                   │
+│      }                                                                    │
+│    ],                                                                     │
+│    "usage": {                       ← Token 使用统计                    │
+│      "prompt_tokens": 50,          ← 输入消耗                          │
+│      "completion_tokens": 100,     ← 输出消耗                          │
+│      "total_tokens": 150           ← 总消耗                            │
+│    },                                                                    │
+│    "system_fingerprint": "fp_xxx"   ← 模型版本指纹                      │
+│  }                                                                         │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">解析响应内容</div>
+                    <pre class="code-block"><code class="language-python">from openai import OpenAI
+
+client = OpenAI(api_key="your-api-key")
+
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "介绍一下人工智能"}],
+    temperature=0.7
+)
+
+# 提取核心信息
+response_id = response.id                    # 响应ID
+model_name = response.model                  # 模型名称
+created_time = response.created              # 创建时间
+
+# 提取回复内容
+message = response.choices[0].message
+content = message.content                     # 实际回答文本
+role = message.role                           # 角色 (assistant)
+
+# 提取结束原因
+finish_reason = response.choices[0].finish_reason
+# stop: 正常结束 | length: 达到max_tokens | tool_calls: 调用工具
+
+# 提取使用统计
+usage = response.usage
+prompt_tokens = usage.prompt_tokens           # 输入token数
+completion_tokens = usage.completion_tokens   # 输出token数
+total_tokens = usage.total_tokens             # 总token数
+
+print(f"模型回复: {content}")
+print(f"消耗Token: {total_tokens} (输入:{prompt_tokens} + 输出:{completion_tokens})")</code></pre>
+                    <div class="info-box tip" style="margin-top: 1rem;">
+                        <p>💡 <strong>提示</strong>：始终检查 `finish_reason` 确保输出完整</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Token 消耗与成本计算</div>
+                    <pre class="code-block"><code class="language-python"># 各模型 Token 定价（示例，单位：美元）
+MODEL_PRICING = {
+    "gpt-4o": {"input": 5.0, "output": 15.0},      # 每百万 token
+    "gpt-4o-mini": {"input": 0.15, "output": 0.6},
+    "gpt-4-turbo": {"input": 10.0, "output": 30.0},
+    "claude-3-5-sonnet": {"input": 3.0, "output": 15.0},
+}
+
+def calculate_cost(model, prompt_tokens, completion_tokens):
+    """计算 API 调用成本"""
+    pricing = MODEL_PRICING.get(model, {"input": 0, "output": 0})
+    
+    input_cost = (prompt_tokens / 1_000_000) * pricing["input"]
+    output_cost = (completion_tokens / 1_000_000) * pricing["output"]
+    
+    return input_cost + output_cost
+
+# 计算单次调用成本
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "你好"}]
+)
+
+usage = response.usage
+cost = calculate_cost("gpt-4o", usage.prompt_tokens, usage.completion_tokens)
+
+print(f"Prompt Tokens: {usage.prompt_tokens}")
+print(f"Completion Tokens: {usage.completion_tokens}")
+print(f"本次调用成本: ${cost:.6f}")</code></pre>
+                    <div class="info-box info" style="margin-top: 1rem;">
+                        <p>📌 <strong>注意</strong>：不同模型、不同提供商标价不同，请以官方最新价格为准</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">流式响应 (Streaming) 解析</div>
+                <pre class="code-block"><code class="language-python">from openai import OpenAI
+
+client = OpenAI(api_key="your-api-key")
+
+# 启用流式输出
+stream = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "写一首关于春天的诗"}],
+    stream=True  # 开启流式
+)
+
+# 逐块解析响应
+full_content = ""
+chunk_count = 0
+
+for chunk in stream:
+    if chunk.choices[0].delta.content:
+        content_chunk = chunk.choices[0].delta.content
+        full_content += content_chunk
+        chunk_count += 1
+        print(f"[Chunk {chunk_count}] {content_chunk}", end="", flush=True)
+
+print(f"\n\n总块数: {chunk_count}")
+print(f"完整内容长度: {len(full_content)} 字符")
+
+# 流式响应结构
+# {
+#     "id": "chatcmpl-...",
+#     "object": "chat.completion.chunk",
+#     "created": 1690000000,
+#     "model": "gpt-4o",
+#     "choices": [{
+#         "index": 0,
+#         "delta": {"content": "春", "role": "assistant"},
+#         "finish_reason": null
+#     }]
+# }</code></pre>
+                <div class="info-box warning" style="margin-top: 1rem;">
+                    <p>⚠️ <strong>流式响应特点</strong>：每次返回部分内容，`finish_reason` 在最后一块为 null，完成后变为 "stop"</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">错误响应处理</div>
+                <pre class="code-block"><code class="language-python">from openai import OpenAI, RateLimitError, APIError, AuthenticationError
+
+client = OpenAI(api_key="your-api-key")
+
+def parse_error_response(error):
+    """解析错误响应并提供处理建议"""
+    
+    if isinstance(error, AuthenticationError):
+        # 认证错误
+        print(f"❌ 认证失败: {error}")
+        print("💡 解决：检查 API Key 是否正确、是否有效")
+        return {"type": "auth", "action": "check_api_key"}
+    
+    elif isinstance(error, RateLimitError):
+        # 速率限制
+        print(f"🚫 速率限制: {error}")
+        if "rate limit" in str(error).lower():
+            print("💡 解决：等待后重试，或申请提高限额")
+        return {"type": "rate_limit", "action": "retry_after"}
+    
+    elif isinstance(error, APIError):
+        # API 服务器错误
+        print(f"⚠️ API 错误: {error.status_code} - {error.message}")
+        if 500 <= error.status_code < 600:
+            print("💡 解决：服务器错误，等待后重试")
+            return {"type": "server_error", "action": "retry"}
+        else:
+            print("💡 解决：检查请求参数是否正确")
+            return {"type": "client_error", "action": "fix_request"}
+    
+    else:
+        print(f"❓ 未知错误: {error}")
+        return {"type": "unknown", "action": "investigate"}
+
+# 使用示例
+try:
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": "Hello"}]
+    )
+except Exception as e:
+    error_info = parse_error_response(e)
+    print(f"错误类型: {error_info['type']}, 建议操作: {error_info['action']}")</code></pre>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>HTTP 状态码</th>
+                            <th>错误类型</th>
+                            <th>常见原因</th>
+                            <th>处理建议</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>401</strong></td>
+                            <td>认证错误</td>
+                            <td>API Key 无效/过期/缺失</td>
+                            <td>检查 Key 配置，生成新 Key</td>
+                        </tr>
+                        <tr>
+                            <td><strong>400</strong></td>
+                            <td>请求错误</td>
+                            <td>参数无效、消息格式错误</td>
+                            <td>检查请求参数格式</td>
+                        </tr>
+                        <tr>
+                            <td><strong>429</strong></td>
+                            <td>速率限制</td>
+                            <td>请求频率超限</td>
+                            <td>降低频率、增加延迟</td>
+                        </tr>
+                        <tr>
+                            <td><strong>500/502/503</strong></td>
+                            <td>服务器错误</td>
+                            <td>OpenAI 服务器问题</td>
+                            <td>等待后重试，实现重试机制</td>
+                        </tr>
+                        <tr>
+                            <td><strong>404</strong></td>
+                            <td>模型不存在</td>
+                            <td>模型名称错误或不可用</td>
+                            <td>检查模型名称是否正确</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-header">响应数据统计分析</div>
+                <pre class="code-block"><code class="language-python">from dataclasses import dataclass
+from typing import List, Dict
+from datetime import datetime
+
+@dataclass
+class APIResponseStats:
+    """API 响应统计"""
+    request_id: str
+    model: str
+    prompt_tokens: int
+    completion_tokens: int
+    total_tokens: int
+    response_time: float  # 秒
+    timestamp: datetime
+
+class ResponseAnalyzer:
+    """响应分析器 - 统计和监控 API 使用情况"""
+    
+    def __init__(self):
+        self.history: List[APIResponseStats] = []
+    
+    def record_response(self, response, response_time: float):
+        """记录一次响应"""
+        stats = APIResponseStats(
+            request_id=response.id,
+            model=response.model,
+            prompt_tokens=response.usage.prompt_tokens,
+            completion_tokens=response.usage.completion_tokens,
+            total_tokens=response.usage.total_tokens,
+            response_time=response_time,
+            timestamp=datetime.now()
+        )
+        self.history.append(stats)
+    
+    def get_statistics(self) -> Dict:
+        """获取统计信息"""
+        if not self.history:
+            return {}
+        
+        total_requests = len(self.history)
+        total_tokens = sum(s.total_tokens for s in self.history)
+        total_prompt = sum(s.prompt_tokens for s in self.history)
+        total_completion = sum(s.completion_tokens for s in self.history)
+        avg_response_time = sum(s.response_time for s in self.history) / total_requests
+        
+        return {
+            "总请求数": total_requests,
+            "总Token消耗": total_tokens,
+            "输入Token": total_prompt,
+            "输出Token": total_completion,
+            "平均响应时间": f"{avg_response_time:.2f}s",
+            "平均每请求Token": total_tokens // total_requests
+        }
+    
+    def get_model_usage(self, model_name: str) -> Dict:
+        """获取特定模型的使用统计"""
+        model_stats = [s for s in self.history if s.model == model_name]
+        if not model_stats:
+            return {}
+        
+        return {
+            "模型": model_name,
+            "请求次数": len(model_stats),
+            "总Token": sum(s.total_tokens for s in model_stats)
+        }
+
+# 使用示例
+analyzer = ResponseAnalyzer()
+
+# 记录 API 调用
+import time
+
+start = time.time()
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "你好"}]
+)
+elapsed = time.time() - start
+
+analyzer.record_response(response, elapsed)
+
+# 查看统计
+stats = analyzer.get_statistics()
+for key, value in stats.items():
+    print(f"{key}: {value}")</code></pre>
+            </div>
+
             <h3>✅ 最佳实践清单</h3>
 
-            <div class="cards-grid card-grid-2">
+            <div class="cards-grid">
                 <div class="card">
                     <h4>🔧 参数调优</h4>
                     <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
@@ -437,12 +778,13 @@ def call_llm_with_retry(messages, max_retries=3):
                     </ul>
                 </div>
                 <div class="card">
-                    <h4>📊 质量保障</h4>
+                    <h4>📊 回包分析</h4>
                     <ul style="font-size: 0.9rem; padding-left: 1.2rem;">
-                        <li>建立评估数据集</li>
-                        <li>定期测试输出质量</li>
-                        <li>收集用户反馈</li>
-                        <li>持续迭代优化</li>
+                        <li>解析响应结构，提取关键信息</li>
+                        <li>监控 Token 消耗和成本</li>
+                        <li>检查 finish_reason 确保输出完整</li>
+                        <li>记录响应日志用于问题排查</li>
+                        <li>实现错误响应分类处理</li>
                     </ul>
                 </div>
             </div>

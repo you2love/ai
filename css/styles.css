@@ -775,3 +775,72 @@ tr:last-child td {
         overflow: visible;
     }
 }
+
+/* Collapsible Details */
+details {
+    background: var(--card-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+}
+
+details[open] {
+    box-shadow: var(--shadow-sm);
+}
+
+summary {
+    padding: 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-primary);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 8px;
+    transition: background var(--transition-fast);
+}
+
+summary:hover {
+    background: var(--bg-secondary);
+}
+
+summary::-webkit-details-marker {
+    display: none;
+}
+
+summary::after {
+    content: '▼';
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    transition: transform var(--transition-fast);
+}
+
+details[open] summary::after {
+    transform: rotate(180deg);
+}
+
+details .details-content {
+    padding: 0 1rem 1rem 1rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: 0;
+    padding-top: 1rem;
+}
+
+/* Collapsible code blocks */
+details code {
+    background: var(--bg-secondary);
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.875em;
+}
+
+details pre {
+    margin: 0;
+}
+
+details pre code {
+    background: transparent;
+    padding: 0;
+}

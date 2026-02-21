@@ -151,6 +151,261 @@
                 </table>
             </div>
 
+            <!-- 实例说明 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">📝 Skill实例说明</h3>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <div>
+                        <div class="card-title">实例1：数据分析Skill</div>
+                        <div class="card-subtitle">对CSV数据进行统计分析</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>data_analysis_skill.json</span>
+                        </div>
+                        <pre><code>{
+  "name": "data_analysis",
+  "version": "1.0.0",
+  "description": "分析CSV数据并生成统计报告",
+  "input": {
+    "file_path": { "type": "string", "required": true },
+    "analysis_type": { "type": "string", "enum": ["summary", "trend", "correlation"] }
+  },
+  "output": {
+    "type": "object",
+    "properties": ["summary", "charts", "insights"]
+  },
+  "dependencies": ["pandas", "matplotlib"],
+  "examples": [
+    {
+      "input": { "file_path": "sales.csv", "analysis_type": "summary" },
+      "output": { "rows": 1000, "columns": 5, "avg_sales": 15000 }
+    }
+  ]
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header">
+                    <div class="card-icon">🔍</div>
+                    <div>
+                        <div class="card-title">实例2：网页搜索Skill</div>
+                        <div class="card-subtitle">搜索互联网并返回摘要结果</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>web_search_skill.json</span>
+                        </div>
+                        <pre><code>{
+  "name": "web_search",
+  "version": "1.0.0",
+  "description": "搜索互联网并返回摘要结果",
+  "input": {
+    "query": { "type": "string", "required": true },
+    "max_results": { "type": "integer", "default": 5 },
+    "language": { "type": "string", "default": "zh-CN" }
+  },
+  "output": {
+    "type": "array",
+    "items": { "title": "string", "url": "string", "summary": "string" }
+  },
+  "dependencies": ["search_api"],
+  "examples": [
+    {
+      "input": { "query": "最新AI技术", "max_results": 3 },
+      "output": [
+        { "title": "2026 AI趋势", "url": "...", "summary": "..." }
+      ]
+    }
+  ]
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header">
+                    <div class="card-icon">💻</div>
+                    <div>
+                        <div class="card-title">实例3：代码生成Skill</div>
+                        <div class="card-subtitle">根据描述生成代码片段</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>code_gen_skill.json</span>
+                        </div>
+                        <pre><code>{
+  "name": "code_generator",
+  "version": "1.0.0",
+  "description": "根据自然语言描述生成代码",
+  "input": {
+    "description": { "type": "string", "required": true },
+    "language": { "type": "string", "enum": ["python", "javascript", "go", "rust"] },
+    "style": { "type": "string", "default": "clean" }
+  },
+  "output": {
+    "type": "object",
+    "properties": ["code", "explanation", "dependencies"]
+  },
+  "dependencies": ["llm_api"],
+  "examples": [
+    {
+      "input": { "description": "读取JSON文件并解析", "language": "python" },
+      "output": {
+        "code": "import json\nwith open('data.json') as f:\n    data = json.load(f)",
+        "explanation": "使用json模块读取并解析文件"
+      }
+    }
+  ]
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 流行技能列表 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🔥 2026年流行AI技能列表</h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>技能名称</th>
+                            <th>用途</th>
+                            <th>热度</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Web Search</strong></td>
+                            <td>联网搜索实时信息</td>
+                            <td><span style="color:#e74c3c;">🔥🔥🔥🔥🔥</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Code Interpreter</strong></td>
+                            <td>执行代码、数据分析</td>
+                            <td><span style="color:#e74c3c;">🔥🔥🔥🔥🔥</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>File Operations</strong></td>
+                            <td>文件读写、格式转换</td>
+                            <td><span style="color:#e74c3c;">🔥🔥🔥🔥</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Image Generation</strong></td>
+                            <td>AI绘画、图像编辑</td>
+                            <td><span style="color:#e74c3c;">🔥🔥🔥🔥</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>SQL Query</strong></td>
+                            <td>数据库查询分析</td>
+                            <td><span style="color:#e74c3c;">🔥🔥🔥🔥</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>API Connector</strong></td>
+                            <td>连接外部API服务</td>
+                            <td><span style="color:#e74c3c;">🔥🔥🔥</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Document Parser</strong></td>
+                            <td>PDF/Word文档解析</td>
+                            <td><span style="color:#e74c3c;">🔥🔥🔥</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Chart Generator</strong></td>
+                            <td>数据可视化图表</td>
+                            <td><span style="color:#e74c3c;">🔥🔥🔥</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Text to Speech</strong></td>
+                            <td>文本转语音</td>
+                            <td><span style="color:#e74c3c;">🔥🔥🔥</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Translation</strong></td>
+                            <td>多语言翻译</td>
+                            <td><span style="color:#e74c3c;">🔥🔥🔥</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Git Operations</strong></td>
+                            <td>版本控制操作</td>
+                            <td><span style="color:#e74c3c;">🔥🔥🔥</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Terminal/Shell</strong></td>
+                            <td>执行命令行操作</td>
+                            <td><span style="color:#e74c3c;">🔥🔥🔥</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Browser Automation</strong></td>
+                            <td>浏览器自动化</td>
+                            <td><span style="color:#e74c3c;">🔥🔥</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Email Handler</strong></td>
+                            <td>邮件发送管理</td>
+                            <td><span style="color:#e74c3c;">🔥🔥</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Calendar/Schedule</strong></td>
+                            <td>日程管理</td>
+                            <td><span style="color:#e74c3c;">🔥🔥</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 技能应用场景 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🎯 技能组合应用场景</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">🔬 研究助手</h4>
+                    <p style="font-size:0.85rem; color:#666;">
+                        Web Search + Document Parser + Translation
+                    </p>
+                    <p style="font-size:0.8rem; color:#999; margin-top:0.5rem;">
+                        自动搜索文献、解析PDF、翻译摘要
+                    </p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">📊 数据分析师</h4>
+                    <p style="font-size:0.85rem; color:#666;">
+                        File Ops + SQL Query + Chart Generator
+                    </p>
+                    <p style="font-size:0.8rem; color:#999; margin-top:0.5rem;">
+                        读取数据、查询分析、生成报表
+                    </p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">👨‍💻 开发助手</h4>
+                    <p style="font-size:0.85rem; color:#666;">
+                        Git Ops + Terminal + Code Interpreter
+                    </p>
+                    <p style="font-size:0.8rem; color:#999; margin-top:0.5rem;">
+                        代码编写、测试运行、版本管理
+                    </p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.5rem;">📝 内容创作</h4>
+                    <p style="font-size:0.85rem; color:#666;">
+                        Web Search + Image Gen + Translation
+                    </p>
+                    <p style="font-size:0.8rem; color:#999; margin-top:0.5rem;">
+                        素材搜集、配图生成、多语言发布
+                    </p>
+                </div>
+            </div>
+
         </div>
     </section>
 </body>

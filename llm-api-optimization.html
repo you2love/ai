@@ -116,7 +116,7 @@
 
             <h3>🎯 准确性优化策略</h3>
 
-            <div class="cards-grid">
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                 <div class="card">
                     <div class="card-header">策略1：降低随机性</div>
                     <pre class="code-block"><code class="language-python"># 准确任务：温度设为最低
@@ -162,8 +162,7 @@ messages = [
                         <li>减少不确定性</li>
                     </ul>
                 </div>
-            </div>
-
+            
             <div class="card">
                 <div class="card-header">策略3：Few-shot 示例学习</div>
                 <pre class="code-block"><code class="language-python"># 通过示例引导模型按特定格式输出
@@ -181,8 +180,7 @@ messages = [
                         <p>💡 <strong>Few-shot 技巧</strong>：提供 2-5 个高质量示例，让模型学习期望的格式和推理方式</p>
                     </div>
                 </div>
-            </div>
-
+            
             <div class="card">
                 <div class="card-header">策略4：Chain-of-Thought 思维链</div>
                 <pre class="code-block"><code class="language-python"># 要求模型分步骤思考
@@ -206,10 +204,11 @@ messages = [
                     </ul>
                 </div>
             </div>
+        </div>
 
-            <h3>🔧 高级优化技术</h3>
+        <h3>🔧 高级优化技术</h3>
 
-            <div class="cards-grid">
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                 <div class="card">
                     <div class="card-header">RAG 检索增强生成</div>
                     <div class="diagram-box" style="margin: 0.5rem 0;">
@@ -340,7 +339,7 @@ most_common_answer = Counter(answers).most_common(1)[0][0]</code></pre>
 
             <h3>💰 成本优化技巧</h3>
 
-            <div class="cards-grid">
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                 <div class="card">
                     <h4>📉 控制输出长度</h4>
                     <ul style="font-size: 0.85rem; padding-left: 1rem;">
@@ -447,7 +446,7 @@ def call_llm_with_retry(messages, max_retries=3):
                 </div>
             </div>
 
-            <div class="cards-grid">
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                 <div class="card">
                     <div class="card-header">解析响应内容</div>
                     <pre class="code-block"><code class="language-python">from openai import OpenAI
@@ -751,7 +750,7 @@ for key, value in stats.items():
 
             <h3>✅ 最佳实践清单</h3>
 
-            <div class="cards-grid">
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                 <div class="card">
                     <h4>🔧 参数调优</h4>
                     <ul style="font-size: 0.9rem; padding-left: 1.2rem;">

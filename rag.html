@@ -178,17 +178,17 @@
                 <div class="card">
                     <h4 style="margin-bottom: 1rem;">检索质量</h4>
                     <ul style="font-size:0.9rem; padding-left:1.2rem;">
-                        <li>Hit Rate - 命中率</li>
-                        <li>MRR - 平均倒数排名</li>
-                        <li>NDCG - 归一化折损累计增益</li>
+                        <li>Hit Rate - 命中率：Hit Rate@k = (# queries with relevant doc in top k) / (total queries)</li>
+                        <li>MRR - 平均倒数排名：MRR = (1/|Q|) × Σ (1/rank_i)</li>
+                        <li>NDCG - 归一化折损累计增益：NDCG@k = DCG@k / IDCG@k，其中 DCG@k = Σ (rel_i / log₂(i+1))</li>
                     </ul>
                 </div>
                 <div class="card">
                     <h4 style="margin-bottom: 1rem;">生成质量</h4>
                     <ul style="font-size:0.9rem; padding-left:1.2rem;">
-                        <li>Faithfulness - 忠实度</li>
-                        <li>Answer Relevancy - 相关性</li>
-                        <li>Context Precision - 上下文精确度</li>
+                        <li>Faithfulness - 忠实度：基于人工评估或LLM评分，衡量生成内容与源文档的一致性</li>
+                        <li>Answer Relevancy - 相关性：基于人工评估或LLM评分，衡量回答与问题的相关程度</li>
+                        <li>Context Precision - 上下文精确度：基于人工评估或LLM评分，衡量检索上下文与问题的精确匹配程度</li>
                     </ul>
                 </div>
             </div>

@@ -1347,6 +1347,7 @@ P(sₜ₊₁|sₜ)
                         <tr>
                             <th>指标</th>
                             <th>说明</th>
+                            <th>计算公式</th>
                             <th>适用场景</th>
                         </tr>
                     </thead>
@@ -1354,31 +1355,37 @@ P(sₜ₊₁|sₜ)
                         <tr>
                             <td><strong>准确率</strong></td>
                             <td>预测正确的比例</td>
+                            <td>(TP+TN)/(TP+TN+FP+FN)</td>
                             <td>分类问题通用</td>
                         </tr>
                         <tr>
                             <td><strong>精确率</strong></td>
                             <td>预测为正类中真正正类的比例</td>
+                            <td>TP/(TP+FP)</td>
                             <td>关注误报</td>
                         </tr>
                         <tr>
                             <td><strong>召回率</strong></td>
                             <td>正类中被正确预测的比例</td>
+                            <td>TP/(TP+FN)</td>
                             <td>关注漏报</td>
                         </tr>
                         <tr>
                             <td><strong>F1分数</strong></td>
                             <td>精确率和召回率的调和平均</td>
+                            <td>2×(精确率×召回率)/(精确率+召回率)</td>
                             <td>综合评价</td>
                         </tr>
                         <tr>
                             <td><strong>MSE</strong></td>
                             <td>预测值与真实值差异的平方平均</td>
+                            <td>Σ(y_i - ŷ_i)² / n</td>
                             <td>回归问题</td>
                         </tr>
                         <tr>
                             <td><strong>R²</strong></td>
                             <td>模型解释数据的能力（0-1）</td>
+                            <td>1 - (Σ(y_i - ŷ_i)² / Σ(y_i - ȳ)²)</td>
                             <td>回归问题</td>
                         </tr>
                     </tbody>

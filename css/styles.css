@@ -682,6 +682,20 @@ tr:last-child td {
     font-size: 1.25rem;
 }
 
+.flow-h-item.start {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    border-radius: 25px;
+}
+
+.flow-h-item.end {
+    background: var(--secondary-color);
+    color: white;
+    border-color: var(--secondary-color);
+    border-radius: 25px;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;

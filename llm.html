@@ -132,20 +132,20 @@
             </div>
 
             <h3>注意力机制</h3>
-            <div class="flow-chart">
-                <div class="flow-item start">输入序列</div>
-                <div class="flow-arrow">↓</div>
-                <div class="flow-item">Query (Q)</div>
-                <div class="flow-arrow">↓</div>
-                <div class="flow-item">Key (K) + Value (V)</div>
-                <div class="flow-arrow">↓</div>
-                <div class="flow-item">计算 Q·K^T 分数</div>
-                <div class="flow-arrow">↓</div>
-                <div class="flow-item">Softmax 归一化</div>
-                <div class="flow-arrow">↓</div>
-                <div class="flow-item">加权求和输出</div>
-                <div class="flow-arrow">↓</div>
-                <div class="flow-item end">注意力权重</div>
+            <div class="flow-horizontal" style="gap: 0.2rem;">
+                <div class="flow-h-item start" style="font-size: 0.8rem; padding: 0.4rem 0.6rem; min-width: 90px;">输入序列</div>
+                <div class="flow-h-arrow" style="font-size: 0.9rem;">→</div>
+                <div class="flow-h-item" style="font-size: 0.8rem; padding: 0.4rem 0.6rem; min-width: 90px;">Query (Q)</div>
+                <div class="flow-h-arrow" style="font-size: 0.9rem;">→</div>
+                <div class="flow-h-item" style="font-size: 0.8rem; padding: 0.4rem 0.6rem; min-width: 90px;">Key (K) + Value (V)</div>
+                <div class="flow-h-arrow" style="font-size: 0.9rem;">→</div>
+                <div class="flow-h-item" style="font-size: 0.8rem; padding: 0.4rem 0.6rem; min-width: 90px;">计算 Q·K^T 分数</div>
+                <div class="flow-h-arrow" style="font-size: 0.9rem;">→</div>
+                <div class="flow-h-item" style="font-size: 0.8rem; padding: 0.4rem 0.6rem; min-width: 90px;">Softmax 归一化</div>
+                <div class="flow-h-arrow" style="font-size: 0.9rem;">→</div>
+                <div class="flow-h-item" style="font-size: 0.8rem; padding: 0.4rem 0.6rem; min-width: 90px;">加权求和输出</div>
+                <div class="flow-h-arrow" style="font-size: 0.9rem;">→</div>
+                <div class="flow-h-item end" style="font-size: 0.8rem; padding: 0.4rem 0.6rem; min-width: 90px;">注意力权重</div>
             </div>
 
             <h3>预训练与微调范式</h3>
@@ -348,14 +348,14 @@
 
             <h3>按部署方式分类</h3>
             <div class="table-container">
-                <table>
+                <table style="table-layout: fixed; width: 100%;">
                     <thead>
                         <tr>
-                            <th>类型</th>
-                            <th>代表模型</th>
-                            <th>优势</th>
-                            <th>适用场景</th>
-                            <th>成本</th>
+                            <th style="width: 15%;">类型</th>
+                            <th style="width: 25%;">代表模型</th>
+                            <th style="width: 20%;">优势</th>
+                            <th style="width: 25%;">适用场景</th>
+                            <th style="width: 15%;">成本</th>
                         </tr>
                     </thead>
                     <tbody>

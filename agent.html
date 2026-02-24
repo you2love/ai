@@ -149,6 +149,391 @@
                 </div>
             </div>
 
+            <!-- 记忆系统详解 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">💾 记忆系统详解</h3>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header">为什么需要记忆系统？</div>
+                <div class="card-body">
+                    <p style="margin-bottom: 1rem;">AI智能体需要<strong>记忆</strong>来保持上下文一致性、学习用户偏好、在多轮对话中积累知识。没有记忆，智能体每次都是"从零开始"。</p>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>记忆类型</th>
+                                    <th>作用</th>
+                                    <th>存储方式</th>
+                                    <th>生命周期</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>工作记忆</strong></td>
+                                    <td>当前任务执行过程中的中间状态</td>
+                                    <td>变量、内存</td>
+                                    <td>任务内</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>短期记忆</strong></td>
+                                    <td>当前对话的上下文</td>
+                                    <td>对话历史（窗口）</td>
+                                    <td>会话内</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>长期记忆</strong></td>
+                                    <td>跨会话的知识和经验</td>
+                                    <td>向量数据库、文件</td>
+                                    <td>永久</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <h4 style="margin: 1.5rem 0 1rem;">🔄 临时记忆（会话内）</h4>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="card">
+                    <h5 style="margin-bottom: 0.5rem;">📝 1）对话历史（Message History）</h5>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 0.75rem;">
+                        最基础的记忆方式，直接保存用户和AI的所有对话记录。
+                    </p>
+                    <pre class="code-block" style="font-size: 0.8rem;"><code class="language-python"># 对话历史示例
+messages = [
+    {"role": "system", "content": "你是一个有帮助的助手"},
+    {"role": "user", "content": "我叫张三"},
+    {"role": "assistant", "content": "你好张三，很高兴认识你！"},
+    {"role": "user", "content": "我刚才说的名字是什么？"},  # 需要记住上面的对话
+]
+
+# 问题：对话太长会超出上下文限制
+# 解决方案：滑动窗口、摘要压缩</code></pre>
+                </div>
+
+                <div class="card">
+                    <h5 style="margin-bottom: 0.5rem;">✂️ 2）上下文窗口管理</h5>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 0.75rem;">
+                        当对话超过模型上下文限制时，需要管理窗口大小。
+                    </p>
+                    <pre class="code-block" style="font-size: 0.8rem;"><code class="language-python">from collections import deque
+
+class ConversationWindow:
+    """滑动窗口管理对话历史"""
+
+    def __init__(self, max_tokens: int = 4000):
+        self.max_tokens = max_tokens
+        self.messages = deque()
+
+    def add_message(self, role: str, content: str):
+        self.messages.append({"role": role, "content": content})
+        self._trim()
+
+    def _trim(self):
+        """裁剪超出限制的消息"""
+        while self._estimate_tokens() > self.max_tokens and len(self.messages) > 1:
+            # 移除最旧的消息（保留system消息）
+            if self.messages[0]["role"] == "system":
+                self.messages.popleft()
+                self.messages.popleft()
+            else:
+                self.messages.popleft()
+
+    def _estimate_tokens(self) -> int:
+        # 简单估算：1 token ≈ 4 字符
+        return sum(len(m["content"]) // 4 for m in self.messages)
+
+    def get_context(self) -> list:
+        return list(self.messages)
+
+# 使用
+window = ConversationWindow(max_tokens=4000)
+window.add_message("user", "我叫张三")
+window.add_message("assistant", "你好张三！")
+window.add_message("user", "帮我查下天气")  # 如果超限，会自动裁剪</code></pre>
+                </div>
+
+                <div class="card">
+                    <h5 style="margin-bottom: 0.5rem;">📜 3）对话摘要（Summarization）</h5>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 0.75rem;">
+                        定期将长对话压缩成摘要，减少token消耗同时保留关键信息。
+                    </p>
+                    <pre class="code-block" style="font-size: 0.8rem;"><code class="language-python">class SummarizedConversation:
+    """对话摘要模式"""
+
+    def __init__(self, llm):
+        self.llm = llm
+        self.summary = ""
+        self.recent_messages = []  # 保留最近N条消息
+        self.summary_threshold = 10  # 多少条消息后摘要
+
+    def add_message(self, role: str, content: str):
+        self.recent_messages.append({"role": role, "content": content})
+
+        # 达到阈值时生成摘要
+        if len(self.recent_messages) >= self.summary_threshold:
+            self._generate_summary()
+            self.recent_messages = []  # 清空只保留摘要
+
+    def _generate_summary(self):
+        """调用LLM生成摘要"""
+        prompt = f"请简要总结以下对话的核心要点（不超过100字）：\n"
+        for msg in self.recent_messages:
+            prompt += f"{msg['role']}: {msg['content']}\n"
+
+        self.summary = self.llm.call(prompt)
+        print(f"📝 生成摘要: {self.summary}")
+
+    def get_context(self) -> list:
+        context = [{"role": "system", "content": f"会话摘要: {self.summary}"}]
+        context.extend(self.recent_messages)
+        return context</code></pre>
+                </div>
+            </div>
+
+            <h4 style="margin: 1.5rem 0 1rem;">💾 永久记忆（跨会话）</h4>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="card">
+                    <h5 style="margin-bottom: 0.5rem;">🗄️ 1）向量数据库存储</h5>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 0.75rem;">
+                        将重要信息存入向量数据库，支持语义检索。
+                    </p>
+                    <pre class="code-block" style="font-size: 0.8rem;"><code class="language-python">from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.schema import Document
+
+class VectorMemory:
+    """向量数据库记忆"""
+
+    def __init__(self):
+        self.embeddings = OpenAIEmbeddings()
+        self.vectorstore = None
+
+    def add(self, text: str, metadata: dict = None):
+        """添加记忆"""
+        doc = Document(page_content=text, metadata=metadata or {})
+
+        if self.vectorstore is None:
+            self.vectorstore = FAISS.from_documents([doc], self.embeddings)
+        else:
+            self.vectorstore.add_documents([doc])
+
+    def search(self, query: str, k: int = 3) -> list:
+        """语义检索相关记忆"""
+        if self.vectorstore is None:
+            return []
+
+        results = self.vectorstore.similarity_search(query, k=k)
+        return [doc.page_content for doc in results]
+
+    def save(self, path: str):
+        """持久化保存"""
+        self.vectorstore.save_local(path)
+
+    def load(self, path: str):
+        """加载已有记忆"""
+        self.vectorstore = FAISS.load_local(path, self.embeddings)
+
+# 使用示例
+memory = VectorMemory()
+
+# 保存用户偏好
+memory.add(
+    "用户喜欢简洁的技术方案，不喜欢太复杂的架构",
+    metadata={"type": "preference", "topic": "architecture"}
+)
+
+memory.add(
+    "用户主要使用Python开发",
+    metadata={"type": "preference", "topic": "language"}
+)
+
+# 检索相关记忆
+related = memory.search("应该用什么语言开发新项目？")
+# 返回: ["用户主要使用Python开发", ...]</code></pre>
+                </div>
+
+                <div class="card">
+                    <h5 style="margin-bottom: 0.5rem;">📁 2）结构化存储（JSON/SQL）</h5>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 0.75rem;">
+                        适合存储明确的结构化信息（用户信息、配置等）。
+                    </p>
+                    <pre class="code-block" style="font-size: 0.8rem;"><code class="language-python">import json
+from datetime import datetime
+
+class StructuredMemory:
+    """结构化记忆存储"""
+
+    def __init__(self, storage_path: str = "memory.json"):
+        self.storage_path = storage_path
+        self.data = self._load()
+
+    def _load(self) -> dict:
+        try:
+            with open(self.storage_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return {"users": {}, "preferences": {}, "knowledge": []}
+
+    def save(self):
+        with open(self.storage_path, "w", encoding="utf-8") as f:
+            json.dump(self.data, f, ensure_ascii=False, indent=2)
+
+    def set_user_info(self, user_id: str, key: str, value):
+        """保存用户信息"""
+        if user_id not in self.data["users"]:
+            self.data["users"][user_id] = {}
+        self.data["users"][user_id][key] = value
+        self.save()
+
+    def get_user_info(self, user_id: str, key: str, default=None):
+        """获取用户信息"""
+        return self.data["users"].get(user_id, {}).get(key, default)
+
+    def add_knowledge(self, fact: str, category: str):
+        """添加知识"""
+        self.data["knowledge"].append({
+            "fact": fact,
+            "category": category,
+            "timestamp": datetime.now().isoformat()
+        })
+        self.save()
+
+    def get_knowledge(self, category: str = None) -> list:
+        """获取知识"""
+        if category:
+            return [k for k in self.data["knowledge"] if k["category"] == category]
+        return self.data["knowledge"]
+
+# 使用
+memory = StructuredMemory("user_memory.json")
+memory.set_user_info("user_123", "name", "张三")
+memory.set_user_info("user_123", "language", "Python")
+memory.add_knowledge("项目使用FastAPI框架", "tech_stack")
+memory.add_knowledge("数据库是PostgreSQL", "tech_stack")</code></pre>
+                </div>
+
+                <div class="card">
+                    <h5 style="margin-bottom: 0.5rem;">🧠 3）混合记忆系统</h5>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 0.75rem;">
+                        结合短期记忆和长期记忆，根据重要性自动分层。
+                    </p>
+                    <pre class="code-block" style="font-size: 0.8rem;"><code class="language-python">class HybridMemory:
+    """混合记忆系统：短期 + 长期"""
+
+    def __init__(self):
+        # 短期记忆：对话窗口
+        self.short_term = ConversationWindow(max_tokens=2000)
+
+        # 长期记忆：向量存储
+        self.long_term = VectorMemory()
+
+        # 重要信息：需要存入长期记忆
+        self.important_patterns = ["偏好", "喜欢", "讨厌", "记住", "以后"]
+        self.llm = None  # 需要注入LLM用于判断重要性
+
+    def add_message(self, role: str, content: str):
+        # 1. 加入短期记忆
+        self.short_term.add_message(role, content)
+
+        # 2. 判断是否需要存入长期记忆
+        if self._is_important(content):
+            self._store_to_long_term(content, role)
+
+    def _is_important(self, content: str) -> bool:
+        """判断内容是否重要"""
+        # 方式1：关键词匹配
+        for pattern in self.important_patterns:
+            if pattern in content:
+                return True
+        # 方式2：LLM判断（更准确但更慢）
+        # return self.llm.judge_importance(content)
+        return False
+
+    def _store_to_long_term(self, content: str, role: str):
+        """存储到长期记忆"""
+        self.long_term.add(
+            text=f"{role}: {content}",
+            metadata={"timestamp": datetime.now().isoformat()}
+        )
+        print(f"💾 已存入长期记忆: {content[:50]}...")
+
+    def retrieve_context(self, current_query: str) -> list:
+        """获取当前上下文"""
+        # 1. 获取短期记忆（对话历史）
+        short_context = self.short_term.get_context()
+
+        # 2. 检索长期记忆（相关知识）
+        long_context = self.long_term.search(current_query, k=3)
+
+        # 3. 合并
+        result = short_context.copy()
+
+        if long_context:
+            result.append({
+                "role": "system",
+                "content": f"相关记忆: {'; '.join(long_context)}"
+            })
+
+        return result
+
+# 使用
+memory = HybridMemory()
+
+# 对话
+memory.add_message("user", "我叫张三，从事Python开发")
+memory.add_message("assistant", "好的张老师，很高兴认识你！")
+memory.add_message("user", "帮我写个排序算法")  # "从事Python开发"会被存入长期记忆
+
+# 检索
+context = memory.retrieve_context("排序算法")
+# 自动包含用户是Python开发者的信息</code></pre>
+                </div>
+            </div>
+
+            <h4 style="margin: 1.5rem 0 1rem;">⚡ 记忆系统实践要点</h4>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>场景</th>
+                            <th>推荐方案</th>
+                            <th>注意事项</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>单轮问答</td>
+                            <td>无需记忆</td>
+                            <td>简洁高效</td>
+                        </tr>
+                        <tr>
+                            <td>简单多轮对话</td>
+                            <td>对话历史窗口</td>
+                            <td>控制窗口大小</td>
+                        </tr>
+                        <tr>
+                            <td>复杂任务</td>
+                            <td>工作记忆 + 对话摘要</td>
+                            <td>定期压缩</td>
+                        </tr>
+                        <tr>
+                            <td>个性化助手</td>
+                            <td>混合记忆（短期+长期）</td>
+                            <td>向量检索</td>
+                        </tr>
+                        <tr>
+                            <td>知识库问答</td>
+                            <td>RAG（向量检索）</td>
+                            <td>定期更新</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
             <!-- ReAct模式 -->
             <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🔄 ReAct模式</h3>
 

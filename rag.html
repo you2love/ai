@@ -24,6 +24,13 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <!-- 新增文字解释 -->
+                    <div style="margin-bottom: 1.5rem; line-height: 1.6;">
+                        <p><strong>RAG = Retrieval-Augmented Generation（检索增强生成）</strong>，一句话概括：先从知识库里"找资料"，再让 LLM 结合这些资料生成回答。</p>
+                        <p>典型流程：用户提问 → 系统把问题转成向量 → 在向量数据库里检索相似文档块 → 把"问题 + 相关文档"一起丢给 LLM → LLM 基于资料生成答案。</p>
+                        <p>价值在于：1) LLM 的"记忆"有限（上下文长度有限，知识可能过时）；2) RAG 能把企业/私有知识库"外挂"给 LLM，不需要重新训练模型；3) 目前企业落地大模型，RAG 是最主流、最可控的方案。</p>
+                    </div>
+                    
                     <div class="diagram-box">
                         <div class="diagram-title">为什么需要RAG？</div>
                         <div class="diagram-content">
@@ -76,6 +83,40 @@
                 <div class="flow-h-item end">LLM生成</div>
             </div>
 
+            <!-- 新增详细工作流说明 -->
+            <div style="margin-top: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                <h4 style="margin-bottom: 0.75rem;">📋 RAG 完整工作流（程序员视角）</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <h5 style="color: #2c5282; margin-bottom: 0.5rem;">1. 数据准备阶段</h5>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>加载文档（PDF、HTML、Markdown、数据库、API）</li>
+                            <li>文档切分成 nodes/chunks</li>
+                            <li>每个 chunk 通过 Embedding 模型转为向量</li>
+                            <li>将 chunk_id, text, vector, metadata 写入向量数据库</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 style="color: #2c5282; margin-bottom: 0.5rem;">2. 在线服务阶段</h5>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>用户问题 → 文本 → Embedding</li>
+                            <li>在向量数据库中做相似度检索，取出 top_k 个相关 chunk</li>
+                            <li>把这些 chunk 拼成提示词模板发给 LLM</li>
+                            <li>LLM 生成最终答案</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 style="color: #2c5282; margin-bottom: 0.5rem;">3. 优化方向</h5>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                            <li>切分策略优化：chunk 大小、重叠、边界</li>
+                            <li>检索策略：混合检索（关键词 + 向量）、重排、过滤</li>
+                            <li>上下文压缩：对检索结果做摘要或抽取，减少噪音</li>
+                            <li>多轮对话：历史对话也作为上下文参与检索</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <!-- 核心组件 -->
             <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🧩 核心组件</h3>
 
@@ -106,6 +147,55 @@
                 </div>
             </div>
 
+            <!-- 新增核心三要素详解 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🔧 核心三要素详解</h3>
+            <div class="cards-grid">
+                <div class="card">
+                    <h4 style="margin-bottom: 0.75rem;">📄 文档切分（Chunking）</h4>
+                    <p style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
+                        <strong>为什么需要切分？</strong> 文档太长会超出上下文窗口，检索时太粗粒度会带进大量无关噪音。
+                    </p>
+                    <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                        <li><strong>固定长度切分：</strong>按字符/Token 数切，比如 512/1024 token 一块</li>
+                        <li><strong>按语义结构切：</strong>按段落、章节、HTML 结构、Markdown 标题层级切</li>
+                        <li><strong>滑动窗口：</strong>chunk 之间有重叠，避免关键信息被切在边界外</li>
+                    </ul>
+                    <div style="margin-top: 0.75rem; padding: 0.5rem; background: #f0f7ff; border-radius: 4px;">
+                        <strong>程序员要掌握：</strong>根据文档类型选择切分策略，保留元数据（文件名、页码、章节等）方便过滤和溯源。
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h4 style="margin-bottom: 0.75rem;">📐 Embedding（向量化表示）</h4>
+                    <p style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
+                        <strong>Embedding 是把文本变成向量</strong>，让计算机能衡量\"语义相似度\"。
+                    </p>
+                    <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                        <li>同义句在向量空间距离近，不同主题的句子距离远</li>
+                        <li>使用 OpenAI text-embedding-3、bge、m3e 等模型</li>
+                        <li>问题本身也被同样模型 Embedding，再去向量库里找最近邻</li>
+                    </ul>
+                    <div style="margin-top: 0.75rem; padding: 0.5rem; background: #f0f7ff; border-radius: 4px;">
+                        <strong>程序员要掌握：</strong>不同 Embedding 模型的特点（多语言支持、长文本支持、维度大小），成本与性能权衡。
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h4 style="margin-bottom: 0.75rem;">🗄️ 向量数据库（Vector Store）</h4>
+                    <p style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
+                        <strong>专门存\"文本 + 向量\"的数据库</strong>，支持高效的向量相似度检索。
+                    </p>
+                    <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                        <li><strong>常见产品：</strong>Pinecone、Weaviate、Qdrant、Milvus、Chroma、pgvector</li>
+                        <li><strong>核心能力：</strong>插入、查询、过滤</li>
+                        <li><strong>检索参数：</strong>top_k、距离度量（cosine/dot product/l2）、阈值设定</li>
+                    </ul>
+                    <div style="margin-top: 0.75rem; padding: 0.5rem; background: #f0f7ff; border-radius: 4px;">
+                        <strong>程序员要掌握：</strong>如何选型（云托管 vs 自托管、QPS、延迟、成本），如何设计集合/索引。
+                    </div>
+                </div>
+            </div>
+
             <!-- 向量数据库对比 -->
             <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🗄️ 向量数据库对比</h3>
 
@@ -125,6 +215,8 @@
                         <tr><td><strong>Milvus</strong></td><td>本地/云</td><td>大</td><td>分布式、高性能</td></tr>
                         <tr><td><strong>Pinecone</strong></td><td>云服务</td><td>超大</td><td>全托管</td></tr>
                         <tr><td><strong>Qdrant</strong></td><td>本地/云</td><td>大</td><td>Rust、高性能</td></tr>
+                        <tr><td><strong>Weaviate</strong></td><td>本地/云</td><td>大</td><td>GraphQL接口、模块化</td></tr>
+                        <tr><td><strong>pgvector</strong></td><td>PostgreSQL扩展</td><td>中小</td><td>与现有PostgreSQL集成</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -211,8 +303,40 @@
                         <tr><td><strong>上下文过长</strong></td><td>摘要压缩、选择性检索</td></tr>
                         <tr><td><strong>幻觉回答</strong></td><td>增强提示、引用来源</td></tr>
                         <tr><td><strong>速度慢</strong></td><td>缓存、异步处理、向量压缩</td></tr>
+                        <tr><td><strong>切分不理想</strong></td><td>调整chunk大小、重叠、边界，按语义结构切分</td></tr>
+                        <tr><td><strong>检索噪音多</strong></td><td>使用重排序、上下文压缩、元数据过滤</td></tr>
+                        <tr><td><strong>多轮对话效果差</strong></td><td>将历史对话作为上下文参与检索</td></tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- 新增程序员学习重点 -->
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.3rem;">🎯 程序员需要重点掌握什么？</h3>
+            <div class="cards-grid">
+                <div class="card">
+                    <h4 style="margin-bottom: 0.75rem;">🗄️ 向量数据库的使用</h4>
+                    <p style="font-size: 0.85rem; color: #666;">
+                        至少会用一两个（如 Chroma / Qdrant / pgvector），掌握插入、查询、过滤等核心操作。
+                    </p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.75rem;">📐 Embedding 流程</h4>
+                    <p style="font-size: 0.85rem; color: #666;">
+                        如何调用模型、缓存向量、批量处理，了解不同 Embedding 模型的特点和成本。
+                    </p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.75rem;">✂️ 文档切分与预处理</h4>
+                    <p style="font-size: 0.85rem; color: #666;">
+                        对不同数据源设计合理的 ETL 流程，根据文档类型选择切分策略。
+                    </p>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 0.75rem;">🛠️ LangChain / LlamaIndex 抽象</h4>
+                    <p style="font-size: 0.85rem; color: #666;">
+                        掌握 LlamaIndex 的 VectorStoreIndex、Node、Reader 概念，以及 LangChain 的 VectorStore、Retriever、Document 抽象。
+                    </p>
+                </div>
             </div>
 
             <h3>💻 代码示例</h3>

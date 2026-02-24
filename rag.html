@@ -101,20 +101,65 @@
                         <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
                             <li>用户问题 → 文本 → Embedding</li>
                             <li>在向量数据库中做相似度检索，取出 top_k 个相关 chunk</li>
-                            <li>把这些 chunk 拼成提示词模板发给 LLM</li>
+                            <li><strong>把这些 chunk 拼成提示词模板发给 LLM</strong> - 这是RAG最关键的步骤，需要精心设计提示词结构</li>
                             <li>LLM 生成最终答案</li>
                         </ul>
                     </div>
-                    <div>
-                        <h5 style="color: #2c5282; margin-bottom: 0.5rem;">3. 优化方向</h5>
-                        <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
-                            <li>切分策略优化：chunk 大小、重叠、边界</li>
-                            <li>检索策略：混合检索（关键词 + 向量）、重排、过滤</li>
-                            <li>上下文压缩：对检索结果做摘要或抽取，减少噪音</li>
-                            <li>多轮对话：历史对话也作为上下文参与检索</li>
+                </div>
+
+                <!-- 提示词模板实例 - 单独拿出 -->
+                <div style="margin: 1.5rem 0; padding: 1rem; background: #f0f7ff; border-radius: 8px; border-left: 4px solid #2c5282;">
+                    <h6 style="margin-bottom: 1rem; font-size: 1.1rem; color: #2c5282; font-weight: 600;">📝 提示词模板实例：</h6>
+                    <div style="font-family: 'Courier New', monospace; font-size: 0.8rem; background: #1e1e1e; color: #d4d4d4; padding: 0.75rem; border-radius: 4px; overflow-x: auto; white-space: pre-wrap;">
+<strong># 基础RAG提示词模板</strong>
+基于以下上下文信息回答用户的问题。如果上下文不包含相关信息，请说明你不知道。
+
+<strong>上下文：</strong>
+{context}
+
+<strong>用户问题：</strong>
+{question}
+
+<strong>要求：</strong>
+1. 基于上下文信息回答，不要编造信息
+2. 如果上下文中有多个相关信息，请综合回答
+3. 如果无法从上下文中找到答案，请诚实说明
+4. 回答要简洁明了
+
+<strong>回答：</strong>
+
+<strong># 带引用的高级模板</strong>
+你是一个专业的问答助手，请基于以下提供的文档片段回答问题。
+
+<strong>参考文档：</strong>
+{document_chunks}
+
+<strong>用户查询：</strong>
+{query}
+
+<strong>指令：</strong>
+1. 仔细分析每个文档片段与问题的相关性
+2. 只使用提供的文档信息，不要添加外部知识
+3. 在回答中注明信息来源（如：根据文档1第3段...）
+4. 如果信息不足，请说明需要哪些额外信息
+
+<strong>思考过程：</strong>
+首先，我会分析每个文档片段...
+
+<strong>最终答案：</strong>
+                    </div>
+                    <div style="margin-top: 0.75rem; font-size: 0.85rem;">
+                        <strong>关键要点：</strong>
+                        <ul style="margin: 0.25rem 0 0; padding-left: 1.2rem;">
+                            <li>使用 <code>{context}</code>、<code>{question}</code> 等占位符动态填充</li>
+                            <li>明确指示LLM只使用提供的上下文</li>
+                            <li>添加格式要求（如引用来源、结构化输出）</li>
+                            <li>设计"思考链"让LLM展示推理过程</li>
+                            <li>处理"不知道"的情况，避免幻觉</li>
                         </ul>
                     </div>
                 </div>
+
             </div>
 
             <!-- 核心组件 -->

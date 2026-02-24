@@ -455,6 +455,156 @@
 """</code></pre>
             </div>
 
+            <h3>💻 程序员进阶：工程化提示词</h3>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header">🎯 为什么需要"进阶版"提示词？</div>
+                <div class="card-body">
+                    <p style="margin-bottom: 1rem;">你之前理解的是"多轮对话、写文案"，那是<strong>用户级 Prompt Engineering</strong>。<br>
+                    程序员需要的是<strong>代码级 Prompt Engineering</strong>：把 Prompt 当成代码的一部分来设计和管理。</p>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>维度</th>
+                                    <th>用户级</th>
+                                    <th>工程师级</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>使用场景</td><td>日常对话</td><td>企业系统、生产环境</td></tr>
+                                <tr><td>Prompt 管理</td><td>手动输入</td><td>版本化、配置化</td></tr>
+                                <tr><td>动态性</td><td>静态</td><td>根据业务动态拼接</td></tr>
+                                <tr><td>测试</td><td>人工评估</td><td>A/B 测试、自动化评估</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <h4 style="margin: 1.5rem 0 1rem;">🔧 动态拼接与管理</h4>
+
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div class="card">
+                    <div class="card-header">📝 1）Prompt 模板化</div>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem;">使用模板引擎定义 Prompt 模板，预留变量</p>
+                    <pre class="code-block"><code class="language-python">from langchain.prompts import PromptTemplate
+
+template = """
+你是一个企业知识库助手，请根据以下参考资料回答用户问题。
+
+【参考资料】
+{context_str}
+
+【用户问题】
+{question}
+
+请用清晰、简洁的语言回答，并注明引用的文档编号。
+"""
+
+PROMPT = PromptTemplate(
+    input_variables=["context_str", "question"],
+    template=template,
+)</code></pre>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">⚙️ 2）动态组装 Prompt</div>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem;">在 RAG 等场景中，根据检索结果动态拼接</p>
+                    <pre class="code-block"><code class="language-python"># 典型 RAG 流程
+def build_prompt(user_question: str, retrieved_chunks: List[str]) -> str:
+    # 1. 将 chunks 拼成上下文
+    context_str = "\n\n".join([
+        f"[文档{i+1}]\n{chunk}"
+        for i, chunk in enumerate(retrieved_chunks)
+    ])
+
+    # 2. 组装完整 Prompt（包含系统指令、上下文、示例等）
+    prompt = f"""
+你是一个专业的技术问答助手。
+
+【系统指令】
+- 只基于提供的上下文回答，不要编造信息
+- 如果找不到答案，直接说"无法从提供的资料中找到答案"
+- 回答要简洁准确
+
+【上下文】
+{context_str}
+
+【用户问题】
+{user_question}
+
+【输出格式】
+请先给出简短结论，然后详细解释。
+"""
+
+    return prompt</code></pre>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">📊 3）版本管理与实验</div>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem;">把 Prompt 模板放在配置中管理</p>
+                    <pre class="code-block"><code class="language-python"># prompts.yaml
+prompts:
+  v1.0:
+    system: "你是一个助手"
+    temperature: 0.7
+  v1.1:
+    system: "你是一个专业助手，请用简洁语言回答"
+    temperature: 0.5
+  v2.0:
+    system: |
+      你是一个技术专家。
+      - 只基于上下文回答
+      - 如果不确定，说明不知道
+    examples:
+      - input: "什么是API?"
+        output: "API是应用程序接口..."
+    temperature: 0.3
+
+# 使用 A/B 测试
+def get_prompt_variant(user_id: str) -> str:
+    variant = "v2.0" if hash(user_id) % 2 == 0 else "v1.1"
+    return load_prompt_template(variant)</code></pre>
+                </div>
+            </div>
+
+            <h4 style="margin: 1.5rem 0 1rem;">🛡️ 工程要点</h4>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <h4 style="margin-bottom: 0.75rem;">📐 结构化提示词设计</h4>
+                    <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                        <li><strong>Role</strong> - 角色定义</li>
+                        <li><strong>Instruction</strong> - 任务指令</li>
+                        <li><strong>Context</strong> - 上下文信息</li>
+                        <li><strong>Output Format</strong> - 输出格式</li>
+                        <li><strong>Examples</strong> - 示例</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4 style="margin-bottom: 0.75rem;">📄 控制输出结构</h4>
+                    <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                        <li>JSON 格式 - 方便后端解析</li>
+                        <li>Markdown 表格 - 结构化展示</li>
+                        <li>代码块 - 技术文档</li>
+                        <li>结构化字段 - 分类、置信度</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4 style="margin-bottom: 0.75rem;">🔒 安全与合规</h4>
+                    <ul style="font-size: 0.85rem; padding-left: 1.2rem;">
+                        <li>Prompt 注入防护</li>
+                        <li>用户输入长度限制</li>
+                        <li>敏感词过滤</li>
+                        <li>输出内容审核</li>
+                    </ul>
+                </div>
+            </div>
+
             <h3>✅ 最佳实践清单</h3>
 
             <div style="display: flex; flex-direction: column; gap: 1.5rem;">
